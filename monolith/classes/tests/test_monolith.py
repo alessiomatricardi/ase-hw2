@@ -15,4 +15,4 @@ class TestApp(unittest.TestCase):
         app = tested_app.test_client()
         reply = app.get("/")
         result = str(reply.data, 'utf-8')
-        self.assertEqual(result, render_template('index.html', welcome=''))
+        self.assertEqual(result, render_template('index.html', welcome=None))
