@@ -15,7 +15,7 @@ class TestApp(unittest.TestCase):
         app = tested_app.test_client()
         reply = app.get("/")
         result = str(reply.data, 'utf-8')
-        self.assertEqual(result, '< h1 > My Message in a Bottle - - Primer < /h1 > \
+        self.assertEqual(result, '<h1>My Message in a Bottle -- Primer</h1>\
 \
 \
-                         Hi Anonymous, < a href="/login" > Log in < / a >')
+                         Hi Anonymous, <a href="/login">Log in</a>')
