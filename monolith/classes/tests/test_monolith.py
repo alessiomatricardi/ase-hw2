@@ -13,9 +13,6 @@ class TestApp(unittest.TestCase):
 
     def test_homepage(self):  
         app = tested_app.test_client()
-        reply = app.get("/")
-        result = str(reply.data, 'utf-8')
-        self.assertEqual(result, '<h1>My Message in a Bottle -- Primer</h1>\
-\
-\
-                         Hi Anonymous, <a href="/login">Log in</a>')
+        reply = self.app.get("/")
+        self.assert_template_used('index.html')
+        #self.assert_context("greeting", "hello")
