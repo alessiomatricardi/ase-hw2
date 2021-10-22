@@ -13,7 +13,7 @@ class User(db.Model):
     firstname = db.Column(db.Unicode(128))
     lastname = db.Column(db.Unicode(128))
     password = db.Column(db.Unicode(128))
-    date_of_birth = db.Column(db.DateTime)
+    date_of_birth = db.Column(db.Date)
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
     is_anonymous = False
@@ -21,7 +21,7 @@ class User(db.Model):
     def __init__(self, *args, **kw):
         super(User, self).__init__(*args, **kw)
         self._authenticated = False
-
+    
     def set_password(self, password):
         self.password = generate_password_hash(password)
 

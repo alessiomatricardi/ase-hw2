@@ -1,0 +1,11 @@
+<h1>My Message in a Bottle -- Account Infos</h1>
+
+{% if current_user.is_authenticated %}
+  First name    : {{ current_user.firstname }} <br>
+  Last name     : {{current_user.lastname}} <br>
+  e-mail        : {{current_user.email}} <br>
+  birth date    : {{current_user.date_of_birth}} <br>
+
+{% else %}
+  <p>Hi Anonymous, what are you searching for???</p>
+{% endif %}

@@ -11,4 +11,15 @@ def index():
         welcome = "Logged In!"
     else:
         welcome = None
-    return render_template("index.html", welcome=welcome)
+    return render_template("index.html", welcome = welcome)
+
+# show the account information
+@home.route('/account_info')
+def account_info():
+    if current_user is not None and hasattr(current_user, 'id'):
+        # show info
+        return render_template("account_info.html")
+    else:
+        # TODO
+        # user does not exists
+        return render_template("error_page.html")
