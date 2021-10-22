@@ -12,7 +12,7 @@ class TestApp(unittest.TestCase):
     # TODO REMEMBER TO DEFINE SINGLE TESTS METHODS PER EACH FUNCTIONALITY
 
     def test_homepage(self):  
-        app = tested_app.test_client()
+        self.app = tested_app.test_client()
         reply = self.app.get("/")
         self.assert_template_used('index.html')
         #self.assert_context("greeting", "hello")
