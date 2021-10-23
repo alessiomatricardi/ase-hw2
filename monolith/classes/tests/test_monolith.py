@@ -1,13 +1,11 @@
-import json
-import unittest
-
-from flask.templating import render_template
+#from flask.templating import render_template
+from flask.testing import TestCase
 
 from monolith import app as tested_app
 
 #tested_app.testing = True
 
-class TestApp(unittest.TestCase):
+class TestApp(TestCase):
 
     # TODO REMEMBER TO DEFINE SINGLE TESTS METHODS PER EACH FUNCTIONALITY
 
