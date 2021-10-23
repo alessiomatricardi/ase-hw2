@@ -26,11 +26,11 @@ class User(db.Model):
     '''
 
     # Relatioships with other classes
-    # sent_messages = db.relationship('Messages', backref='sender', lazy=True)
-    # received_messages = db.relationship('Message_Recipients', backref='recipient', lazy=True)
-    # reported_messages = db.relationship('Reports', backref='reporter', lazy=True)
-    # blocked_users = db.relationship('Blacklist', backref='blocked', lazy=True)
-    # blocking_users = db.relationship('Blacklist', backref='blocking', lazy=True)
+    sent_messages = db.relationship('Message', backref='sender', lazy=True)
+    received_messages = db.relationship('Message_Recipient', backref='recipient', lazy=True)
+    reported_messages = db.relationship('Report', backref='reporter', lazy=True)
+    # blocked_users = db.relationship('Blacklist', backref='blocked', foreign_keys='blocked_user_id', lazy=True)
+    # blocking_users = db.relationship('Blacklist', backref='blocking', foreign_keys='blocking_user_id', lazy=True)
 
     def __init__(self, *args, **kw):
         super(User, self).__init__(*args, **kw)
@@ -63,8 +63,8 @@ class Message(db.Model):
     deliver_time = db.Column(db.DateTime)
 
     # Relatioship with other classes
-    # recipients = db.relationship('Message_Recipients', backref='message', lazy=True)
-    # reports = db.relationship('Reports', backref='message_report', lazy=True)
+    recipients = db.relationship('Message_Recipient', backref='message', lazy=True)
+    reports = db.relationship('Report', backref='message_report', lazy=True)
 
     def __init__(self, *args, **kw):
         super(Message, self).__init__(*args, **kw)
@@ -118,13 +118,9 @@ class Report(db.Model):
         ),
     )
 
-    '''
+
     def __init__(self, *args, **kw):
-        super(Reports, self).__init__(*args, **kw)
-   
-    def get_reporting_user_id(self):
-        return selg.reporting_user_id
-    '''
+        super(Report, self).__init__(*args, **kw)
 
 
 class Blacklist (db.Model):
@@ -139,3 +135,6 @@ class Blacklist (db.Model):
             blocking_user_id, blocked_user_id,
         ),
     )
+
+    def __init__(self, *args, **kw):
+        super(Blacklist, self).__init__(*args, **kw)
