@@ -1,4 +1,3 @@
-from flask.testing import TestCase
 import unittest
 
 from monolith import app as tested_app
