@@ -26,11 +26,11 @@ class User(db.Model):
     '''
 
     # Relatioships with other classes
-    sent_messages = db.relationship('Messages', backref='sender', lazy=True)
-    received_messages = db.relationship('Message_Recipients', backref='recipient', lazy=True)
-    reported_messages = db.relationship('Reports', backref='reporter', lazy=True)
-    blocked_users = db.relationship('Blacklist', backref='blocked', lazy=True)
-    blocking_users = db.relationship('Blacklist', backref='blocking', lazy=True)
+    # sent_messages = db.relationship('Messages', backref='sender', lazy=True)
+    # received_messages = db.relationship('Message_Recipients', backref='recipient', lazy=True)
+    # reported_messages = db.relationship('Reports', backref='reporter', lazy=True)
+    # blocked_users = db.relationship('Blacklist', backref='blocked', lazy=True)
+    # blocking_users = db.relationship('Blacklist', backref='blocking', lazy=True)
 
     def __init__(self, *args, **kw):
         super(User, self).__init__(*args, **kw)
@@ -59,12 +59,12 @@ class Messages(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     content = db.Column(db.Unicode(700), nullable=False)
-    is_sent = db.Column(db.boolean, default=False)
+    is_sent = db.Column(db.Boolean, default=False)
     deliver_time = db.Column(db.DateTime)
 
     # Relatioship with other classes
-    recipients = db.relationship('Message_Recipients', backref='message', lazy=True)
-    reports = db.relationship('Reports', backref='message', lazy=True)
+    # recipients = db.relationship('Message_Recipients', backref='message', lazy=True)
+    # reports = db.relationship('Reports', backref='message_report', lazy=True)
 
     def __init__(self, *args, **kw):
         super(Messages, self).__init__(*args, **kw)
@@ -79,11 +79,11 @@ class Messages(db.Model):
         return self.id
 
 
-class Message_Recipients(db.model):
+class Message_Recipients(db.Model):
 
     __tablename__ = 'message_recipients'
 
-    id = db.Column(db.Integer, db.ForeignKey('message.id'), nullable=False)
+    id = db.Column(db.Integer, db.ForeignKey('messages.id'), nullable=False)
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     is_read = db.Column(db.Boolean, default=False)
     read_time = db.Column(db.DateTime)
@@ -104,13 +104,13 @@ class Message_Recipients(db.model):
         return self.recipient_id
 
 
-class Reports(db.model):
+class Reports(db.Model):
 
     __tablename__ = 'reports'
 
     reporting_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     message_id = db.Column(db.Integer, db.ForeignKey('messages.id'), nullable=False)
-    report_time = db.Column(db.Datetime)
+    report_time = db.Column(db.DateTime)
 
     __table_args__ = (
         db.PrimaryKeyConstraint(
