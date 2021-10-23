@@ -20,7 +20,7 @@ class User(db.Model):
     has_picture = db.Column(db.Boolean, default=False)  # has the user a personal profile picture
 
     '''
-    2nd priority stuffs
+    TODO 2nd priority stuffs
     lottery_points = db.Column(db.integer, default=0)
     content_filter_enabled = db.Column(db.Boolean, default=False)
     '''
@@ -52,9 +52,9 @@ class User(db.Model):
         return self.id
 
 
-class Messages(db.Model):
+class Message(db.Model):
 
-    __tablename__ = 'messages'
+    __tablename__ = 'message'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -67,7 +67,7 @@ class Messages(db.Model):
     # reports = db.relationship('Reports', backref='message_report', lazy=True)
 
     def __init__(self, *args, **kw):
-        super(Messages, self).__init__(*args, **kw)
+        super(Message, self).__init__(*args, **kw)
 
     def set_sender(self, id):
         self.sender_id = id
@@ -79,11 +79,11 @@ class Messages(db.Model):
         return self.id
 
 
-class Message_Recipients(db.Model):
+class Message_Recipient(db.Model):
 
-    __tablename__ = 'message_recipients'
+    __tablename__ = 'message_recipient'
 
-    id = db.Column(db.Integer, db.ForeignKey('messages.id'), nullable=False)
+    id = db.Column(db.Integer, db.ForeignKey('message.id'), nullable=False)
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     is_read = db.Column(db.Boolean, default=False)
     read_time = db.Column(db.DateTime)
@@ -95,7 +95,7 @@ class Message_Recipients(db.Model):
     )
 
     def __init__(self, *args, **kw):
-        super(Message_Recipients, self).__init__(*args, **kw)
+        super(Message_Recipient, self).__init__(*args, **kw)
 
     def get_id(self):
         return self.id
@@ -104,12 +104,12 @@ class Message_Recipients(db.Model):
         return self.recipient_id
 
 
-class Reports(db.Model):
+class Report(db.Model):
 
-    __tablename__ = 'reports'
+    __tablename__ = 'report'
 
     reporting_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    message_id = db.Column(db.Integer, db.ForeignKey('messages.id'), nullable=False)
+    message_id = db.Column(db.Integer, db.ForeignKey('message.id'), nullable=False)
     report_time = db.Column(db.DateTime)
 
     __table_args__ = (
@@ -139,21 +139,3 @@ class Blacklist (db.Model):
             blocking_user_id, blocked_user_id,
         ),
     )
-
-
-"""
-__table_args__ = (
-    db.PrimaryKeyConstraint(
-        transaction_id, customer_id,
-        ),
-    )
-
-
-__table_args__ = (
-        db.ForeignKeyConstraint(
-            ['pptr_perf_id', 'pptr_plan_id', 'pptr_tran_id'],
-            ['perfil.perf_id', 'plano.plan_id', 'transacao.tran_id'],
-            ['fk_Perfil_Plano_Transacao_Perfil1', 'fk_Perfil_Plano_Transacao_Plano1', 'fk_Perfil_Plano_Transacao_Transacao1']
-        ),
-    )
-"""
