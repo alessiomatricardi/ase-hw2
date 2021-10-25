@@ -10,11 +10,14 @@
       {% for msg in messages: %}
       <li>
 
-        {% for user in users: %} {% if user.id == msg.sender_id %}  From: {{user.email}} {% endif %} {% endfor %}
+        <p>{% for user in users: %} {% if user.id == msg.sender_id %}  From: {{user.email}} {% endif %} {% endfor %}</p>
 
-        {% for recipient in msg.recipients: %} {% for user in users: %} {% if user.id == recipient.recipient_id %}  to: {{user.email}} {% endif %} {% endfor %} {% endfor %}
+        <p>{% for recipient in msg.recipients: %} {% for user in users: %} {% if user.id == recipient.recipient_id %}  to: {{user.email}} {% endif %} {% endfor %} {% endfor %}</p>
+
+        <p>Deliver time: {{msg.deliver_time}}</p>
 
         <p>{{msg.content}}</p>
+        <p> <button onclick="location.href = '/message?value='+{{msg.id}};" id="homeButton" class="float-left submit-button" >Open</button></p>
       </li>
       
       {% endfor %}

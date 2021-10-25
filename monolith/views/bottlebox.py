@@ -6,6 +6,7 @@ from monolith.auth import current_user
 
 import datetime
 
+
 bottlebox = Blueprint('bottlebox', __name__)
 
 @bottlebox.route('/bottlebox',methods=['GET'])
@@ -18,7 +19,7 @@ def retrieving_bottlebox():
         if v == "home":
             return render_template('bottlebox_home.html')
         
-        today = datetime.date.today()
+        today = datetime.datetime.today()
         all_users = db.session.query(User).where(User.is_admin == False)
         msg = []
 
