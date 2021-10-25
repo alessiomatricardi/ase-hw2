@@ -63,7 +63,7 @@ class Message(db.Model):
     deliver_time = db.Column(db.DateTime)
 
     # Relatioship with other classes
-    recipients = db.relationship('Message_Recipient', backref='message', lazy=True)
+    recipients = db.relationship('Message_Recipient', backref='message_recipient.recipient_id', lazy=True)
     reports = db.relationship('Report', backref='message_report', lazy=True)
 
     def __init__(self, *args, **kw):
