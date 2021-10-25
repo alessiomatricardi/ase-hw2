@@ -1,16 +1,17 @@
 import wtforms as f
 from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired
+from wtforms.fields.html5 import EmailField
+from wtforms.validators import DataRequired, Email
 
 
 class LoginForm(FlaskForm):
-    email = f.StringField('email', validators=[DataRequired()])
+    email = EmailField('email', validators=[DataRequired(), Email()])
     password = f.PasswordField('password', validators=[DataRequired()])
     display = ['email', 'password']
 
 
 class UserForm(FlaskForm):
-    email = f.StringField('email', validators=[DataRequired()])
+    email = EmailField('email', validators=[DataRequired(), Email()])
     firstname = f.StringField('firstname', validators=[DataRequired()])
     lastname = f.StringField('lastname', validators=[DataRequired()])
     password = f.PasswordField('password', validators=[DataRequired()])
