@@ -1,0 +1,24 @@
+<html>
+ <body>
+     <h1>Unregister Confirmation</h1>
+     <h2> {{user.firstname}}, are you sure you really want to unregister yourself? If so insert your password and confirm</h2>
+  <form action="" method="POST">
+    {{ form.hidden_tag() }}
+    <dl>
+     {% for field in form.display %}
+     <dt>{{ form[field].label }}</dt>
+     <dd>{{ form[field]() }}</dd>
+       {% if form[field].errors %}
+          {% for e in form[field].errors %}
+           <p class="help-block">{{ e }}</p>
+          {% endfor %}
+       {% endif %}
+     {% endfor %}
+    </dl>
+    <p>
+    <input type=submit value="Confirm">
+  </form>
+  <button onclick="location.href = '/';" id="home_button" class="float-left submit-button">Home</button>
+  <button onclick="location.href = '/account_info';" id="account_info_button" class="float-left submit-button">Go back</button>
+ </body>
+</html>

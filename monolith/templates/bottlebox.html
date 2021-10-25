@@ -1,0 +1,30 @@
+<!-- 127.0.0.1:5000/bottlebox?value=home
+127.0.0.1:5000/bottlebox?value=received
+127.0.0.1:5000/bottlebox?value=sent
+127.0.0.1:5000/bottlebox?value=pending -->
+
+<html>
+  <body>
+    <h1>{{value}} Bottlebox</h1>
+    <ul>
+      {% for msg in messages: %}
+      <li>
+
+        <p>{% for user in users: %} {% if user.id == msg.sender_id %}  From: {{user.email}} {% endif %} {% endfor %}</p>
+
+        <p>{% for recipient in msg.recipients: %} {% for user in users: %} {% if user.id == recipient.recipient_id %}  to: {{user.email}} {% endif %} {% endfor %} {% endfor %}</p>
+
+        <p>Deliver time: {{msg.deliver_time}}</p>
+
+        <p>{{msg.content}}</p>
+        <p> <button onclick="location.href = '/message?value='+{{msg.id}};" id="homeButton" class="float-left submit-button" >Open</button></p>
+      </li>
+      
+      {% endfor %}
+    </ul>
+    <button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
+  
+    <button onclick="location.href = '/test_message';" id="homeButton" >Add message</button>
+
+  </body>
+</html>
