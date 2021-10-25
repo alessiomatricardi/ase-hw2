@@ -6,9 +6,10 @@
       <li>
       {{user.firstname}} {{user.lastname}} {{user.email}}  
       <button onclick="location.href = '/writeto?recipient='+{{user.id}};" id="homeButton" class="float-left submit-button">Write to</button> 
-      <button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
       </li>
+      
       {% endfor %}
     </ul>
+    <button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
   </body>
 </html>

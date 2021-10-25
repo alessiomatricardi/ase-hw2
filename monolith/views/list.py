@@ -9,7 +9,7 @@ list = Blueprint('list', __name__)
 @list.route('/recipients_list',methods=['GET'])
 def users_list():
        
-    # checking if there'is a logged user
+    # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
         
         # retrieving the list of non admin users, active users, without current_user 
