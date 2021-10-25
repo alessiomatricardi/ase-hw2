@@ -10,15 +10,16 @@ class LoginForm(FlaskForm):
 
 
 class UserForm(FlaskForm):
-    # TODO need to check if the email has the correct format e.g.
-    # something @ domain . it/com/co.uk/etc etc...
-    # investigate if there is a library to have the work done
     email = f.StringField('email', validators=[DataRequired()])
     firstname = f.StringField('firstname', validators=[DataRequired()])
     lastname = f.StringField('lastname', validators=[DataRequired()])
     password = f.PasswordField('password', validators=[
         DataRequired(), 
+        # this allow us to check the password on server-side
         Length(min = 8, message = 'Password must be at least %(min)d characters'),
-        ])
+        ],
+        # this add minlength attribute to the <input> rendered, for client-side check
+        render_kw = {'minlength' : '8'}
+        )
     date_of_birth = f.DateField('date_of_birth', format='%d/%m/%Y')
     display = ['email', 'firstname', 'lastname', 'password', 'date_of_birth']
