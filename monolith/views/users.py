@@ -1,10 +1,26 @@
-from flask import Blueprint, redirect, render_template, request
+from flask import Blueprint, redirect, render_template, request, abort
 
 from monolith.database import User, db
 from monolith.forms import UserForm
 
-users = Blueprint('users', __name__)
+class EmailAlreadyUsedError(Exception):
+    def __init__(self, value):
+        self.value = value
 
+    def __str__(self):
+        return repr(self.value)
+
+def check_existing_user(email):
+    check = db.session.query(User).where(User.email == email).count()
+
+    if check != 0:
+        raise EmailAlreadyUsedError('You must use a different email, this one has already been used')
+    else:
+        return None
+
+
+
+users = Blueprint('users', __name__)
 
 @users.route('/users')
 def _users():
@@ -25,6 +41,11 @@ def create_user():
             where x is in [md5, sha1, bcrypt], the hashed_password should be = x(password + s) where
             s is a secret key.
             """
+            try:
+                check_existing_user(new_user.email)
+            except EmailAlreadyUsedError:
+                abort(400,"This email has already been used in a previous registration, please register with another email.") 
+
             new_user.set_password(form.password.data)
             db.session.add(new_user)
             db.session.commit()
