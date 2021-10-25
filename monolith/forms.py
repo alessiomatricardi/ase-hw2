@@ -1,6 +1,6 @@
 import wtforms as f
 from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length
 
 
 class LoginForm(FlaskForm):
@@ -16,6 +16,9 @@ class UserForm(FlaskForm):
     email = f.StringField('email', validators=[DataRequired()])
     firstname = f.StringField('firstname', validators=[DataRequired()])
     lastname = f.StringField('lastname', validators=[DataRequired()])
-    password = f.PasswordField('password', validators=[DataRequired()])
+    password = f.PasswordField('password', validators=[
+        DataRequired(), 
+        Length(min = 8, message = 'Password must be at least %(min)d characters'),
+        ])
     date_of_birth = f.DateField('date_of_birth', format='%d/%m/%Y')
     display = ['email', 'firstname', 'lastname', 'password', 'date_of_birth']

@@ -29,6 +29,9 @@ def create_user():
             db.session.add(new_user)
             db.session.commit()
             return redirect('/users')
+        else:
+            # something was wrong, when the page reloads it will show the error message
+            return render_template('create_user.html', form=form)
     elif request.method == 'GET':
         return render_template('create_user.html', form=form)
     else:
