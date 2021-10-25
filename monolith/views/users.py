@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request, abort
+from flask import Blueprint, redirect, render_template, request
 
 from monolith.database import User, db
 from monolith.forms import UserForm
