@@ -1,3 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <p> Select one or more recipients:</p>
+        {{ form.recipients }}
+        <p> Insert the text of the message:</p>
+        {{ form.content }}
+        <p>
+          <input type="submit" name="submit" value="Insert into a bottle"></input>
+        </p>
+        <p>
+          <input type="submit" name="submit" value="Save draft"></input>
+        </p>
+    </form>
+    <form method="get" action="/">
+      <input type="submit" value="Back"></input>
+    </form>
+  
+</body>
+</html>
+
+<!--
 <html>
  <body>
   <form action="" method="POST">
@@ -15,7 +39,9 @@
     </dl>
     <p>
     <input type=submit value="Publish">
-    <!-- TODO: add the input bottons to save the draft and to go back in the previous page -->
+    TODO: add the input bottons to save the draft and to go back in the previous page
   </form>
- </body>
+</body>
 </html>
+-->
+
