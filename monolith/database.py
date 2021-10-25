@@ -1,6 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 
+# default library salt length is 8
+# adjusting it to 16 allow us to improve the strongness of the password
+_SALT_LENGTH = 16
+
 db = SQLAlchemy()
 
 
@@ -37,7 +41,12 @@ class User(db.Model):
         self._authenticated = False
 
     def set_password(self, password):
-        self.password = generate_password_hash(password)
+        '''
+        According to https://werkzeug.palletsprojects.com/en/2.0.x/utils/#werkzeug.security.generate_password_hash
+        generate_password_hash returns a string in the format below
+        pbkdf2:sha256:num_of_iterations$salt$hash
+        '''
+        self.password = generate_password_hash(password, salt_length = _SALT_LENGTH)
 
     @property
     def is_authenticated(self):

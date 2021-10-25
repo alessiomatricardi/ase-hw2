@@ -5,11 +5,12 @@
     <dl>
      {% for field in form.display %}
      <dt>{{ form[field].label }}</dt>
-     <dd>{{ form[field]() }}</dd>
+     <dd>{{ form[field]() }}
        {% if form[field].errors %}
           {% for e in form[field].errors %}
-           <p class="help-block">{{ e }}</p>
+           <li class="help-block" style="color: red;">{{ e }}</li>
           {% endfor %}
+     </dd>
        {% endif %}
      {% endfor %}
     </dl>
