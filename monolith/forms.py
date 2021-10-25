@@ -16,3 +16,9 @@ class UserForm(FlaskForm):
     password = f.PasswordField('password', validators=[DataRequired()])
     date_of_birth = f.DateField('date_of_birth', format='%d/%m/%Y')
     display = ['email', 'firstname', 'lastname', 'password', 'date_of_birth']
+
+# class used to write a new message and decide the recipients
+class MessageForm(FlaskForm):
+    recipient = f.SelectMultipleField('recipient', validators=[DataRequired()]) # TODO change in a way that there could be more recipients
+    content = f.TextAreaField('content', validators=[DataRequired()])
+    display = ['recipient', 'content']
