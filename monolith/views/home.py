@@ -22,4 +22,4 @@ def account_info():
     else:
         # TODO
         # user does not exists
-        return render_template("error_page.html")
+        return redirect("/login")

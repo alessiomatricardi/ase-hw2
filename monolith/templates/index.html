@@ -1,9 +1,15 @@
-<h1>My Message in a Bottle -- Primer</h1>
+<html>
+  <body><h1>My Message in a Bottle -- Primer</h1>
 
 {% if current_user.is_authenticated %}
-  Hi {{ current_user.firstname }}! <a href="/logout">Logout</a>
+  Hi {{ current_user.firstname }}! 
+    <button onclick="location.href = '/recipients_list';" id="recipient_list_button" class="float-left submit-button">Recipients List</button>
+    <button onclick="location.href = '/bottlebox?value=home';" id="logout_button" class="float-left submit-button">Bottleboxes</button>
+    <button onclick="location.href = '/logout';" id="logout_button" class="float-left submit-button">Logout</button>
+    <button onclick="location.href = '/account_info';" id="logout_button" class="float-left submit-button">Account Info</button>
     <h2>{{ welcome }}</h2>
 
 {% else %}
-  Hi Anonymous, <a href="/login">Log in</a>
+  Hi Anonymous, <a href="/login">Log in</a> or <a href="/create_user">Register yourself</a>
 {% endif %}
+</body></html>

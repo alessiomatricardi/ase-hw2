@@ -1,6 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 
+# default library salt length is 8
+# adjusting it to 16 allow us to improve the strongness of the password
+_SALT_LENGTH = 16
+
 db = SQLAlchemy()
 
 
@@ -9,7 +13,7 @@ class User(db.Model):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    email = db.Column(db.Unicode(128), nullable=False)
+    email = db.Column(db.Unicode(128), unique=True, nullable=False)
     firstname = db.Column(db.Unicode(128))
     lastname = db.Column(db.Unicode(128))
     password = db.Column(db.Unicode(128))
@@ -37,7 +41,12 @@ class User(db.Model):
         self._authenticated = False
 
     def set_password(self, password):
-        self.password = generate_password_hash(password)
+        '''
+        According to https://werkzeug.palletsprojects.com/en/2.0.x/utils/#werkzeug.security.generate_password_hash
+        generate_password_hash returns a string in the format below
+        pbkdf2:sha256:num_of_iterations$salt$hash
+        '''
+        self.password = generate_password_hash(password, salt_length = _SALT_LENGTH)
 
     @property
     def is_authenticated(self):
@@ -63,7 +72,7 @@ class Message(db.Model):
     deliver_time = db.Column(db.DateTime)
 
     # Relatioship with other classes
-    recipients = db.relationship('Message_Recipient', backref='message', lazy=True)
+    recipients = db.relationship('Message_Recipient', backref='message_recipient.recipient_id', lazy=True)
     reports = db.relationship('Report', backref='message_report', lazy=True)
 
     def __init__(self, *args, **kw):
