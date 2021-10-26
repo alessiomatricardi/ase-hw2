@@ -3,6 +3,8 @@ from flask import Blueprint, redirect, render_template, request, abort
 from monolith.database import User, db
 from monolith.forms import UserForm
 
+from flask_login import current_user
+
 # defining exception error for handling the registration with duplicate email
 class EmailAlreadyUsedError(Exception):
     def __init__(self, value):
@@ -30,8 +32,12 @@ def _users():
     return render_template("users.html", users=_users)
 
 
-@users.route('/create_user', methods=['POST', 'GET'])
-def create_user():
+@users.route('/register', methods=['POST', 'GET'])
+def register():
+    # if the user is already logged in, redirect him to homepage
+    if current_user is not None and hasattr(current_user, 'id'):
+        return redirect('/')
+
     form = UserForm()
 
     if request.method == 'POST':
@@ -56,8 +62,8 @@ def create_user():
             db.session.commit()
             return redirect('/users')
         # validation failed, when the page reloads it will show the specific error message
-        return render_template('create_user.html', form=form)
+        return render_template('register.html', form=form)
     elif request.method == 'GET':
-        return render_template('create_user.html', form=form)
+        return render_template('register.html', form=form)
     else:
         raise RuntimeError('This should not happen!')
