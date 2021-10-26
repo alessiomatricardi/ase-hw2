@@ -1,6 +1,7 @@
 # this class contains all the logic required to handle messages
 from monolith.database import Blacklist, db, Message, Message_Recipient, User, Blacklist
 import datetime
+from .background import celery
 
 class Message_logic:
     
@@ -62,3 +63,10 @@ class Message_logic:
         #
         
         return True # TODO decide the return value depending on tests 
+
+    @celery.task(name="new_message.send_notification")
+    def send_notification(sender_email, recipients_list):
+        for recipient_email in recipients_list:
+            print("email sent to: " + recipient_email) # TODO send email OR popup
+            
+        return "Notifications sent"

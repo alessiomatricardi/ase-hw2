@@ -1,10 +1,11 @@
 from flask import Blueprint, redirect, render_template, request, json
 from flask.helpers import flash, url_for
-from flask.signals import request_finished
+from flask.signals import message_flashed, request_finished
 from sqlalchemy.sql.elements import Null
 from monolith.database import Message, Message_Recipient, db
 from monolith.forms import MessageForm
 import datetime
+from monolith.tasks.new_message_tasks import send_notification
 
 from monolith.auth import current_user
 
@@ -63,6 +64,8 @@ def new_message():
 
                 if form['submit'] == 'Send bottle': 
                     msg_logic.send_bottle(message) 
+                    seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
+                    msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
                 
                 # if form['submit'] == 'Save draft' it will only redirect
                 return redirect("/") 
