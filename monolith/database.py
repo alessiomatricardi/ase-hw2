@@ -59,7 +59,7 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     content = db.Column(db.Unicode(700), nullable=False)
-    is_sent = db.Column(db.Boolean, default=False)
+    is_sent = db.Column(db.Boolean, default=False) 
     deliver_time = db.Column(db.DateTime)
 
     # Relatioship with other classes

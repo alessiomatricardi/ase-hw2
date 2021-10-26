@@ -24,13 +24,6 @@ class MultiCheckboxField(SelectMultipleField):
     option_widget = widgets.CheckboxInput()
 
 class MessageForm(FlaskForm):
-    string_of_recipients = ['1\r\n2\r\n3\r\n']
-    list_of_recipients = string_of_recipients[0].split()
-    # create a list of value/description tuples
-    recipients_pair = [(x, x) for x in list_of_recipients]
-    recipients = MultiCheckboxField('Label', choices=recipients_pair) # TODO write javascript script that set/remove the required attribute from the checkist
+    recipients = MultiCheckboxField('Label', choices=[]) # TODO write javascript script that set/remove the required attribute from the checkist
     content = f.TextAreaField('content', validators=[DataRequired()])
-    #display = ['recipient', 'content']
-
-class BottleForm(FlaskForm):
-    deliver_time = f.DateTimeField('deliver_time', validators=[DataRequired()])
+    deliver_time = f.DateTimeField('deliver_time', validators=[DataRequired()], format="%d-%m-%Y, %H:%M")

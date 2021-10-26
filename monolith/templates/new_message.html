@@ -2,13 +2,22 @@
 <html lang="en">
 <body>
     <form method="post">
+        {% with msg = get_flashed_messages() %}
+          {% if msg %}
+              <p>{{ msg[0] }}</p>
+          {% endif %}
+        {% endwith %}
         {{ form.hidden_tag() }}
         <p> Select one or more recipients:</p>
         {{ form.recipients }}
         <p> Insert the text of the message:</p>
         {{ form.content }}
         <p>
-          <input type="submit" name="submit" value="Insert into a bottle"></input>
+          <label for="deliver_time">Deliver time</label>
+          <input type="datetime-local" id="deliver_time" name="deliver_time">
+        </p>
+        <p>
+          <input type="submit" name="submit" value="Send bottle"></input>
         </p>
         <p>
           <input type="submit" name="submit" value="Save draft"></input>
