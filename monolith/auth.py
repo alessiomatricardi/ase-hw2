@@ -17,6 +17,7 @@ def admin_required(func):
     return _admin_required
 
 
+# what is its utility ????
 @login_manager.user_loader
 def load_user(user_id):
     user = User.query.get(user_id)

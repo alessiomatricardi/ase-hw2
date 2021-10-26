@@ -28,10 +28,14 @@ class TestApp(unittest.TestCase):
         #self.assertEqual(response.status_code, 200)
         
         assert b'email' in response.data # returns to the login page, without the password inserted
-
         app = tested_app.test_client()
-        data2 = { "email" : "example@example.com" , "password" : "admin" } # correct password
-        response = app.post("/login", data = data2 , content_type='html/text')
+        data2 = { 'email' : 'example@example.com' , 'password' : 'admin' } # correct password
+        response = app.post(
+            "/login", 
+            data = data2 , 
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+            )
         #response = app.get("/", content_type='html/text')
 
         #self.assertEqual(response.status_code, 200)
