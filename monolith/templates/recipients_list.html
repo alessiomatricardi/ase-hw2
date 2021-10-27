@@ -5,7 +5,7 @@
       {% for user in users: %}
       <li>
       {{user.firstname}} {{user.lastname}} {{user.email}}  
-      <button onclick="location.href = '/writeto?recipient='+{{user.id}};" id="homeButton" class="float-left submit-button">Write to</button> 
+      <button onclick="location.href = '/new_message?single_recipient={{user.email}}';" id="homeButton" class="float-left submit-button">Write to</button> 
       </li>
       
       {% endfor %}

@@ -2,6 +2,7 @@
 from monolith.database import Blacklist, db, Message, Message_Recipient, User, Blacklist
 import datetime
 from .background import celery
+from monolith.list_logic import ListLogic
 
 class MessageLogic:
     
@@ -10,11 +11,9 @@ class MessageLogic:
 
     # create a STRING of recipients' emails to be usedwhen sending a message
     def get_list_of_recipients_email(self, sender_id):
-        list_of_recipients = db.session.query(User).filter(User.id != sender_id).all()
-        #
-        # TODO check if some recipient is in the black list
-        # TODO merge with file of Marco/RiccardoB – KEEP ATTENTION TO THE CHECKS (e.g., user not in blacklist)
-        #
+        
+        list_logic = ListLogic()
+        list_of_recipients = list_logic.retrieving_recipients(sender_id)
         return [(recipient.email, recipient.email) for recipient in list_of_recipients]
 
 

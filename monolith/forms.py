@@ -33,7 +33,7 @@ class MultiCheckboxField(SelectMultipleField):
     option_widget = widgets.CheckboxInput()
 
 class MessageForm(FlaskForm):
-    recipients = MultiCheckboxField('Label', choices=[]) # TODO write javascript script that set/remove the required attribute from the checkist
+    recipients = MultiCheckboxField('recipients', choices=[]) # TODO write javascript script that set/remove the required attribute from the checkist
     content = f.TextAreaField('content', validators=[DataRequired()])
     deliver_time = f.DateTimeField('deliver_time', validators=[DataRequired()], format="%d-%m-%Y, %H:%M")
 
