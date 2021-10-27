@@ -1,4 +1,3 @@
-from typing import Literal
 from flask import Blueprint, redirect, render_template, request, json
 from flask.helpers import flash, url_for
 from flask.signals import message_flashed, request_finished
