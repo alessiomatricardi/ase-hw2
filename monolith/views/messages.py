@@ -73,10 +73,15 @@ def new_message():
 
                 if form['submit'] == 'Send bottle': 
                     msg_logic.send_bottle(message) 
-                    seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
-                    msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
+
+                    #
+                    # TODO ASK THE PROFESSOR IF IT IS REQUIRED ONLY 1 WORKER TO MANAGE THE SENDING OF
+                    #      NOTIFICATION OR IT CAN BE INSTANCIATED 1 WORKER PER EACH NOTIFICATION
+                    #
+                    # seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
+                    # msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
                 
-                return redirect("/") 
+                return render_template("index.html") 
 
             else:
                 #msg = json.dumps({"msg":"Condition failed on page baz"})
@@ -84,17 +89,6 @@ def new_message():
                 #return redirect(url_for('.do_foo', messages=messages))
                 flash("Please select at least 1 reecipient")
                 return redirect(url_for('.new_message'))
-
-            """
-            TEST
-            import unittest
-            import monolith.Message_logic as m
-            class TestAdd(unittest.TestCase):
-                def test_NAME(self):
-                    # il db è vuoto
-                    result = m.new_message(message)
-                    self.assertEqual(result, {message_id: 1})
-            """
 
         else:
             raise RuntimeError('This should not happen!')

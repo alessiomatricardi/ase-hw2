@@ -57,16 +57,13 @@ class MessageLogic:
         db.session.query(Message).filter(Message.id == message.id).update({'is_sent': True})
         db.session.commit()
 
-        #
-        # TODO implement asynchronous sending of message at a given datetime
-        #
-        
         return True # TODO decide the return value depending on tests 
 
-
+"""
     @celery.task(name="send_notification")
     def send_notification(sender_email, recipients_list):
         for recipient_email in recipients_list:
             print("email sent to: " + recipient_email) # TODO send email OR popup
             
         return "Notifications sent"
+"""
