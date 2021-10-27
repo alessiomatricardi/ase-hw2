@@ -1,3 +1,4 @@
+from typing import Literal
 from flask import Blueprint, redirect, render_template, request, json
 from flask.helpers import flash, url_for
 from flask.signals import message_flashed, request_finished
@@ -25,8 +26,18 @@ def new_message():
         # the user clicks the "new message" in the homepage
         if request.method == 'GET': 
             form = MessageForm()
-            form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id)
-            return render_template('new_message.html', form=form)
+            form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id) 
+            single_recipient = request.args.get('single_recipient') # used to set a checkbox as checked if the recipient is choosen from the recipient list page
+
+            #
+            # TODO add multiple_recipients in case a draft with more than 1 recipient has been saved
+            #      json_var = request.get_json()
+            #      multiple_recipients = json_var['NOME_DELLA_VARIABILE_JSON']
+            #      
+            #      pass multiple recipients into render_template
+            #
+            
+            return render_template('new_message.html', form=form, single_recipient=single_recipient)
 
         # the user submits the form to create the new message ("Send bottle" option)
         elif request.method == 'POST': 

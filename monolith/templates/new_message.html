@@ -9,7 +9,18 @@
         {% endwith %}
         {{ form.hidden_tag() }}
         <p> Select one or more recipients:</p>
-        {{ form.recipients }}
+        <ul>
+          {% for checkbox in form.recipients %}
+          <li>
+            {% if checkbox.data == single_recipient %}
+              <input type="checkbox" name="recipients" value={{checkbox.data}} checked>
+            {% else %}
+                {{ checkbox }}
+            {% endif %}
+            {{ checkbox.data }}
+          </li>
+          {% endfor %}
+        </ul>
         <p> Insert the text of the message:</p>
         {{ form.content }}
         <p>
