@@ -10,5 +10,5 @@ class TestAdd(unittest.TestCase):
         # il db è vuoto
             m = MessageLogic()
             result = m.get_list_of_recipients_email(1) # retrieve all the users that user 1 (admin) can write to
-            expected_result = ("example2@example.com", "example2@example.com")
+            expected_result = ("prova@mail.com", "prova@mail.com")
             self.assertEqual(result[0], expected_result)

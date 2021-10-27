@@ -2,6 +2,9 @@ import unittest
 
 from monolith import app as tested_app
 
+# this allows us to test forms without WTForm token
+tested_app.config['WTF_CSRF_ENABLED'] = False
+
 #tested_app.testing = True
 
 class TestApp(unittest.TestCase):

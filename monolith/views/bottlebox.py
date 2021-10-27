@@ -24,7 +24,7 @@ def bottlebox_home():
 def show_pending():
     today = datetime.datetime.today()
     all_users = db.session.query(User).where(User.is_admin == False)
-    msg = db.session.query(Message).where(Message.sender_id == current_user.id).where(Message.is_sent == True).where(Message.deliver_time > today)
+    msg = db.session.query(Message).where(Message.sender_id == current_user.id).where(Message.is_sent == True).where(Message.is_delivered == False).where(Message.deliver_time > today)
 
     return render_template('bottlebox.html', messages = msg, users = all_users)
 
@@ -33,7 +33,7 @@ def show_pending():
 def show_received():
     today = datetime.datetime.today()
     all_users = db.session.query(User).where(User.is_admin == False)
-    msg = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message_Recipient.recipient_id == current_user.id).where(Message.is_sent == True).where(Message.deliver_time <= today)
+    msg = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message_Recipient.recipient_id == current_user.id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today)
 
     return render_template('bottlebox.html', messages = msg, users = all_users)
 
@@ -42,7 +42,7 @@ def show_received():
 def show_delivered():
     today = datetime.datetime.today()
     all_users = db.session.query(User).where(User.is_admin == False)
-    msg = db.session.query(Message).where(Message.sender_id == current_user.id).where(Message.is_sent == True).where(Message.deliver_time <= today)
+    msg = db.session.query(Message).where(Message.sender_id == current_user.id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today)
 
     return render_template('bottlebox.html', messages = msg, users = all_users)
 
