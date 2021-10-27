@@ -5,7 +5,7 @@
 
 <html>
   <body>
-    <h1>{{value}} Bottlebox</h1>
+    <h1>{{ current_user.firstname }} Bottlebox</h1>
     <ul>
       {% for msg in messages: %}
       <li>
@@ -17,7 +17,7 @@
         <p>Deliver time: {{msg.deliver_time}}</p>
 
         <p>{{msg.content}}</p>
-        <p> <button onclick="location.href = '/message?value='+{{msg.id}};" id="homeButton" class="float-left submit-button" >Open</button></p>
+        <p> <button onclick="location.href = '/message/{{msg.id}}'" id="homeButton" class="float-left submit-button" >Open</button></p>
       </li>
       
       {% endfor %}
