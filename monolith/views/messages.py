@@ -5,13 +5,12 @@ from sqlalchemy.sql.elements import Null
 from monolith.database import Message, Message_Recipient, db
 from monolith.forms import MessageForm
 import datetime
-from monolith.tasks.new_message_tasks import send_notification
 
 from monolith.auth import current_user
 
-from monolith.message_logic import Message_logic # gestisce la logica dei messaggi. 
-                                                 # Ad esempio, la creazione di un nuovo messaggio + 
-                                                 # richiesta al db + ritorna oggetto json per fare il test
+from monolith.message_logic import MessageLogic # gestisce la logica dei messaggi. 
+                                                # Ad esempio, la creazione di un nuovo messaggio + 
+                                                # richiesta al db + ritorna oggetto json per fare il test
 
 messages = Blueprint('messages', __name__)
 
@@ -21,7 +20,7 @@ def new_message():
     # verify that the user is logged in
     if current_user is not None and hasattr(current_user, 'id'):
 
-        msg_logic = Message_logic() 
+        msg_logic = MessageLogic() 
 
         # the user clicks the "new message" in the homepage
         if request.method == 'GET': 

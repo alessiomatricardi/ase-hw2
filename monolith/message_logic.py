@@ -3,7 +3,7 @@ from monolith.database import Blacklist, db, Message, Message_Recipient, User, B
 import datetime
 from .background import celery
 
-class Message_logic:
+class MessageLogic:
     
     def __init__(self):
         pass
@@ -64,7 +64,7 @@ class Message_logic:
         
         return True # TODO decide the return value depending on tests 
 
-    @celery.task(name="new_message.send_notification")
+    @celery.task(name="send_notification")
     def send_notification(sender_email, recipients_list):
         for recipient_email in recipients_list:
             print("email sent to: " + recipient_email) # TODO send email OR popup

@@ -3,7 +3,7 @@ from monolith.database import User, db
 
 BACKEND = BROKER = 'redis://localhost:6379'
 celery = Celery(__name__, backend=BACKEND, broker=BROKER,
-                include=['monolith.tasks.new_message_tasks']) # include these files in the tasks of celery
+                include=['monolith.tasks.new_message_tasks', 'monolith.message_logic']) # include these files in the tasks of celery
 
 _APP = None
 
