@@ -1,12 +1,11 @@
 from celery import Celery
-
 from monolith.database import User, db
 
 BACKEND = BROKER = 'redis://localhost:6379'
-celery = Celery(__name__, backend=BACKEND, broker=BROKER)
+celery = Celery(__name__, backend=BACKEND, broker=BROKER,
+                include=['monolith.tasks.new_message_tasks', 'monolith.message_logic']) # include these files in the tasks of celery
 
 _APP = None
-
 
 @celery.task
 def do_task():

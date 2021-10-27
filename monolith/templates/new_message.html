@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <form method="post">
+        {% with msg = get_flashed_messages() %}
+          {% if msg %}
+              <p>{{ msg[0] }}</p>
+          {% endif %}
+        {% endwith %}
+        {{ form.hidden_tag() }}
+        <p> Select one or more recipients:</p>
+        {{ form.recipients }}
+        <p> Insert the text of the message:</p>
+        {{ form.content }}
+        <p>
+          <label for="deliver_time">Deliver time</label>
+          <input type="datetime-local" id="deliver_time" name="deliver_time">
+        </p>
+        <p>
+          <input type="submit" name="submit" value="Send bottle"></input>
+        </p>
+        <p>
+          <input type="submit" name="submit" value="Save draft"></input>
+        </p>
+    </form>
+    <form method="get" action="/">
+      <input type="submit" value="Back"></input>
+    </form>
+  
+</body>
+</html>
+
+<!--
+<html>
+ <body>
+  <form action="" method="POST">
+    {{ form.hidden_tag() }}
+    <dl>
+     {% for field in form.display %}
+     <dt>{{ form[field].label }}</dt>
+     <dd>{{ form[field]() }}</dd>
+       {% if form[field].errors %}
+          {% for e in form[field].errors %}
+           <p class="help-block">{{ e }}</p>
+          {% endfor %}
+       {% endif %}
+     {% endfor %}
+    </dl>
+    <p>
+    <input type=submit value="Publish">
+    TODO: add the input bottons to save the draft and to go back in the previous page
+  </form>
+</body>
+</html>
+-->
+
