@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect
 
 from monolith.auth import current_user
 
@@ -17,9 +17,9 @@ def index():
 @home.route('/account_info')
 def account_info():
     if current_user is not None and hasattr(current_user, 'id'):
-        # show info
+        # show user informations
         return render_template("account_info.html")
     else:
         # TODO
         # user does not exists
-        return render_template("error_page.html")
+        return redirect("/login")
