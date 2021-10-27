@@ -66,7 +66,6 @@ def new_message():
                     seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
                     msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
                 
-                # if form['submit'] == 'Save draft' it will only redirect
                 return redirect("/") 
 
             else:

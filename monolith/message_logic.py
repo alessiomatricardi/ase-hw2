@@ -64,6 +64,7 @@ class MessageLogic:
         
         return True # TODO decide the return value depending on tests 
 
+
     @celery.task(name="send_notification")
     def send_notification(sender_email, recipients_list):
         for recipient_email in recipients_list:
