@@ -14,6 +14,9 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../mmiab.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    # This allows us to test forms without WTForm token
+    app.config['WTF_CSRF_ENABLED'] = False
+
     for bp in blueprints:
         app.register_blueprint(bp)
         bp.app = app
@@ -31,7 +34,7 @@ def create_app():
             example.firstname = 'Admin'
             example.lastname = 'Admin'
             example.email = 'example@example.com'
-            example.dateofbirth = datetime.datetime(2020, 10, 5)
+            example.date_of_birth = datetime.datetime(2020, 10, 5)
             example.is_admin = True
             example.set_password('admin')
             db.session.add(example)
