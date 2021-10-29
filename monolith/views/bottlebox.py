@@ -28,7 +28,7 @@ def show_pending():
     all_users = bottlebox_logic.retrieving_all_users()
     msg = bottlebox_logic.retrieving_messages(current_user.id,1)
 
-    return render_template('bottlebox.html', messages = msg, users = all_users)
+    return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Pending')
 
 
 @bottlebox.route('/bottlebox/received', methods=['GET'])
@@ -39,7 +39,7 @@ def show_received():
     all_users = bottlebox_logic.retrieving_all_users()
     msg = bottlebox_logic.retrieving_messages(current_user.id,2)
 
-    return render_template('bottlebox.html', messages = msg, users = all_users)
+    return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Received')
 
 
 @bottlebox.route('/bottlebox/delivered', methods=['GET'])
@@ -50,7 +50,7 @@ def show_delivered():
     all_users = bottlebox_logic.retrieving_all_users()
     msg = bottlebox_logic.retrieving_messages(current_user.id,3)
 
-    return render_template('bottlebox.html', messages = msg, users = all_users)
+    return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Delivered')
 
 
 @bottlebox.route('/message/<id>', methods=['GET'])
