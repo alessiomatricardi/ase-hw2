@@ -1,6 +1,5 @@
 from flask import Blueprint, redirect, render_template
 from flask_login import login_user, logout_user
-from werkzeug.security import check_password_hash
 
 from monolith.database import User, db
 from monolith.forms import LoginForm
@@ -29,9 +28,9 @@ def login():
             )
             return render_template('login.html', form=form)
         
-        password_is_right = check_password_hash(user.password, password)
+        authenticated = user.authenticate(password)
 
-        if user.is_active and password_is_right:
+        if user.is_active and authenticated:
             # login the user
             login_user(user)
             return redirect('/')
@@ -39,9 +38,9 @@ def login():
             # the user unregistered his profile
             # this add an error message that will be printed on screen
             form.email.errors.append(
-                "This account is no longer available."
+                "This account is no longer active."
             )
-        elif not password_is_right:
+        elif not authenticated:
             # wrong password
             # this add an error message that will be printed on screen
             form.password.errors.append(

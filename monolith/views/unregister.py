@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, render_template
-from flask_login import login_user, logout_user
+from flask_login import logout_user
+from werkzeug.security import check_password_hash
 
 from monolith.database import User, db
 from monolith.forms import UnregisterForm
@@ -19,14 +20,19 @@ def confirmation():
             password = form.data['password']
             q = db.session.query(User).where(User.id == current_user.id)
             user = q.first()
+            
             # if the password is correct, the user won't be active anymore 
             # the user is not going to be deleted from db because there may be pending messages to be sent from this user
-            if user is not None and user.authenticate(password):
-                # TODO check if it works
-                user.is_active = False
-                db.session.commit()
-                logout_user()
-                return redirect('/')
+            
+            if user is not None:
+                password_is_right = check_password_hash(user.password, password)
+                if password_is_right:
+                    # TODO check if it works
+                    user.is_active = False
+                    db.session.commit()
+                    logout_user()
+                    return redirect('/')
+                # TODO else: print error message
                 
         # html template for unregistration confirmation
         return render_template('unregister.html', form=form, user = current_user)

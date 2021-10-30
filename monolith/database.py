@@ -53,6 +53,10 @@ class User(db.Model):
         return self._authenticated
 
     def authenticate(self, password):
+        # an user no more active should not authenticate himself
+        if not self.is_active:
+            return False
+        
         checked = check_password_hash(self.password, password)
         self._authenticated = checked
         return self._authenticated
