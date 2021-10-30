@@ -1,17 +1,21 @@
-<html>
-  <body>
-    <h1>BottleBoxes</h1>
-    <ul>
-        <li>
-            <button onclick="location.href = '/bottlebox/pending';" id="bottlebox_button" class="float-left submit-button">Pending Bottles</button> 
-        </li>
-        <li>
-            <button onclick="location.href = '/bottlebox/received';" id="bottlebox_button" class="float-left submit-button">Received Bottles</button> 
-        </li>
-        <li>
-            <button onclick="location.href = '/bottlebox/delivered';" id="bottlebox_button" class="float-left submit-button">Delivered Bottles</button> 
-        </li>
-    </ul>
-    <button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
-  </body>
-</html>
+{% extends "layout.html" %}
+
+{% block title %}BottleBoxes{% endblock %}
+
+{% block content %}
+
+<h1>BottleBoxes</h1>
+<ul>
+    <li>
+        <button onclick="location.href = '/bottlebox/pending';" id="bottlebox_button" class="float-left submit-button">Pending Bottles</button> 
+    </li>
+    <li>
+        <button onclick="location.href = '/bottlebox/received';" id="bottlebox_button" class="float-left submit-button">Received Bottles</button> 
+    </li>
+    <li>
+        <button onclick="location.href = '/bottlebox/delivered';" id="bottlebox_button" class="float-left submit-button">Delivered Bottles</button> 
+    </li>
+</ul>
+<button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
+
+{% endblock %}
