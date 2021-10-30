@@ -22,6 +22,7 @@ def confirmation():
             # if the password is correct, the user won't be active anymore 
             # the user is not going to be deleted from db because there may be pending messages to be sent from this user
             if user is not None and user.authenticate(password):
+                # TODO check if it works
                 user.is_active = False
                 db.session.commit()
                 logout_user()

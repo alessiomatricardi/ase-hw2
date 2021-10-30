@@ -62,8 +62,8 @@ class TestAuthAndReg(unittest.TestCase):
         
         # try to register again the same user  
         response = app.post("/register", data = data1 , content_type='application/x-www-form-urlencoded',follow_redirects=True)
-        self.assertEqual(response.status_code, 400)
-        assert b"This email has already been used in a previous registration, please register with another email." in response.data
+        self.assertEqual(response.status_code, 200)
+        assert b"please register with another email." in response.data
 
 
     def test_unregister(self):
