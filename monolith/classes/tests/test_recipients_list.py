@@ -64,6 +64,22 @@ class TestRecipientsList(unittest.TestCase):
             expected_result = [3]
             self.assertEqual(result, expected_result)
 
-          
+    def test_recipients_list_rendering(self):
+        tested_app = app.test_client()
+        
+        # checking that accessing the recipients list redirects to the login page if not already logged in
+        response = tested_app.get("/recipients_list", content_type='html/text', follow_redirects=True)
+        assert b'<label for="email">email</label>' in response.data 
 
+        # logging in
+        data1 = { 'email' : 'prova2@mail.com' , 'password' : 'prova123' }
+        response = tested_app.post("/login", data = data1 , content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        assert b'Hi Damiano' in response.data 
+          
+        # checking the presence of the correct button to write to specific recipient
+        response = tested_app.get("/recipients_list", data = data1 , content_type='html/text', follow_redirects=True)
+        assert b'id="writeToButton"' in response.data 
+
+        # checking the presence of the correct user in recipients list
+        assert b'Carlo Neri' in response.data
 
