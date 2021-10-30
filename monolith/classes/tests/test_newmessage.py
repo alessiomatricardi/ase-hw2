@@ -4,7 +4,7 @@ from monolith import app
 
 #APP = app.test_client()
 
-class TestAdd(unittest.TestCase):
+class TestNewMessage(unittest.TestCase):
     def test_name(self):
         with app.app_context():
         # il db è vuoto
