@@ -53,7 +53,7 @@ class User(db.Model):
         return self._authenticated
 
     def authenticate(self, password):
-        # an user no more active should not authenticate himself
+        # an user no more active couldn't authenticate himself
         if not self.is_active:
             return False
         
