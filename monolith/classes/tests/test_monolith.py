@@ -63,7 +63,7 @@ class TestAuthAndReg(unittest.TestCase):
         # try to register again the same user  
         response = app.post("/register", data = data1 , content_type='application/x-www-form-urlencoded',follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        assert b"prova3@mail.com is not available, please register with another email." in response.data
+        assert b"please register with another email." in response.data
 
 
     def test_unregister(self):
