@@ -1,11 +1,11 @@
-{% extends "default.html" %}
+{% extends "layout.html" %}
 {% from "macros.html" import render_form_field %}
 
 {% block title %}Register{% endblock %}
 
 {% block content %}
 
-<main class="form-register">
+<main class="form-register text-center">
   <form action="" method="POST">
 
     {{ form.hidden_tag() }}
