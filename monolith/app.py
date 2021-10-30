@@ -5,6 +5,7 @@ from flask import Flask
 from monolith.auth import login_manager
 from monolith.database import User, db
 from monolith.views import blueprints
+from monolith import errors
 
 
 def create_app():
@@ -16,6 +17,11 @@ def create_app():
 
     # This allows us to test forms without WTForm token
     app.config['WTF_CSRF_ENABLED'] = False
+
+    # Errors handling
+    app.register_error_handler(401, errors.unauthorized)
+    app.register_error_handler(403, errors.forbidden)
+    app.register_error_handler(404, errors.page_not_found)
 
     for bp in blueprints:
         app.register_blueprint(bp)

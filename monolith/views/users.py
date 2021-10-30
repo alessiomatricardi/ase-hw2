@@ -22,8 +22,6 @@ def check_existing_user(email):
     else:
         return None
 
-
-
 users = Blueprint('users', __name__)
 
 @users.route('/users')
