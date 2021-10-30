@@ -1,26 +1,46 @@
-{% extends "layout.html" %}
+{% extends "default.html" %}
+{% from "macros.html" import render_form_field %}
 
-{% block title %}Sign-up{% endblock %}
+{% block title %}Register{% endblock %}
 
 {% block content %}
 
+<main class="form-register">
   <form action="" method="POST">
+
     {{ form.hidden_tag() }}
-    <dl>
-     {% for field in form.display %}
-     <dt>{{ form[field].label }}</dt>
-     <dd>{{ form[field]() }}
-       {% if form[field].errors %}
-          {% for e in form[field].errors %}
-           <li class="help-block" style="color: red;">{{ e }}</li>
-          {% endfor %}
-     </dd>
-       {% endif %}
-     {% endfor %}
-    </dl>
-    <p>
-    <input type=submit value="Submit">
+
+    <img class="mb-4" src="TODO LOGO" alt="" width="72" height="57">
+    <h1 class="h3 mb-3 fw-normal">
+      Register to<br>
+      My message in a bottle!
+    </h1>
+
+    <div class="alert alert-danger" role="alert">
+      boh
+    </div>
+    {# print errors, if occours #}
+    {% for field in form.display %}
+      {% if field.errors %}
+        {% for error in field.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+
+    {% for field in form.display %}
+      {{ render_form_field(form[field], class="form-control", placeholder="nothing") }}
+    {% endfor %}
+
+    <button class="w-100 btn btn-lg btn-warning" type="submit">Register</button>
+
+    <div class="mt-3 mb-3">
+      <a href="/login" class="btn w-100 btn-lg btn-primary">Login</a>
+    </div>
+    <p class="mt-5 mb-3 text-muted">© 2021, ASE - Squad 4</p>
   </form>
-  <button onclick="location.href = '/login';" id="login_button" class="float-left submit-button">Login</button>
+</main>
 
 {% endblock %}

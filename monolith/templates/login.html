@@ -13,14 +13,14 @@
     <img class="mb-4" src="TODO LOGO" alt="" width="72" height="57">
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
-    <!-- TODO FINIRE -->
+    {# print errors, if occours #}
     {% for field in form.display %}
       {% if field.errors %}
-        <ul class=errors>
           {% for error in field.errors %}
-          <li>{{ error }}</li>
+            <div class="alert alert-danger" role="alert">
+              {{ error }}
+            </div>
           {% endfor %}
-        </ul>
       {% endif %}
     {% endfor %}
 

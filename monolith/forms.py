@@ -6,25 +6,25 @@ from wtforms.fields.html5 import EmailField
 
 
 class LoginForm(FlaskForm):
-    email = EmailField('email', validators=[DataRequired(), Email()])
-    password = f.PasswordField('password', validators=[DataRequired()])
+    email = EmailField('E-mail', validators=[DataRequired(), Email()])
+    password = f.PasswordField('Password', validators=[DataRequired()])
     display = ['email', 'password']
 
 
 class UserForm(FlaskForm):
-    email = EmailField('email', validators=[DataRequired(), Email()])
-    firstname = f.StringField('firstname', validators=[DataRequired()])
-    lastname = f.StringField('lastname', validators=[DataRequired()])
-    password = f.PasswordField('password', validators=[
+    email = EmailField('E-mail', validators=[DataRequired(), Email()])
+    firstname = f.StringField('First name', validators=[DataRequired()])
+    lastname = f.StringField('Last name', validators=[DataRequired()])
+    password = f.PasswordField('Password', validators=[
         DataRequired(), 
         # this allow us to check the password on server-side
         Length(min = 8, message = 'Password must be at least %(min)d characters'),
         ],
         # this add minlength attribute to the <input> rendered, for client-side check
-        render_kw = {'minlength' : '8'}
+        #render_kw = {'minlength' : '8'}
         )
-    date_of_birth = f.DateField('date_of_birth', format='%d/%m/%Y')
-    display = ['email', 'firstname', 'lastname', 'password', 'date_of_birth']
+    date_of_birth = f.DateField('Date of birth', format='%d/%m/%Y', render_kw = {'type' : 'date'})
+    display = ['email', 'firstname', 'lastname', 'date_of_birth', 'password']
 
 
 # class used to write a new message and decide the recipients
