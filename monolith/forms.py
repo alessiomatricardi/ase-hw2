@@ -21,9 +21,9 @@ class UserForm(FlaskForm):
         Length(min = 8, message = 'Password must be at least %(min)d characters'),
         ],
         # this add minlength attribute to the <input> rendered, for client-side check
-        #render_kw = {'minlength' : '8'}
+        render_kw = {'minlength' : '8'}
         )
-    date_of_birth = f.DateField('Date of birth', format='%d/%m/%Y', render_kw = {'type' : 'date'})
+    date_of_birth = f.DateField('Date of birth', render_kw = {'type' : 'date'})
     display = ['email', 'firstname', 'lastname', 'date_of_birth', 'password']
 
 

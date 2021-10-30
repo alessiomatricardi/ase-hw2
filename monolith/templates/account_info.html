@@ -10,7 +10,7 @@
 First name : {{ current_user.firstname }} <br>
 Last name : {{current_user.lastname}} <br>
 e-mail : {{current_user.email}} <br>
-birth date : {{current_user.date_of_birth}} <br>
+birth date : {{current_user.date_of_birth.strftime('%d/%m/%Y')}} <br>
 <button onclick="location.href = '/';" id="home_button" class="float-left submit-button">Home</button>
 <button onclick="location.href = '/unregister';" id="unregister_button"
   class="float-left submit-button">Unregister</button>

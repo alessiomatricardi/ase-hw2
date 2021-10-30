@@ -16,13 +16,10 @@
       My message in a bottle!
     </h1>
 
-    <div class="alert alert-danger" role="alert">
-      boh
-    </div>
     {# print errors, if occours #}
     {% for field in form.display %}
-      {% if field.errors %}
-        {% for error in field.errors %}
+      {% if form[field].errors %}
+        {% for error in form[field].errors %}
           <div class="alert alert-danger" role="alert">
             {{ error }}
           </div>
