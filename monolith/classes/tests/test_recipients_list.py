@@ -69,7 +69,7 @@ class TestRecipientsList(unittest.TestCase):
         
         # checking that accessing the recipients list redirects to the login page if not already logged in
         response = tested_app.get("/recipients_list", content_type='html/text', follow_redirects=True)
-        assert b'<label for="email">email</label>' in response.data 
+        assert b'<label for="email">E-mail</label>' in response.data 
 
         # logging in
         data1 = { 'email' : 'prova2@mail.com' , 'password' : 'prova123' }

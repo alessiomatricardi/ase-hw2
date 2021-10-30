@@ -1,5 +1,10 @@
-<html>
-  <body><h1>My Message in a Bottle -- Primer</h1>
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<h1>My Message in a Bottle -- Primer</h1>
 
 {% if current_user.is_authenticated %}
   Hi {{ current_user.firstname }}! 
@@ -13,4 +18,5 @@
 {% else %}
   Hi Anonymous, <a href="/login">Log in</a> or <a href="/register">Register yourself</a>
 {% endif %}
-</body></html>
+
+{% endblock %}
