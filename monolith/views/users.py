@@ -54,8 +54,12 @@ def register():
             try:
                 check_existing_user(new_user.email)
             except EmailAlreadyUsedError:
-                # bad request
-                abort(400,"This email has already been used in a previous registration, please register with another email.") 
+                # this add an error message that will be printed on screen
+                form.email.errors.append(
+                    new_user.email + " is not available, \
+                        please register with another email."
+                )
+                return render_template('register.html', form=form)
 
             new_user.set_password(form.password.data)
             db.session.add(new_user)
