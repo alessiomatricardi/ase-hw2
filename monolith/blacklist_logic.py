@@ -1,4 +1,6 @@
+from sqlalchemy.sql.elements import and_
 from monolith.database import db, User, Blacklist
+from sqlalchemy.sql import and_
 
 class BlacklistLogic:
     
@@ -7,8 +9,9 @@ class BlacklistLogic:
     
     def check_existing_user(self,id):
         result = db.session.query(User).where(User.id == id)
+        result = [ob for ob in result]
 
-        if result is None:
+        if not result:
             return False
         else: 
             return True
@@ -19,8 +22,12 @@ class BlacklistLogic:
         blacklist.blocking_user_id = blocking
         blacklist.blocked_user_id = blocked
 
-        db.session.add(blacklist)
-        db.session.commit()
+        check = db.session.query(Blacklist).where(and_(Blacklist.blocking_user_id==blocking,Blacklist.blocked_user_id==blocked))
+        check = [ob for ob in check]
+        
+        if not check:
+            db.session.add(blacklist)
+            db.session.commit()
 
         return blacklist
 

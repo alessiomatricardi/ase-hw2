@@ -5,9 +5,9 @@ from .list import list
 from .bottlebox import bottlebox
 from .unregister import unregister
 from .messages import messages
-from .block_user import block_user
+from .blacklist import blacklist
 
-blueprints = [home, auth, users, messages, list, bottlebox, unregister, block_user]
+blueprints = [home, auth, users, messages, list, bottlebox, unregister, blacklist]
 
 #
 # TODO remember to add the new blueprint in creating a new view

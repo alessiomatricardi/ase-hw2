@@ -17,15 +17,13 @@
         <p>Deliver time: {{msg.deliver_time}}</p>
 
         <p>{{msg.content}}</p>
-        <p> <button onclick="location.href = '/message/{{msg.id}}'" id="homeButton" class="float-left submit-button" >Open</button></p>
+        <p> <button onclick="location.href = '/message/{{msg.id}}'" id="openButton" class="float-left submit-button" >Open</button></p>
 
       </li>
       
       {% endfor %}
     </ul>
     <button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
-  
-    <button onclick="location.href = '/test_message';" id="homeButton" >Add message</button>
 
   </body>
 </html>

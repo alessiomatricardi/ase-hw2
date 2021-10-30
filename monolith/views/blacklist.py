@@ -7,12 +7,12 @@ from monolith.blacklist_logic import BlacklistLogic
 
 from flask_login import current_user
 
-block_user = Blueprint('block_user', __name__)
+blacklist = Blueprint('blacklist', __name__)
 
 ll = ListLogic()
 bll = BlacklistLogic()
 
-@block_user.route('/blacklist',methods=['GET'])
+@blacklist.route('/blacklist',methods=['GET'])
 def retrieve_blacklist():
     
     # checking if there is a logged user
@@ -25,7 +25,7 @@ def retrieve_blacklist():
         return redirect('/login')
 
 
-@block_user.route('/block_user', methods=['GET'])
+@blacklist.route('/block_user', methods=['GET'])
 def blocking():
 
     # checking if there is a logged user
