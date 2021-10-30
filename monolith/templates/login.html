@@ -1,22 +1,40 @@
-<html>
- <body>
+{% extends "default.html" %}
+{% from "macros.html" import render_form_field %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+<main class="form-signin">
   <form action="" method="POST">
+
     {{ form.hidden_tag() }}
-    <dl>
-     {% for field in form.display %}
-     <dt>{{ form[field].label }}</dt>
-     <dd>{{ form[field]() }}</dd>
-       {% if form[field].errors %}
-          {% for e in form[field].errors %}
-           <p class="help-block">{{ e }}</p>
+
+    <img class="mb-4" src="TODO LOGO" alt="" width="72" height="57">
+    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+
+    <!-- TODO FINIRE -->
+    {% for field in form.display %}
+      {% if field.errors %}
+        <ul class=errors>
+          {% for error in field.errors %}
+          <li>{{ error }}</li>
           {% endfor %}
-       {% endif %}
-     {% endfor %}
-    </dl>
-    <p>
-    <input type=submit value="Login">
+        </ul>
+      {% endif %}
+    {% endfor %}
+
+    {% for field in form.display %}
+      {{ render_form_field(form[field], class="form-control", placeholder="nothing") }}
+    {% endfor %}
+
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Login</button>
+
+    <div class="mt-3 mb-3">
+      <a href="/register" class="btn w-100 btn-lg btn-warning">Register</a>
+    </div>
+    <p class="mt-5 mb-3 text-muted">© 2021, ASE - Squad 4</p>
   </form>
-  <button onclick="location.href = '/register';" id="register_button" class="float-left submit-button">Register</button>
-  
- </body>
-</html>
+</main>
+
+{% endblock %}

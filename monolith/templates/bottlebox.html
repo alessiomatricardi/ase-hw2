@@ -1,31 +1,29 @@
-<!-- 127.0.0.1:5000/bottlebox?value=home
-127.0.0.1:5000/bottlebox?value=received
-127.0.0.1:5000/bottlebox?value=sent
-127.0.0.1:5000/bottlebox?value=pending -->
+{% extends "layout.html" %}
 
-<html>
-  <body>
-    <h1>{{ current_user.firstname }} Bottlebox</h1>
-    <ul>
-      {% for msg in messages: %}
-      <li>
+{% block title %}TODO AGGIUSTARE{% endblock %}
 
-        <p>{% for user in users: %} {% if user.id == msg.sender_id %}  From: {{user.email}} {% endif %} {% endfor %}</p>
+{% block content %}
 
-        <p>{% for recipient in msg.recipients: %} {% for user in users: %} {% if user.id == recipient.recipient_id %}  to: {{user.email}} {% endif %} {% endfor %} {% endfor %}</p>
+<h1>{{ current_user.firstname }} Bottlebox</h1>
+<ul>
+  {% for msg in messages: %}
+  <li>
 
-        <p>Deliver time: {{msg.deliver_time}}</p>
+    <p>{% for user in users: %} {% if user.id == msg.sender_id %}  From: {{user.email}} {% endif %} {% endfor %}</p>
 
-        <p>{{msg.content}}</p>
-        <p> <button onclick="location.href = '/message/{{msg.id}}'" id="homeButton" class="float-left submit-button" >Open</button></p>
+    <p>{% for recipient in msg.recipients: %} {% for user in users: %} {% if user.id == recipient.recipient_id %}  to: {{user.email}} {% endif %} {% endfor %} {% endfor %}</p>
 
-      </li>
-      
-      {% endfor %}
-    </ul>
-    <button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
+    <p>Deliver time: {{msg.deliver_time}}</p>
+
+    <p>{{msg.content}}</p>
+    <p> <button onclick="location.href = '/message/{{msg.id}}'" id="homeButton" class="float-left submit-button" >Open</button></p>
+
+  </li>
   
-    <button onclick="location.href = '/test_message';" id="homeButton" >Add message</button>
+  {% endfor %}
+</ul>
+<button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
 
-  </body>
-</html>
+<button onclick="location.href = '/test_message';" id="homeButton" >Add message</button>
+
+{% endblock %}

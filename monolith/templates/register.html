@@ -1,5 +1,9 @@
-<html>
- <body>
+{% extends "layout.html" %}
+
+{% block title %}Sign-up{% endblock %}
+
+{% block content %}
+
   <form action="" method="POST">
     {{ form.hidden_tag() }}
     <dl>
@@ -19,6 +23,4 @@
   </form>
   <button onclick="location.href = '/login';" id="login_button" class="float-left submit-button">Login</button>
 
- </body>
-</html>
-
+{% endblock %}
