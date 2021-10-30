@@ -28,9 +28,46 @@ class TestBlacklist(unittest.TestCase):
         assert b'You are trying to block a non existing user!' in response.data
 
         # TODO checking blacklist 
-        # block existing user
+        # block existing user 6
+        response = app.get("/block_user?target=6", content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        assert b'Carlo Neri' in response.data
+
         # block again same user
+        response = app.get("/block_user?target=6", content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        assert b'Carlo Neri' in response.data
+
         # check rendering
+
+        # check that the recipients list is now empty (user 3 has blocked everyone)
+        response = app.get("/recipients_list", content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        assert b'Carlo Neri' not in response.data
+        assert b'Alessio Bianchi' not in response.data
+        
+        # logging out
+        response = app.get("/logout", content_type='html/text', follow_redirects=True)
+        assert b'Hi Anonymous' in response.data
+
+        # trying to access the blacklist while not being logged in
+        response = app.get("/blacklist", content_type='html/text', follow_redirects=True)
+        assert b'<label for="email">email</label>' in response.data 
+
+        # trying to block a user while not being logged in
+        response = app.get("/block_user?target=6", content_type='html/text', follow_redirects=True)
+        assert b'<label for="email">email</label>' in response.data 
+
+        # restoring the db to the previous form
+        with tested_app.app_context():
+
+            db.session.query(Blacklist).where(and_(Blacklist.blocking_user_id==3,Blacklist.blocked_user_id==6)).delete()
+            db.session.commit()
+            result = db.session.query(Blacklist).where(Blacklist.blocking_user_id == 3)
+            result = [(ob.blocking_user_id,ob.blocked_user_id) for ob in result]
+            expected_result = [ (3,2) ]
+            self.assertEqual(result,expected_result)
+
 
     def test_blacklist_logic(self):
 
