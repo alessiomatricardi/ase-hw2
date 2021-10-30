@@ -1,5 +1,6 @@
 from monolith.database import Blacklist, db, Message, Message_Recipient, User, Blacklist
 import datetime
+from sqlalchemy.sql import or_
 
 class ListLogic:
     
@@ -13,7 +14,7 @@ class ListLogic:
 
     # retrieving the list of blacklist instances in which current_user is involved
     def retrieving_users_in_blacklist(self, id):
-        blacklist = db.session.query(Blacklist).where(Blacklist.blocking_user_id == id or Blacklist.blocked_user_id == id)
+        blacklist = db.session.query(Blacklist).where(or_(Blacklist.blocking_user_id == id, Blacklist.blocked_user_id == id))
         return [b for b in blacklist]
         
     def retrieving_recipients(self, id):
