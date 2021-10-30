@@ -25,7 +25,7 @@ def login():
         if user is None:
             # this add an error message that will be printed on screen
             form.email.errors.append(
-                "Account '" + user.email + "' doesn't exists."
+                "Account " + email + " doesn't exists."
             )
             return render_template('login.html', form=form)
         
