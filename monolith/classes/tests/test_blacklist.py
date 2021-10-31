@@ -51,11 +51,11 @@ class TestBlacklist(unittest.TestCase):
 
         # trying to access the blacklist while not being logged in
         response = app.get("/blacklist", content_type='html/text', follow_redirects=True)
-        assert b'<label for="email">email</label>' in response.data 
+        assert b'<input class="form-control" id="email" name="email" placeholder="nothing" required type="email" value="">' in response.data 
 
         # trying to block a user while not being logged in
         response = app.get("/block_user?target=6", content_type='html/text', follow_redirects=True)
-        assert b'<label for="email">email</label>' in response.data 
+        assert b'<input class="form-control" id="email" name="email" placeholder="nothing" required type="email" value="">' in response.data 
 
         # restoring the db to the previous form
         with tested_app.app_context():
