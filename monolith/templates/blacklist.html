@@ -1,0 +1,17 @@
+<html>
+  <body>
+    <h1>Blacklist</h1>
+    <ul>
+        {% for bl in blacklist: %}
+            {% for user in users: %}
+                {% if user.id == bl.blocked_user_id %}
+                    <li>
+                    {{user.firstname}} {{user.lastname}} {{user.email}}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </ul>
+    <button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
+  </body>
+</html>

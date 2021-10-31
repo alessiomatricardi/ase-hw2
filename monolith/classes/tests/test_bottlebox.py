@@ -23,6 +23,7 @@ class TestBottlebox(unittest.TestCase):
             expected_firstname = ['Alessio','Damiano','Barbara', 'Carlo']
             expected_lastname = ['Bianchi','Rossi', 'Verdi', 'Neri']
             expected_administrator = [False,False, False, False]
+            self.assertEqual(result_id,expected_id)
             self.assertEqual(result_email,expected_email)
             self.assertEqual(result_firstname,expected_firstname)
             self.assertEqual(result_lastname,expected_lastname)
