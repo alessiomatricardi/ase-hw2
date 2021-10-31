@@ -3,8 +3,13 @@
 {% block title %}Message details{% endblock %}
 
 {% block content %}
-
+{% if received == True %}
 <h1>Message from {{sender_name}}</h1>
+<h3>{{sender_email}}</h3>
+{% endif %}
+{% if received == False %}
+<h1>Message to</h1>
+{% endif %}
 <ul>
   <li>
     <p>Deliver time: {{message.deliver_time}}</p>
@@ -13,7 +18,10 @@
   </li>
     
 </ul>
-<button onclick="location.href = '/block_user?target={{message.sender_id}}';" id="blockUserButton" class="float-left submit-button">Block user</button> 
+{% if blocked == False %}
+<button onclick="location.href = '/new_message?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button> 
+<button onclick="location.href = '/block_user?target={{message.sender_id}}';" id="blockUserButton" class="float-left submit-button">Block user</button>
+{% endif %} 
 <button onclick="location.href = '/bottlebox?value=Received';" id="backButton" class="float-left submit-button" >Home</button>
  
 {% endblock %}

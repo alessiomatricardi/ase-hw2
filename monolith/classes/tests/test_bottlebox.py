@@ -54,8 +54,8 @@ class TestBottlebox(unittest.TestCase):
             self.assertEqual(result_deliver_time,expected_deliver_time)
             self.assertEqual(result_delivered,expected_delivered)
 
-            #received messages for user 2
-            result = b.retrieving_messages(2,2)
+            #received messages for user 6
+            result = b.retrieving_messages(6,2)
             result_id = [ob.get_id() for ob in result]
             result_sender = [ob.sender_id for ob in result]
             result_deliver_time = [ob.deliver_time for ob in result]
