@@ -25,7 +25,7 @@ class TestAuthAndReg(unittest.TestCase):
         # testing that the login fails
         data1 = { 'email' : 'example@example.com' , 'password' : 'admina' } # wrong password
         response = app.post("/login", data = data1 , content_type='html/text')
-        assert b'<label for="email">email</label>' in response.data # returns to the login page
+        assert b'<label for="email">E-mail</label>' in response.data # returns to the login page
         
         # checking that the login succeeds
         app = tested_app.test_client()
@@ -52,18 +52,18 @@ class TestAuthAndReg(unittest.TestCase):
 
         # new user to register data
         data1 = { 'email' : 'prova3@mail.com' , 'firstname': 'Mario', 'lastname': 'Rossi', 
-        'password' : 'prova123', 'date_of_birth': '25/05/1990'} 
+        'password' : 'prova123', 'date_of_birth': '1990-05-25'} 
         response = app.post("/register", data = data1 , content_type='application/x-www-form-urlencoded',follow_redirects=True)
         
         self.assertEqual(response.status_code, 200)
 
 
-        assert b"<li>\n      Mario Rossi\n      </li>" in response.data
+        assert b"Mario Rossi" in response.data
         
         # try to register again the same user  
         response = app.post("/register", data = data1 , content_type='application/x-www-form-urlencoded',follow_redirects=True)
-        self.assertEqual(response.status_code, 400)
-        assert b"This email has already been used in a previous registration, please register with another email." in response.data
+        self.assertEqual(response.status_code, 200)
+        assert b"please register with another email." in response.data
 
 
     def test_unregister(self):
@@ -82,7 +82,7 @@ class TestAuthAndReg(unittest.TestCase):
         # unregister with wrong password
         data_unregister = { 'password' : 'xxx' }
         response = app.post("/unregister", data = data_unregister , content_type='application/x-www-form-urlencoded',follow_redirects=True)
-        assert b"<h2> Mario, are you sure you really want to unregister yourself? If so insert your password and confirm</h2>" in response.data
+        assert b"Mario, are you sure you really want to unregister yourself? If so insert your password and confirm" in response.data
 
         # unregister with correct password
         data_unregister = { 'password' : 'prova123' }
