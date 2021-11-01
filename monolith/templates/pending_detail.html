@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}Message details{% endblock %}
+
+{% block content %}
+
+<h1>Message from {{sender_name}}</h1>
+<ul>
+  <li>
+    <p>Deliver time: {{message.deliver_time}}</p>
+<!--cdjnvfln f-->
+    <p>{{message.content}}</p>
+  </li>
+
+</ul>
+<button onclick="location.href = '/bottlebox/pending';" id="backButton" class="float-left submit-button" >Back</button>
+  
+{% endblock %}

@@ -28,7 +28,7 @@ def show_pending():
     all_users = bottlebox_logic.retrieving_all_users()
     msg = bottlebox_logic.retrieving_messages(current_user.id,1)
 
-    return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Pending')
+    return render_template('bottlebox_pending.html', messages = msg, users = all_users, label = 'Pending')
 
 
 @bottlebox.route('/bottlebox/received', methods=['GET'])
@@ -39,8 +39,7 @@ def show_received():
     all_users = bottlebox_logic.retrieving_all_users()
     msg = bottlebox_logic.retrieving_messages(current_user.id,2)
 
-    return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Received')
-
+    return render_template('bottlebox_received.html', messages = msg, users = all_users, label = 'Received')
 
 @bottlebox.route('/bottlebox/delivered', methods=['GET'])
 def show_delivered():
@@ -50,11 +49,11 @@ def show_delivered():
     all_users = bottlebox_logic.retrieving_all_users()
     msg = bottlebox_logic.retrieving_messages(current_user.id,3)
 
-    return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Delivered')
+    return render_template('bottlebox_delivered.html', messages = msg, users = all_users, label = 'Delivered')
 
+@bottlebox.route('/message_pending/<id>', methods=['GET'])
+def pending_detail(id):
 
-@bottlebox.route('/message/<id>', methods=['GET'])
-def message_detail(id):
     # if <id> is not a number, render 404 page
     try:
         int(id)
@@ -69,7 +68,55 @@ def message_detail(id):
             detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True)[0]
             sender = User.query.where(User.id == detailed_message.sender_id)[0]
             sender_name = sender.firstname + ' ' + sender.lastname
-            return render_template('/message_detail.html', message = detailed_message, sender_name = sender_name)
+            return render_template('/pending_detail.html', message = detailed_message, sender_name = sender_name)
+        else:
+            # 404 TODO
+            render_template('/index.html')
+    else:
+        # there is no logged user, redirect to login
+        return redirect('/login')
+
+@bottlebox.route('/message_received/<id>', methods=['GET'])
+def received_detail(id):
+    # if <id> is not a number, render 404 page
+    try:
+        int(id)
+    except:
+        # TODO 404
+        return render_template('/index.html')
+
+    # checking if there is a logged user
+    if current_user is not None and hasattr(current_user, 'id'):
+        message = db.session.query(Message_Recipient).where(Message_Recipient.id == id).where(Message_Recipient.recipient_id == current_user.id)
+        if message is not None:
+            detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True)[0]
+            sender = User.query.where(User.id == detailed_message.sender_id)[0]
+            sender_name = sender.firstname + ' ' + sender.lastname
+            return render_template('/received_detail.html', message = detailed_message, sender_name = sender_name)
+        else:
+            # 404 TODO
+            render_template('/index.html')
+    else:
+        # there is no logged user, redirect to login
+        return redirect('/login')
+
+@bottlebox.route('/message_delivered/<id>', methods=['GET'])
+def delivered_detail(id):
+    # if <id> is not a number, render 404 page
+    try:
+        int(id)
+    except:
+        # TODO 404
+        return render_template('/index.html')
+
+    # checking if there is a logged user
+    if current_user is not None and hasattr(current_user, 'id'):
+        message = db.session.query(Message_Recipient).where(Message_Recipient.id == id).where(Message_Recipient.recipient_id == current_user.id)
+        if message is not None:
+            detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True)[0]
+            sender = User.query.where(User.id == detailed_message.sender_id)[0]
+            sender_name = sender.firstname + ' ' + sender.lastname
+            return render_template('/delivered_detail.html', message = detailed_message, sender_name = sender_name)
         else:
             # 404 TODO
             render_template('/index.html')

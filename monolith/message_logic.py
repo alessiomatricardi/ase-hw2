@@ -63,6 +63,16 @@ class MessageLogic:
         
         return True # TODO decide the return value depending on tests 
 
+    # utility to chek if a user has the right to forward a message
+    def is_my_message(self, user_id, msg_id):
+
+        today = datetime.datetime.now()
+
+        # return a void list if the user has no right on message <msg_id>
+        # return a list containg the right message if the user has rights on message <msg_id>
+        # you can check if the user has right on <msg_id> if the retrieved list is not empty
+        
+        return Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today).where(Message_Recipient.recipient_id == user_id).where(Message.id == msg_id)
 
     @celery.task(name="send_notification")
     def send_notification(sender_email, recipients_list):

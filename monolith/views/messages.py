@@ -1,8 +1,9 @@
 from flask import Blueprint, redirect, render_template, request, json
 from flask.helpers import flash, url_for
 from flask.signals import message_flashed, request_finished
+from sqlalchemy.orm import query
 from sqlalchemy.sql.elements import Null
-from monolith.database import Message, Message_Recipient, db
+from monolith.database import Message, Message_Recipient, User, db
 from monolith.forms import MessageForm
 import datetime
 
@@ -49,6 +50,10 @@ def new_message():
             message.content = form['content']
             message.is_sent = False # redundant because the db automatically set it to False
             message.deliver_time = datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M') # !!! DO NOT TOUCH !!!
+            
+            # TODO add a mechanism to attach, send and handle images/documents. 
+            # add a field in which store images/documents.
+            # add a mechanism to render images/documents in web pages.
 
             # validate message content
             if msg_logic.validate_message_fields(message):
@@ -82,7 +87,7 @@ def new_message():
                 #msg = json.dumps({"msg":"Condition failed on page baz"})
                 #db.session['msg'] = msg
                 #return redirect(url_for('.do_foo', messages=messages))
-                flash("Please select at least 1 reecipient")
+                flash("Please select at least 1 recipient")
                 return redirect(url_for('.new_message'))
 
             """
@@ -98,6 +103,54 @@ def new_message():
 
         else:
             raise RuntimeError('This should not happen!')
+
+    else: # user not logged
+        return redirect('/login') # TODO print an error
+
+
+
+# implement the forward_message 
+# by checking if the current_user 
+# has the rights to perform this
+# action using the passed message
+@messages.route('/new_message/<msg_id>', methods=['GET'])
+def forward_message(msg_id):
+    try:
+        int(msg_id)
+    except:
+        # TODO 404
+        return render_template('/index.html')
+
+
+    if current_user is not None and hasattr(current_user, 'id'):
+
+        # this is the check on the rights of the user on a given message
+        msg_logic = MessageLogic()
+
+        msg = msg_logic.is_my_message(current_user.id, msg_id)
+
+
+        if msg: # the list is not empty
+
+            # text builder
+            sender = db.session.query(User).where(User.id == msg[0].sender_id)[0]
+            recipient = db.session.query(User).where(User.id == current_user.id)[0]
+            forward = "Sent by " + sender.firstname + " " + sender.lastname + "\nto " + recipient.firstname + " " + recipient.lastname + "\non " + str(msg[0].deliver_time) + "\n\n\n\"" + msg[0].content + "\"\n"
+            ##### 
+
+            # form builder
+            form = MessageForm()
+            form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id) 
+            form.content.data = forward
+            single_recipient = request.args.get('single_recipient') # used to set a checkbox as checked if the recipient is choosen from the recipient list page
+            #####
+
+            return render_template('new_message.html', form=form, single_recipient=single_recipient)
+
+        else: # the list is empty so the user doesn't have any right on the selected message
+
+            return render_template('error.html')
+
 
     else: # user not logged
         return redirect('/login') # TODO print an error
