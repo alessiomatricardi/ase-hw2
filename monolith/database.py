@@ -22,10 +22,11 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     is_anonymous = False
     has_picture = db.Column(db.Boolean, default=False)  # has the user a personal profile picture
+    lottery_points = db.Column(db.Integer, default=0)
 
     '''
     TODO 2nd priority stuffs
-    lottery_points = db.Column(db.integer, default=0)
+    
     content_filter_enabled = db.Column(db.Boolean, default=False)
     '''
 
