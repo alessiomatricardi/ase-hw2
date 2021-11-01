@@ -19,9 +19,34 @@ def login():
         email, password = form.data['email'], form.data['password']
         q = db.session.query(User).filter(User.email == email)
         user = q.first()
-        if user is not None and user.is_active and user.authenticate(password):
+
+        # the user doesn't exists
+        if user is None:
+            # this add an error message that will be printed on screen
+            form.email.errors.append(
+                "Account " + email + " doesn't exists."
+            )
+            return render_template('login.html', form=form)
+        
+        authenticated = user.authenticate(password)
+
+        if user.is_active and authenticated:
+            # login the user
             login_user(user)
             return redirect('/')
+        elif not user.is_active:
+            # the user unregistered his profile
+            # this add an error message that will be printed on screen
+            form.email.errors.append(
+                "This account is no longer active."
+            )
+        elif not authenticated:
+            # wrong password
+            # this add an error message that will be printed on screen
+            form.password.errors.append(
+                "Password is wrong."
+            )
+
     return render_template('login.html', form=form)
 
 

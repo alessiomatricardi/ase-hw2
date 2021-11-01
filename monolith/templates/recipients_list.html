@@ -1,15 +1,18 @@
-<html>
-  <body>
-    <h1>Recipients List</h1>
+{% extends "layout.html" %}
+
+{% block title %}Recipient list{% endblock %}
+
+{% block content %}
+
+  <h1>Recipients List</h1>
     <ul>
       {% for user in users: %}
       <li>
       {{user.firstname}} {{user.lastname}} {{user.email}}  
-      <button onclick="location.href = '/new_message?single_recipient={{user.email}}';" id="homeButton" class="float-left submit-button">Write to</button> 
+      <button onclick="location.href = '/new_message?single_recipient={{user.email}}';" id="writeToButton" class="float-left submit-button">Write to</button> 
+      <button onclick="location.href = '/block_user?target={{user.id}}';" id="blockUserButton" class="float-left submit-button">Block user</button> 
       </li>
-      
       {% endfor %}
     </ul>
     <button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
-  </body>
-</html>
+{% endblock %}

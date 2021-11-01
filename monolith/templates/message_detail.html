@@ -1,21 +1,19 @@
-<!-- 127.0.0.1:5000/bottlebox?value=home
-127.0.0.1:5000/bottlebox?value=received
-127.0.0.1:5000/bottlebox?value=sent
-127.0.0.1:5000/bottlebox?value=pending -->
+{% extends "layout.html" %}
 
-<html>
-  <body>
-    <h1>Message from {{sender_name}}</h1>
-    <ul>
-      <li>
-        <p>Deliver time: {{message.deliver_time}}</p>
+{% block title %}Message details{% endblock %}
+
+{% block content %}
+
+<h1>Message from {{sender_name}}</h1>
+<ul>
+  <li>
+    <p>Deliver time: {{message.deliver_time}}</p>
 <!--cdjnvfln f-->
-        <p>{{message.content}}</p>
-      </li>
+    <p>{{message.content}}</p>
+  </li>
     
-    </ul>
-    <button onclick="location.href = '/bottlebox?value=Received';" id="backButton" class="float-left submit-button" >Home</button>
-  
-
-  </body>
-</html>
+</ul>
+<button onclick="location.href = '/block_user?target={{message.sender_id}}';" id="blockUserButton" class="float-left submit-button">Block user</button> 
+<button onclick="location.href = '/bottlebox?value=Received';" id="backButton" class="float-left submit-button" >Home</button>
+ 
+{% endblock %}

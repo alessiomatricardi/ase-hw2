@@ -5,6 +5,7 @@ from flask import Flask
 from monolith.auth import login_manager
 from monolith.database import User, db
 from monolith.views import blueprints
+from monolith import errors
 
 
 def create_app():
@@ -13,6 +14,14 @@ def create_app():
     app.config['SECRET_KEY'] = 'ANOTHER ONE'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../mmiab.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # This allows us to test forms without WTForm token
+    app.config['WTF_CSRF_ENABLED'] = False
+
+    # Errors handling
+    app.register_error_handler(401, errors.unauthorized)
+    app.register_error_handler(403, errors.forbidden)
+    app.register_error_handler(404, errors.page_not_found)
 
     for bp in blueprints:
         app.register_blueprint(bp)
@@ -31,7 +40,7 @@ def create_app():
             example.firstname = 'Admin'
             example.lastname = 'Admin'
             example.email = 'example@example.com'
-            example.dateofbirth = datetime.datetime(2020, 10, 5)
+            example.date_of_birth = datetime.datetime(2020, 10, 5)
             example.is_admin = True
             example.set_password('admin')
             db.session.add(example)

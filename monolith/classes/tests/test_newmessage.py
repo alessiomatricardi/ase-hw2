@@ -21,9 +21,12 @@ def fill_database_with_default_values():
     # TODO fill the database
     return True
 
-
 class TestAdd(unittest.TestCase):
     def test_correct_get_list_of_recipients_email(self):
+        return True
+
+class TestNewMessage(unittest.TestCase):
+    def test_name(self):
         with app.app_context():
             m = MessageLogic()
             result = m.get_list_of_recipients_email(1) # retrieve all the users that user 1 (admin) can write to

@@ -1,5 +1,10 @@
-<html>
-  <body><h1>My Message in a Bottle -- Primer</h1>
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<h1>My Message in a Bottle -- Primer</h1>
 
 {% if current_user.is_authenticated %}
   Hi {{ current_user.firstname }}! 
@@ -8,9 +13,11 @@
     <button onclick="location.href = '/logout';" id="logout_button" class="float-left submit-button">Logout</button>
     <button onclick="location.href = '/account_info';" id="account_info_button" class="float-left submit-button">Account Info</button>
     <button onclick="location.href = '/new_message';" id="new_message_button" class="float-left submit-button">New message in a bottle</button>
+    <button onclick="location.href = '/blacklist';" id="blacklist_button" class="float-left submit-button">Blacklist</button>
     <h2>{{ welcome }}</h2>
 
 {% else %}
   Hi Anonymous, <a href="/login">Log in</a> or <a href="/register">Register yourself</a>
 {% endif %}
-</body></html>
+
+{% endblock %}
