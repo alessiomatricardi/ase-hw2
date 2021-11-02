@@ -9,6 +9,12 @@
 {% endif %}
 {% if received == False %}
 <h1>Message to</h1>
+<h5>{% for user in recipients: %} {{user[0].firstname}} {{user[0].lastname}} 
+    {% if user[1] == False %}
+    <button onclick="location.href = '/block_user?target={{user[0].id}}';" id="blockUserButton" class="float-left submit-button">Block user</button>
+    {% endif %}
+  {% endfor %}</h5>
+
 {% endif %}
 <ul>
   <li>
@@ -18,8 +24,10 @@
   </li>
     
 </ul>
-{% if blocked == False %}
-<button onclick="location.href = '/new_message?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button> 
+{% if blocked == False and received == True%}
+
+    <button onclick="location.href = '/new_message?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button>
+
 <button onclick="location.href = '/block_user?target={{message.sender_id}}';" id="blockUserButton" class="float-left submit-button">Block user</button>
 {% endif %} 
 <button onclick="location.href = '/bottlebox?value=Received';" id="backButton" class="float-left submit-button" >Home</button>

@@ -79,27 +79,55 @@ def message_detail(id):
         
         detailed_message = detailed_message[0]
 
+        recipients = None
+        blocked_info = []
         if detailed_message.sender_id == current_user.id:
-                received_message = False
+            
+            received_message = False
+            recipients_id = db.session.query(Message_Recipient).where(Message_Recipient.id == id)
+            recipients_id = [ob.recipient_id for ob in recipients_id]
+            recipients = User.query.filter(User.id.in_(recipients_id))
+            recipients = [ob for ob in recipients]
+            #blocked_info = []
+            #print("hello world")
+
 
         if not received_message or (message != [] and detailed_message.is_delivered):
             sender = User.query.where(User.id == detailed_message.sender_id)[0]
             sender_name = sender.firstname + ' ' + sender.lastname
-
-            # checking if the message is from a blocked or blocking user 
-            blacklist_istance = db.session.query(Blacklist).where(or_(
-                                                                        and_(Blacklist.blocked_user_id == current_user.id, Blacklist.blocking_user_id == sender.id),
-                                                                        and_(Blacklist.blocked_user_id == sender.id, Blacklist.blocking_user_id == current_user.id)
-                                                                    ))
-            blacklist_istance = [ob for ob in blacklist_istance]
+            
             blocked = None
-            if not blacklist_istance:
-                blocked = False
-            else:
-                blocked = True
+            # case 1: the message is a received one, need to check if the sender is blocked or has blocked the current user
+            if received_message:
+                other_id = sender.id
+                # checking if the message is from a blocked or blocking user 
+                blacklist_istance = db.session.query(Blacklist).where(or_(
+                                                                            and_(Blacklist.blocked_user_id == current_user.id, Blacklist.blocking_user_id == other_id),
+                                                                            and_(Blacklist.blocked_user_id == other_id, Blacklist.blocking_user_id == current_user.id)
+                                                                        ))
+                blacklist_istance = [ob for ob in blacklist_istance]
+                
+                if not blacklist_istance:
+                    blocked = False
+                else:
+                    blocked = True
+            # case 2: the message is either a pending or a delivered one, need to check every possibile recipient if they have/have been blocked
+            else: 
+                other_id = None
+                for i in range(len(recipients)):
+                    other_id = recipients[i].id
+                    blacklist_istance = db.session.query(Blacklist).where(or_(
+                                                                        and_(Blacklist.blocked_user_id == current_user.id, Blacklist.blocking_user_id == other_id),
+                                                                        and_(Blacklist.blocked_user_id == other_id, Blacklist.blocking_user_id == current_user.id)
+                                                                    ))
+                    blacklist_istance = [ob for ob in blacklist_istance]
+                    if not blacklist_istance:
+                        blocked_info.append([recipients[i], False])
+                    else:
+                        blocked_info.append([recipients[i], True])
 
 
-            return render_template('/message_detail.html', message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, received = received_message)
+            return render_template('/message_detail.html', message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, received = received_message, recipients = blocked_info)
         else:
             # 404 TODO
             # render_template('/index.html')
