@@ -148,13 +148,6 @@ class TestNewMessage(unittest.TestCase):
         # test that neither a get or post request are done
         try:
             response = tested_app.put("/new_message")
-            print("\n\n")
-            print(response)
-            print(response.status_code)
-            print("\n\n")
         except RuntimeError as e:
-            print("\n\n")
-            print(e)
-            print("\n\n")
             self.assertEqual('This should not happen!', e)
         self.assertEqual(response.status_code, 405)

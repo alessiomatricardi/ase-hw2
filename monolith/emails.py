@@ -1,4 +1,7 @@
 import smtplib, ssl
+from unittest import result
+
+from flask.signals import _FakeSignal
 
 port = 587  # For starttls
 smtp_server = "smtp.gmail.com"
@@ -14,8 +17,11 @@ def send_email(recipient, msg):
         server.starttls() # Secure the connection
         server.login(sender_email, password)
         server.sendmail(sender_email, recipient, msg)
+        result = True
     except Exception as e:
         # Print any error messages to stdout
         print(e)
+        result = False
     finally:
         server.quit() 
+        return result
