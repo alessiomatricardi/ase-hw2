@@ -7,7 +7,7 @@ sender_email = "squad04ase@gmail.com"
 password = "Squad-04-ASE"
 
 
-def send_email(recipient, msg):    
+def send_email(recipient, msg):
     # Try to log in to server and send email
     try:
         server = smtplib.SMTP(smtp_server,port)

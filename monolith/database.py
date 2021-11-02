@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql.elements import Null
 from werkzeug.security import check_password_hash, generate_password_hash
+import json
 
 # default library salt length is 8
 # adjusting it to 16 allow us to improve the strongness of the password
@@ -13,7 +15,7 @@ class User(db.Model):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    email = db.Column(db.Unicode(128), unique=True, nullable=False)
+    email = db.Column(db.Unicode(128), unique=True, nullable=False) # TODO insert again 
     firstname = db.Column(db.Unicode(128))
     lastname = db.Column(db.Unicode(128))
     password = db.Column(db.Unicode(128))
@@ -96,6 +98,18 @@ class Message(db.Model):
 
     def get_id(self):
         return self.id
+    
+    def get_obj(self):
+        message_obj = {
+            'id': self.id,
+            'sender_id': self.sender_id,
+            'content': self.content,
+            'is_sent': self.is_sent,
+            'is_delivered': self.is_delivered,
+            'deliver_time': self.deliver_time
+        }
+        return message_obj
+
 
 
 class Message_Recipient(db.Model):
@@ -105,7 +119,7 @@ class Message_Recipient(db.Model):
     id = db.Column(db.Integer, db.ForeignKey('message.id'), nullable=False)
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     is_read = db.Column(db.Boolean, default=False)
-    read_time = db.Column(db.DateTime)
+    read_time = db.Column(db.DateTime, default=Null)
 
     __table_args__ = (
         db.PrimaryKeyConstraint(
@@ -121,6 +135,14 @@ class Message_Recipient(db.Model):
 
     def get_recipient_id(self):
         return self.recipient_id
+    
+    def get_recipient_obj(self):
+        return {
+            'id': self.id,
+            'recipient_id': self.recipient_id,
+            'is_read': self.is_read,
+            'read_time': self.read_time
+        }
 
 
 class Report(db.Model):
