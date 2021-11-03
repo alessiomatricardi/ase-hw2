@@ -13,7 +13,7 @@
 <h1>{{ label }} Bottlebox</h1>
 <ul>
   {% for msg in messages: %}
-  <li>
+    <li>
 
     <p>{% for user in users: %} {% if user.id == msg.sender_id %}  From: {{user.email}} {% endif %} {% endfor %}</p>
 
@@ -22,14 +22,11 @@
     <p>Deliver time: {{msg.deliver_time}}</p>
 
     <p>{{msg.content}}</p>
-    <p> <button onclick="location.href = '/message/{{msg.id}}'" id="homeButton" class="float-left submit-button" >Open</button></p>
+    <p> <button onclick="location.href = '/message/{{msg.id}}'" id="openButton" class="float-left submit-button" >Open</button></p>
 
-  </li>
-  
+    </li>
   {% endfor %}
 </ul>
 <button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
-
-<button onclick="location.href = '/test_message';" id="homeButton" >Add message</button>
 
 {% endblock %}

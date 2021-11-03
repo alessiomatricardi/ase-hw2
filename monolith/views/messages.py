@@ -68,7 +68,6 @@ def new_message():
             message = Message()
             message.sender_id = current_user.id
             message.content = form['content']
-            message.is_sent = False # redundant because the db automatically set it to False
             message.deliver_time = datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M') # !!! DO NOT TOUCH !!!
 
             """if request.files: # if the user passes it, save a file in a reposistory and set the field message.image to the filename
@@ -116,12 +115,13 @@ def new_message():
                     message_recipient.recipient_id = recipient_id
                     msg_logic.create_new_message_recipient(message_recipient)
 
-                if form['submit'] == 'Send bottle': 
+                if form['submit'] == 'Send bottle': # if it is a draft, the is_sent flag will not be set to True
                     msg_logic.send_bottle(message) 
-                    seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
-                    msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
+
+                    # seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
+                    # msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
                 
-                return redirect("/") 
+                return render_template("index.html") 
 
             else:
                 #msg = json.dumps({"msg":"Condition failed on page baz"})
@@ -129,6 +129,7 @@ def new_message():
                 #return redirect(url_for('.do_foo', messages=messages))
                 flash("Please select at least 1 recipient")
                 return redirect(url_for('.new_message'))
+                return redirect('/new_message') # TODO VEDIAMO COSA SUCCEDE con questo
 
             """
             TEST

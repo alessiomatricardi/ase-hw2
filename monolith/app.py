@@ -1,10 +1,11 @@
 import datetime
 import os
+import random
 
 from flask import Flask
 
 from monolith.auth import login_manager
-from monolith.database import User, db
+from monolith.database import Message, User, Message_Recipient, db
 from monolith.views import blueprints
 from monolith import errors
 
@@ -35,9 +36,11 @@ def create_app():
 
     # create a first admin user
     with app.app_context():
+        
         q = db.session.query(User).filter(User.email == 'example@example.com')
         user = q.first()
-        if user is None:
+        #print(user)
+        if user is None:            
             example = User()
             example.firstname = 'Admin'
             example.lastname = 'Admin'
