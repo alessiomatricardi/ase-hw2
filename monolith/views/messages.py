@@ -1,8 +1,7 @@
 import datetime
 import os
 
-
-from flask import Blueprint, config, redirect, render_template, request, json, current_app
+from flask import Blueprint, config, redirect, render_template, request, json, current_app, abort
 from flask.helpers import flash, send_from_directory, url_for
 from flask.signals import message_flashed, request_finished
 from sqlalchemy.orm import query
@@ -71,21 +70,35 @@ def new_message():
             message.content = form['content']
             message.is_sent = False # redundant because the db automatically set it to False
             message.deliver_time = datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M') # !!! DO NOT TOUCH !!!
-            
-            if request.files: # if the user passes it, save a file in a reposistory and set the field message.image to the filename
+
+            """if request.files: # if the user passes it, save a file in a reposistory and set the field message.image to the filename
 
                 file = request.files['attach_image']
 
                 if msg_logic.control_file(file): # proper controls on the given file
                     
                     s_filename = secure_filename(file.filename)
-                    file.save(os.path.join(current_app.root_path, 'static', s_filename))
-                    message.image = s_filename
+                    file.save(os.path.join(current_app.root_path, 'static/' + str(3), s_filename))
+                    message.image = s_filename"""
 
             # validate message content
             if msg_logic.validate_message_fields(message):
                 # add message in the db
-                id = msg_logic.create_new_message(message)
+
+                if request.files: # if the user passes it, save a file in a reposistory and set the field message.image to the filename
+
+                    file = request.files['attach_image']
+
+                    if msg_logic.control_file(file): # proper controls on the given file
+
+                        message.image = secure_filename(file.filename)
+
+                #print(message.image)
+                id = msg_logic.create_new_message(message) 
+                path_to_folder = os.getcwd() + '/monolith/static/attached/' + str(id)
+                os.mkdir(path_to_folder)    
+                file.save(os.path.join(path_to_folder, message.image))
+
             else:
                 # TODO handle incorrect message fields
                 return render_template('/error_page.html')
@@ -135,15 +148,18 @@ def new_message():
         return redirect('/login') # TODO print an error
 
 # utility to show an image, do not change
-@messages.route('/show/<filename>')
-def send_file(filename):
+@messages.route('/show/<msg_id>/<filename>')
+def send_file(msg_id, filename):
 
     msg_logic = MessageLogic()
 
-    if msg_logic.control_rights_on_image(filename, current_user.id): 
-        return send_from_directory('static', filename)
+    if msg_logic.control_rights_on_image(msg_id, current_user.id): 
+        return send_from_directory(os.getcwd() + '/monolith/static/attached/' + str(msg_id), filename)
+    else:
+        # TODO handle no suorce requested
+        abort(403)
+
     
-    return render_template('error.html')
 
     
    

@@ -12,7 +12,7 @@
     <p>{{message.content}}</p>
 
     {% if message.image != '' %}
-      <img src = "{{url_for('messages.send_file', filename = message.image)}}" width="480" height="270">
+      <img src = "{{url_for('messages.send_file', msg_id = message.id, filename = message.image)}}" width="480" height="270">
     {% endif %}
 
   </li>

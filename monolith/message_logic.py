@@ -81,19 +81,14 @@ class MessageLogic:
         else: 
             return False
 
-    def control_rights_on_image(self, filename, user_id):
+    def control_rights_on_image(self, msg_id, user_id):
         
-        for msg in  db.session.query(Message).\
-                where(Message.sender_id == user_id).all() + \
-                Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).\
-                where(Message_Recipient.recipient_id == user_id).where(Message.is_sent == True).\
-                where(Message.is_delivered == True).\
-                where(Message.deliver_time <= datetime.datetime.now()).all():
-
-            if filename == msg.image:
-                return True
-
-            return False
+        messages_sent = db.session.query(Message).filter(Message.sender_id == user_id).where(Message.id == msg_id).all()
+        messages_recived = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id == msg_id).all()
+ 
+        if messages_sent or messages_recived:
+            return True
+        return False
         
 
     @celery.task(name="send_notification")
