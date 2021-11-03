@@ -47,16 +47,12 @@ def new_message():
             message = Message()
             message.sender_id = current_user.id
             message.content = form['content']
-            message.is_sent = False # redundant because the db automatically set it to False
             message.deliver_time = datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M') # !!! DO NOT TOUCH !!!
 
-            # validate message content
-            if msg_logic.validate_message_fields(message):
-                # add message in the db
-                id = msg_logic.create_new_message(message)
-            else:
-                # TODO handle incorrect message fields
-                return render_template('/error_page.html')
+            msg_logic.validate_message_fields(message)
+            message_obj = msg_logic.create_new_message(message)
+            id = message_obj["id"]
+
             
             if len(form.getlist('recipients')) > 0: # if no recipients have been selected
                 for recipient_email in form.getlist('recipients'): # list of selected recipients emails
@@ -71,30 +67,17 @@ def new_message():
                     message_recipient.recipient_id = recipient_id
                     msg_logic.create_new_message_recipient(message_recipient)
 
-                if form['submit'] == 'Send bottle': 
+                if form['submit'] == 'Send bottle': # if it is a draft, the is_sent flag will not be set to True
                     msg_logic.send_bottle(message) 
-                    seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
-                    msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
+
+                    # seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
+                    # msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
                 
-                return redirect("/") 
+                return render_template("index.html") 
 
             else:
-                #msg = json.dumps({"msg":"Condition failed on page baz"})
-                #db.session['msg'] = msg
-                #return redirect(url_for('.do_foo', messages=messages))
                 flash("Please select at least 1 reecipient")
-                return redirect(url_for('.new_message'))
-
-            """
-            TEST
-            import unittest
-            import monolith.Message_logic as m
-            class TestAdd(unittest.TestCase):
-                def test_NAME(self):
-                    # il db è vuoto
-                    result = m.new_message(message)
-                    self.assertEqual(result, {message_id: 1})
-            """
+                return redirect(url_for('messages.new_message')) # TODO solve error 302 in POST
 
         else:
             raise RuntimeError('This should not happen!')
