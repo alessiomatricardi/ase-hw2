@@ -1,8 +1,9 @@
 # this class contains all the logic required to handle messages
 from monolith.database import Blacklist, db, Message, Message_Recipient, User, Blacklist
 import datetime
-from .background import celery
+from .background import celery  
 from monolith.list_logic import ListLogic
+#from monolith.app import ALLOWED_EXTENSIONS
 
 class MessageLogic:
     
@@ -72,7 +73,28 @@ class MessageLogic:
         # return a list containg the right message if the user has rights on message <msg_id>
         # you can check if the user has right on <msg_id> if the retrieved list is not empty
         
-        return Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today).where(Message_Recipient.recipient_id == user_id).where(Message.id == msg_id)
+        return Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today).where(Message_Recipient.recipient_id == user_id).where(Message.id == msg_id).all()
+
+    def control_file(self, file):
+        if file and file.filename != '' and file.filename.split('.')[1] in ['png', 'jpg', 'jpeg', 'gif']:
+            return True
+        else: 
+            return False
+
+    def control_rights_on_image(self, filename, user_id):
+        
+        for msg in  db.session.query(Message).\
+                where(Message.sender_id == user_id).all() + \
+                Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).\
+                where(Message_Recipient.recipient_id == user_id).where(Message.is_sent == True).\
+                where(Message.is_delivered == True).\
+                where(Message.deliver_time <= datetime.datetime.now()).all():
+
+            if filename == msg.image:
+                return True
+
+            return False
+        
 
     @celery.task(name="send_notification")
     def send_notification(sender_email, recipients_list):

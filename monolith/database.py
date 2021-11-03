@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
-
+#from monolith.views.list import users_list
 # default library salt length is 8
 # adjusting it to 16 allow us to improve the strongness of the password
 _SALT_LENGTH = 16
@@ -75,6 +75,7 @@ class Message(db.Model):
     is_sent = db.Column(db.Boolean, default = False) 
     is_delivered = db.Column(db.Boolean, default = False)
     deliver_time = db.Column(db.DateTime)
+    image = db.Column(db.Unicode(700), default="") # the name of the attached file
 
     # Relatioship with other classes
     recipients = db.relationship('Message_Recipient', backref='message_recipient.recipient_id', lazy=True)
@@ -135,7 +136,6 @@ class Report(db.Model):
             reporting_user_id, message_id,
         ),
     )
-
 
     def __init__(self, *args, **kw):
         super(Report, self).__init__(*args, **kw)

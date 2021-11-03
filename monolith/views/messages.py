@@ -1,20 +1,27 @@
-from flask import Blueprint, redirect, render_template, request, json
-from flask.helpers import flash, url_for
+import datetime
+import os
+
+
+from flask import Blueprint, config, redirect, render_template, request, json, current_app
+from flask.helpers import flash, send_from_directory, url_for
 from flask.signals import message_flashed, request_finished
 from sqlalchemy.orm import query
 from sqlalchemy.sql.elements import Null
+from werkzeug.utils import secure_filename
+from monolith.message_logic import MessageLogic
 from monolith.database import Message, Message_Recipient, User, db
 from monolith.forms import MessageForm
-import datetime
-
 from monolith.auth import current_user
+
+
 
 from monolith.message_logic import MessageLogic # gestisce la logica dei messaggi. 
                                                 # Ad esempio, la creazione di un nuovo messaggio + 
                                                 # richiesta al db + ritorna oggetto json per fare il test
 
-messages = Blueprint('messages', __name__)
 
+
+messages = Blueprint('messages', __name__)
 
 @messages.route('/new_message', methods=['POST', 'GET'])
 def new_message():
@@ -28,7 +35,21 @@ def new_message():
             form = MessageForm()
             form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id) 
             single_recipient = request.args.get('single_recipient') # used to set a checkbox as checked if the recipient is choosen from the recipient list page
-
+            msg_id = request.args.get('msg_id')
+            
+            print(msg_id)
+            if msg_id: # if a message id has been given as argument
+                
+                msg = msg_logic.is_my_message(current_user.id, msg_id)
+                if msg: # the list is not empty
+            
+                    # text builder
+                    sender = db.session.query(User).where(User.id == msg[0].sender_id)[0]
+                    recipient = db.session.query(User).where(User.id == current_user.id)[0]
+                    "Sent by " + sender.firstname + " " + sender.lastname + "\nto " + recipient.firstname + " " + recipient.lastname + "\non " + str(msg[0].deliver_time) + "\n\n\n\"" + msg[0].content + "\"\n"
+                    form.content.data = "Sent by " + sender.firstname + " " + sender.lastname + "\nto " + recipient.firstname + " " + recipient.lastname + "\non " + str(msg[0].deliver_time) + "\n\n\n\"" + msg[0].content + "\"\n" # fill the content with the forward message
+                    #####
+                
             #
             # TODO add multiple_recipients in case a draft with more than 1 recipient has been saved
             #      json_var = request.get_json()
@@ -51,9 +72,15 @@ def new_message():
             message.is_sent = False # redundant because the db automatically set it to False
             message.deliver_time = datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M') # !!! DO NOT TOUCH !!!
             
-            # TODO add a mechanism to attach, send and handle images/documents. 
-            # add a field in which store images/documents.
-            # add a mechanism to render images/documents in web pages.
+            if request.files: # if the user passes it, save a file in a reposistory and set the field message.image to the filename
+
+                file = request.files['attach_image']
+
+                if msg_logic.control_file(file): # proper controls on the given file
+                    
+                    s_filename = secure_filename(file.filename)
+                    file.save(os.path.join(current_app.root_path, 'static', s_filename))
+                    message.image = s_filename
 
             # validate message content
             if msg_logic.validate_message_fields(message):
@@ -107,50 +134,16 @@ def new_message():
     else: # user not logged
         return redirect('/login') # TODO print an error
 
+# utility to show an image, do not change
+@messages.route('/show/<filename>')
+def send_file(filename):
 
+    msg_logic = MessageLogic()
 
-# implement the forward_message 
-# by checking if the current_user 
-# has the rights to perform this
-# action using the passed message
-@messages.route('/new_message/<msg_id>', methods=['GET'])
-def forward_message(msg_id):
-    try:
-        int(msg_id)
-    except:
-        # TODO 404
-        return render_template('/index.html')
+    if msg_logic.control_rights_on_image(filename, current_user.id): 
+        return send_from_directory('static', filename)
+    
+    return render_template('error.html')
 
-
-    if current_user is not None and hasattr(current_user, 'id'):
-
-        # this is the check on the rights of the user on a given message
-        msg_logic = MessageLogic()
-
-        msg = msg_logic.is_my_message(current_user.id, msg_id)
-
-
-        if msg: # the list is not empty
-
-            # text builder
-            sender = db.session.query(User).where(User.id == msg[0].sender_id)[0]
-            recipient = db.session.query(User).where(User.id == current_user.id)[0]
-            forward = "Sent by " + sender.firstname + " " + sender.lastname + "\nto " + recipient.firstname + " " + recipient.lastname + "\non " + str(msg[0].deliver_time) + "\n\n\n\"" + msg[0].content + "\"\n"
-            ##### 
-
-            # form builder
-            form = MessageForm()
-            form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id) 
-            form.content.data = forward
-            single_recipient = request.args.get('single_recipient') # used to set a checkbox as checked if the recipient is choosen from the recipient list page
-            #####
-
-            return render_template('new_message.html', form=form, single_recipient=single_recipient)
-
-        else: # the list is empty so the user doesn't have any right on the selected message
-
-            return render_template('error.html')
-
-
-    else: # user not logged
-        return redirect('/login') # TODO print an error
+    
+   

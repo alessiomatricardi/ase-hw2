@@ -10,11 +10,15 @@
     <p>Deliver time: {{message.deliver_time}}</p>
 <!--cdjnvfln f-->
     <p>{{message.content}}</p>
+
+    {% if message.image != '' %}
+      <img src = "{{url_for('messages.send_file', filename = message.image)}}" width="480" height="270">
+    {% endif %}
   </li>
 
 </ul>
 <button onclick="location.href = '/bottlebox/received';" id="backButton" class="float-left submit-button" >Back</button>
-<button onclick="location.href = '/new_message/{{message.id}}';" id="forwardButotn" class="float-left submit-button" >Forward</button>
+<button onclick="location.href = '/new_message?msg_id={{message.id}}';" id="forwardButton" class="float-left submit-button" >Forward</button>
 
 
 {% endblock %}

@@ -1,4 +1,6 @@
 from flask import Blueprint, redirect, render_template, request
+from flask.globals import current_app
+from sqlalchemy.sql.elements import Null
 
 from monolith.database import User, db, Blacklist, Message, Message_Recipient
 from monolith.forms import UserForm
@@ -6,6 +8,7 @@ from flask_login import current_user
 from monolith.bottlebox_logic import BottleBoxLogic
 
 import datetime
+import os
 
 
 bottlebox = Blueprint('bottlebox', __name__)
@@ -51,6 +54,20 @@ def show_delivered():
 
     return render_template('bottlebox_delivered.html', messages = msg, users = all_users, label = 'Delivered')
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @bottlebox.route('/message_pending/<id>', methods=['GET'])
 def pending_detail(id):
 
@@ -65,10 +82,12 @@ def pending_detail(id):
     if current_user is not None and hasattr(current_user, 'id'):
         message = db.session.query(Message_Recipient).where(Message_Recipient.id == id).where(Message_Recipient.recipient_id == current_user.id)
         if message is not None:
-            detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True)[0]
+            
+            detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True).where(Message.is_delivered == False)[0]
             sender = User.query.where(User.id == detailed_message.sender_id)[0]
             sender_name = sender.firstname + ' ' + sender.lastname
-            return render_template('/pending_detail.html', message = detailed_message, sender_name = sender_name)
+
+            return render_template('/pending_detail.html', message=detailed_message, sender_name=sender_name)
         else:
             # 404 TODO
             render_template('/index.html')
@@ -89,9 +108,11 @@ def received_detail(id):
     if current_user is not None and hasattr(current_user, 'id'):
         message = db.session.query(Message_Recipient).where(Message_Recipient.id == id).where(Message_Recipient.recipient_id == current_user.id)
         if message is not None:
-            detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True)[0]
+
+            detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True).where(Message.is_delivered == True)[0]
             sender = User.query.where(User.id == detailed_message.sender_id)[0]
             sender_name = sender.firstname + ' ' + sender.lastname
+            db.session.query(Message_Recipient).where(Message_Recipient.recipient_id == current_user.id).where(Message_Recipient.id == detailed_message.id).update({Message_Recipient.is_read : 1})
             return render_template('/received_detail.html', message = detailed_message, sender_name = sender_name)
         else:
             # 404 TODO
@@ -116,6 +137,7 @@ def delivered_detail(id):
             detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True)[0]
             sender = User.query.where(User.id == detailed_message.sender_id)[0]
             sender_name = sender.firstname + ' ' + sender.lastname
+
             return render_template('/delivered_detail.html', message = detailed_message, sender_name = sender_name)
         else:
             # 404 TODO

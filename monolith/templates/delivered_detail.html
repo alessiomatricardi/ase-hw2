@@ -10,6 +10,11 @@
     <p>Deliver time: {{message.deliver_time}}</p>
 <!--cdjnvfln f-->
     <p>{{message.content}}</p>
+
+    {% if message.image != '' %}
+      <p><img src = "{{url_for('messages.send_file', filename = message.image)}}" width="480" height="270"></p>
+    {% endif %}
+
   </li>
 
 </ul>

@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from flask import Flask
 
@@ -7,13 +8,14 @@ from monolith.database import User, db
 from monolith.views import blueprints
 from monolith import errors
 
-
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='/home/davide/Scrivania/ase-hw2/Static/')
     app.config['WTF_CSRF_SECRET_KEY'] = 'A SECRET KEY'
     app.config['SECRET_KEY'] = 'ANOTHER ONE'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../mmiab.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # app.config['UPLOAD_FOLDER'] = app.static_folder # !! SET THE PROPER PATH TO THE UPLOAD FOLDER !! 
+
 
     # This allows us to test forms without WTForm token
     app.config['WTF_CSRF_ENABLED'] = False
