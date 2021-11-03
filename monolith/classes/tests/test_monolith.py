@@ -91,12 +91,12 @@ class TestAuthAndReg(unittest.TestCase):
 
         # further checks on database
         with tested_app.app_context():
-            row = db.session.query(User).where(User.id==7)
+            row = db.session.query(User).where(User.id==6)
             row = [ob for ob in row]
             user = row[0]
             self.assertEqual(user.is_active,False)
 
             # deleting the test account
-            db.session.query(User).where(User.id== 7).delete()
+            db.session.query(User).where(User.id==6).delete()
             db.session.commit()
 

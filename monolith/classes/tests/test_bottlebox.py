@@ -18,7 +18,7 @@ class TestBottlebox(unittest.TestCase):
             result_firstname = [ob.firstname for ob in result]
             result_lastname = [ob.lastname for ob in result]
             result_administrator = [ob.is_admin for ob in result]
-            expected_id = [2,3,5,6]
+            expected_id = [2,3,4,5]
             expected_email = ["prova@mail.com", "prova2@mail.com", "prova4@mail.com", "prova5@mail.com"]
             expected_firstname = ['Alessio','Damiano','Barbara', 'Carlo']
             expected_lastname = ['Bianchi','Rossi', 'Verdi', 'Neri']
@@ -54,8 +54,8 @@ class TestBottlebox(unittest.TestCase):
             self.assertEqual(result_deliver_time,expected_deliver_time)
             self.assertEqual(result_delivered,expected_delivered)
 
-            #received messages for user 2
-            result = b.retrieving_messages(2,2)
+            #received messages for user 5
+            result = b.retrieving_messages(5,2)
             result_id = [ob.get_id() for ob in result]
             result_sender = [ob.sender_id for ob in result]
             result_deliver_time = [ob.deliver_time for ob in result]
@@ -97,6 +97,10 @@ class TestBottlebox(unittest.TestCase):
         response = tested_app.get("/bottlebox", content_type='html/text', follow_redirects=True)
         assert b'<label for="email">E-mail</label>' in response.data 
 
+        # checking that accessing to message details page redirects to the login page if not already logged in
+        response = tested_app.get("/message/2", content_type='html/text', follow_redirects=True)
+        assert b'<label for="email">E-mail</label>' in response.data 
+
         # logging in
         data1 = { 'email' : 'prova2@mail.com' , 'password' : 'prova123' }
         response = tested_app.post("/login", data = data1 , content_type='application/x-www-form-urlencoded', follow_redirects=True)
@@ -117,6 +121,67 @@ class TestBottlebox(unittest.TestCase):
         # checking the rendering of delivered messages bottlebox
         response = tested_app.get("/bottlebox/delivered", data = data1 , content_type='html/text', follow_redirects=True)
         assert b'<h1>Delivered Bottlebox</h1>' in response.data 
+
+        # checking the rendering of a received message from a blocked user
+        response = tested_app.get("/message/3", data = data1 , content_type='html/text', follow_redirects=True)
+        assert b'<h1>Message from</h1>' in response.data
+        assert b'<h5>Alessio Bianchi</h5>' in response.data 
+        assert b'Reply' not in response.data
+        assert b'Block user' not in response.data
+
+        # checking the rendering of a delivered message to a non blocking/blocked user
+        response = tested_app.get("/message/2", data = data1 , content_type='html/text', follow_redirects=True)
+        assert b'<h1>Message to</h1>' in response.data
+        assert b'Carlo Neri' in response.data 
+        assert b'Block user' in response.data
+       
+        # checking that the opening of a message not yet delivered is not possible
+        response = tested_app.get("/message/1", data = data1 , content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 404)
+        
+        # checking that the opening of a non existing message is not possible
+        response = tested_app.get("/message/100000", data = data1 , content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 404)
+
+        # logout
+        response = tested_app.get("/logout", content_type='html/text', follow_redirects=True)
+        assert b'Hi Anonymous' in response.data
+
+        # logging onto another account
+        data1 = { 'email' : 'prova5@mail.com' , 'password' : 'prova123' }
+        response = tested_app.post("/login", data = data1 , content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        assert b'Hi Carlo' in response.data 
+
+        # checking that opening a message received from a non blocked/blocking user displays the reply and block user buttons
+        response = tested_app.get("/message/2", data = data1 , content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        assert b'<h1>Message from</h1>' in response.data
+        assert b'<h5>Damiano Rossi</h5>' in response.data 
+        assert b'Reply' in response.data
+        assert b'Block user' in response.data
+
+         # logout
+        response = tested_app.get("/logout", content_type='html/text', follow_redirects=True)
+        assert b'Hi Anonymous' in response.data
+
+        # logging onto another account
+        data1 = { 'email' : 'prova@mail.com' , 'password' : 'prova123' }
+        response = tested_app.post("/login", data = data1 , content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        assert b'Hi Alessio' in response.data 
+
+        # checking that opening a message delivered to a blocked/blocking user does not display the reply and block user buttons
+        response = tested_app.get("/message/3", data = data1 , content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        assert b'<h1>Message to</h1>' in response.data
+        assert b'Damiano Rossi' in response.data 
+        assert b'Reply' not in response.data
+        assert b'Block user' not in response.data
+
+        # checking that opening a message with wrong URL args redirects to the Home Page
+        response = tested_app.get("/message/not_an_int_arg", data = data1 , content_type='html/text', follow_redirects=True)
+        assert b'Hi Alessio' in response.data 
+
+
 
 
 
