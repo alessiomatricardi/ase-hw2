@@ -1,5 +1,4 @@
 from monolith.database import db, Message_Recipient, Message, User, Blacklist, Report
-import datetime
 import random
 
 import re
@@ -94,7 +93,6 @@ class TestPopulateDB(unittest.TestCase):
             message.is_sent = True
             message.is_delivered  = False
             message_recipient.is_read = False
-            message_recipient.read_time = None
             message.deliver_time = datetime.datetime(2031,10,29,18,32)
             db.session.add(message)
             db.session.add(message_recipient)
@@ -109,7 +107,6 @@ class TestPopulateDB(unittest.TestCase):
             message.is_sent = True
             message.is_delivered  = True
             message_recipient.is_read = False
-            message_recipient.read_time = None
             message.deliver_time = datetime.datetime(2021,9,29,18,32)
             db.session.add(message)
             db.session.add(message_recipient)
@@ -124,7 +121,6 @@ class TestPopulateDB(unittest.TestCase):
             message.is_sent = True
             message.is_delivered  = True
             message_recipient.is_read = False
-            message_recipient.read_time = None
             message.deliver_time = datetime.datetime(2021,9,29,18,32)
             db.session.add(message)
             db.session.add(message_recipient)

@@ -115,7 +115,7 @@ class Message_Recipient(db.Model):
     id = db.Column(db.Integer, db.ForeignKey('message.id'), nullable=False)
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     is_read = db.Column(db.Boolean, default=False)
-    read_time = db.Column(db.DateTime, default=Null)
+    # read_time = db.Column(db.DateTime, default=Null)
 
     __table_args__ = (
         db.PrimaryKeyConstraint(
@@ -136,8 +136,8 @@ class Message_Recipient(db.Model):
         return {
             'id': self.id,
             'recipient_id': self.recipient_id,
-            'is_read': self.is_read,
-            'read_time': self.read_time
+            'is_read': self.is_read
+            #'read_time': self.read_time
         }
 
 

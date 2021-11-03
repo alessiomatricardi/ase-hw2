@@ -18,9 +18,7 @@ def send_email(recipient, msg):
         server.login(sender_email, password)
         server.sendmail(sender_email, recipient, msg)
         result = True
-    except Exception as e:
-        # Print any error messages to stdout
-        print(e)
+    except Exception:
         result = False
     finally:
         server.quit() 
