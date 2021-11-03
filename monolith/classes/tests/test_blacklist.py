@@ -28,12 +28,12 @@ class TestBlacklist(unittest.TestCase):
         assert b'You are trying to block a non existing user!' in response.data
  
         # block existing user 6
-        response = app.get("/block_user?target=6", content_type='html/text', follow_redirects=True)
+        response = app.get("/block_user?target=5", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         assert b'Carlo Neri' in response.data
 
         # block again same user
-        response = app.get("/block_user?target=6", content_type='html/text', follow_redirects=True)
+        response = app.get("/block_user?target=5", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         assert b'Carlo Neri' in response.data
 
@@ -60,7 +60,7 @@ class TestBlacklist(unittest.TestCase):
         # restoring the db to the previous form
         with tested_app.app_context():
 
-            db.session.query(Blacklist).where(and_(Blacklist.blocking_user_id==3,Blacklist.blocked_user_id==6)).delete()
+            db.session.query(Blacklist).where(and_(Blacklist.blocking_user_id==3,Blacklist.blocked_user_id==5)).delete()
             db.session.commit()
             result = db.session.query(Blacklist).where(Blacklist.blocking_user_id == 3)
             result = [(ob.blocking_user_id,ob.blocked_user_id) for ob in result]
@@ -78,18 +78,18 @@ class TestBlacklist(unittest.TestCase):
             self.assertEqual(result, False)
 
             # retrieving existing user
-            result = bl.check_existing_user(6)
+            result = bl.check_existing_user(5)
             self.assertEqual(result,True)    
 
             # adding a blacklist istance to db
-            bl.add_to_blackist(3,6)      
+            bl.add_to_blackist(3,5)      
             result = db.session.query(Blacklist).where(Blacklist.blocking_user_id == 3)
             result = [(ob.blocking_user_id,ob.blocked_user_id) for ob in result]
-            expected_result = [ (3,2),(3,6) ]
+            expected_result = [ (3,2),(3,5) ]
             self.assertEqual(result,expected_result)
 
             # removing the previously created istance from blacklist table
-            db.session.query(Blacklist).where(and_(Blacklist.blocking_user_id==3,Blacklist.blocked_user_id==6)).delete()
+            db.session.query(Blacklist).where(and_(Blacklist.blocking_user_id==3,Blacklist.blocked_user_id==5)).delete()
             db.session.commit()
  
             # checking the istances on database

@@ -26,8 +26,8 @@ class User(db.Model):
     '''
     TODO 2nd priority stuffs
     lottery_points = db.Column(db.integer, default=0)
-    content_filter_enabled = db.Column(db.Boolean, default=False)
     '''
+    content_filter_enabled = db.Column(db.Boolean, default=False)
 
     # Relatioships with other classes
     sent_messages = db.relationship('Message', backref='sender', lazy=True)

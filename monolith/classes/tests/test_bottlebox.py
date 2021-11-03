@@ -18,7 +18,7 @@ class TestBottlebox(unittest.TestCase):
             result_firstname = [ob.firstname for ob in result]
             result_lastname = [ob.lastname for ob in result]
             result_administrator = [ob.is_admin for ob in result]
-            expected_id = [2,3,5,6]
+            expected_id = [2,3,4,5]
             expected_email = ["prova@mail.com", "prova2@mail.com", "prova4@mail.com", "prova5@mail.com"]
             expected_firstname = ['Alessio','Damiano','Barbara', 'Carlo']
             expected_lastname = ['Bianchi','Rossi', 'Verdi', 'Neri']
@@ -54,8 +54,8 @@ class TestBottlebox(unittest.TestCase):
             self.assertEqual(result_deliver_time,expected_deliver_time)
             self.assertEqual(result_delivered,expected_delivered)
 
-            #received messages for user 6
-            result = b.retrieving_messages(6,2)
+            #received messages for user 5
+            result = b.retrieving_messages(5,2)
             result_id = [ob.get_id() for ob in result]
             result_sender = [ob.sender_id for ob in result]
             result_deliver_time = [ob.deliver_time for ob in result]
