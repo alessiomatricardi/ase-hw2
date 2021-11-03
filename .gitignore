@@ -2,6 +2,12 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,macos,flask,visualstudiocode,jupyternotebooks,linux,pycharm+all,virtualenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,macos,flask,visualstudiocode,jupyternotebooks,linux,pycharm+all,virtualenv
 
+### Images ###
+*.jpg
+*.jpeg
+*.gif
+*.png
+
 ### Flask ###
 instance/*
 !instance/.gitignore

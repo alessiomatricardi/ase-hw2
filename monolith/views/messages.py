@@ -1,19 +1,26 @@
-from flask import Blueprint, redirect, render_template, request, json
-from flask.helpers import flash, url_for
-from flask.signals import message_flashed, request_finished
-from sqlalchemy.sql.elements import Null
-from monolith.database import Message, Message_Recipient, db
-from monolith.forms import MessageForm
 import datetime
+import os
 
+from flask import Blueprint, config, redirect, render_template, request, json, current_app, abort
+from flask.helpers import flash, send_from_directory, url_for
+from flask.signals import message_flashed, request_finished
+from sqlalchemy.orm import query
+from sqlalchemy.sql.elements import Null
+from werkzeug.utils import secure_filename
+from monolith.message_logic import MessageLogic
+from monolith.database import Message, Message_Recipient, User, db
+from monolith.forms import MessageForm
 from monolith.auth import current_user
+
+
 
 from monolith.message_logic import MessageLogic # gestisce la logica dei messaggi. 
                                                 # Ad esempio, la creazione di un nuovo messaggio + 
                                                 # richiesta al db + ritorna oggetto json per fare il test
 
-messages = Blueprint('messages', __name__)
 
+
+messages = Blueprint('messages', __name__)
 
 @messages.route('/new_message', methods=['POST', 'GET'])
 def new_message():
@@ -27,7 +34,21 @@ def new_message():
             form = MessageForm()
             form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id) 
             single_recipient = request.args.get('single_recipient') # used to set a checkbox as checked if the recipient is choosen from the recipient list page
-
+            msg_id = request.args.get('msg_id')
+            
+            print(msg_id)
+            if msg_id: # if a message id has been given as argument
+                
+                msg = msg_logic.is_my_message(current_user.id, msg_id)
+                if msg: # the list is not empty
+            
+                    # text builder
+                    sender = db.session.query(User).where(User.id == msg[0].sender_id)[0]
+                    recipient = db.session.query(User).where(User.id == current_user.id)[0]
+                    "Sent by " + sender.firstname + " " + sender.lastname + "\nto " + recipient.firstname + " " + recipient.lastname + "\non " + str(msg[0].deliver_time) + "\n\n\n\"" + msg[0].content + "\"\n"
+                    form.content.data = "Sent by " + sender.firstname + " " + sender.lastname + "\nto " + recipient.firstname + " " + recipient.lastname + "\non " + str(msg[0].deliver_time) + "\n\n\n\"" + msg[0].content + "\"\n" # fill the content with the forward message
+                    #####
+                
             #
             # TODO add multiple_recipients in case a draft with more than 1 recipient has been saved
             #      json_var = request.get_json()
@@ -49,10 +70,37 @@ def new_message():
             message.content = form['content']
             message.deliver_time = datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M') # !!! DO NOT TOUCH !!!
 
-            msg_logic.validate_message_fields(message)
-            message_obj = msg_logic.create_new_message(message)
-            id = message_obj["id"]
+            """if request.files: # if the user passes it, save a file in a reposistory and set the field message.image to the filename
 
+                file = request.files['attach_image']
+
+                if msg_logic.control_file(file): # proper controls on the given file
+                    
+                    s_filename = secure_filename(file.filename)
+                    file.save(os.path.join(current_app.root_path, 'static/' + str(3), s_filename))
+                    message.image = s_filename"""
+
+            # validate message content
+            if msg_logic.validate_message_fields(message):
+                # add message in the db
+
+                if request.files: # if the user passes it, save a file in a reposistory and set the field message.image to the filename
+
+                    file = request.files['attach_image']
+
+                    if msg_logic.control_file(file): # proper controls on the given file
+
+                        message.image = secure_filename(file.filename)
+
+                #print(message.image)
+                id = msg_logic.create_new_message(message) 
+                path_to_folder = os.getcwd() + '/monolith/static/attached/' + str(id)
+                os.mkdir(path_to_folder)    
+                file.save(os.path.join(path_to_folder, message.image))
+
+            else:
+                # TODO handle incorrect message fields
+                return render_template('/error_page.html')
             
             if len(form.getlist('recipients')) > 0: # if no recipients have been selected
                 for recipient_email in form.getlist('recipients'): # list of selected recipients emails
@@ -76,11 +124,43 @@ def new_message():
                 return render_template("index.html") 
 
             else:
-                flash("Please select at least 1 reecipient")
-                return redirect(url_for('messages.new_message')) # TODO solve error 302 in POST
+                #msg = json.dumps({"msg":"Condition failed on page baz"})
+                #db.session['msg'] = msg
+                #return redirect(url_for('.do_foo', messages=messages))
+                flash("Please select at least 1 recipient")
+                return redirect(url_for('.new_message'))
+                return redirect('/new_message') # TODO VEDIAMO COSA SUCCEDE con questo
+
+            """
+            TEST
+            import unittest
+            import monolith.Message_logic as m
+            class TestAdd(unittest.TestCase):
+                def test_NAME(self):
+                    # il db è vuoto
+                    result = m.new_message(message)
+                    self.assertEqual(result, {message_id: 1})
+            """
 
         else:
             raise RuntimeError('This should not happen!')
 
     else: # user not logged
         return redirect('/login') # TODO print an error
+
+# utility to show an image, do not change
+@messages.route('/show/<msg_id>/<filename>')
+def send_file(msg_id, filename):
+
+    msg_logic = MessageLogic()
+
+    if msg_logic.control_rights_on_image(msg_id, current_user.id): 
+        return send_from_directory(os.getcwd() + '/monolith/static/attached/' + str(msg_id), filename)
+    else:
+        # TODO handle no suorce requested
+        abort(403)
+
+    
+
+    
+   

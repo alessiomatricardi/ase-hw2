@@ -74,6 +74,7 @@ class Message(db.Model):
     is_sent = db.Column(db.Boolean, default = False) 
     is_delivered = db.Column(db.Boolean, default = False)
     deliver_time = db.Column(db.DateTime)
+    image = db.Column(db.Unicode(700), default="") # the name of the attached file
 
     # Relatioship with other classes
     recipients = db.relationship('Message_Recipient', backref='message_recipient.recipient_id', lazy=True)
@@ -154,7 +155,6 @@ class Report(db.Model):
             reporting_user_id, message_id,
         ),
     )
-
 
     def __init__(self, *args, **kw):
         super(Report, self).__init__(*args, **kw)
