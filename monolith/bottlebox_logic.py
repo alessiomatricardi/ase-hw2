@@ -26,7 +26,7 @@ class BottleBoxLogic:
             msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == False).where(Message.deliver_time > today)
             
             #if the content filter is active, all the messages will be displayed censored
-            if user.is_active:
+            if user.content_filter_enabled:
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
                    message.content = censored_content
@@ -35,7 +35,7 @@ class BottleBoxLogic:
         elif type == 2: #received
             msg = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message_Recipient.recipient_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today)
 
-            if user.is_active:
+            if user.content_filter_enabled:
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
                    message.content = censored_content
@@ -43,7 +43,7 @@ class BottleBoxLogic:
         elif type == 3: #delivered
             msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today)
 
-            if user.is_active:
+            if user.content_filter_enabled:
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
                    message.content = censored_content

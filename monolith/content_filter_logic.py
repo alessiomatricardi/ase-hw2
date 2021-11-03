@@ -9,12 +9,12 @@ class ContentFilterLogic:
         pass
 
     def activate_filter(self, user_id):
-        db.session.query(User).filter(User.id == user_id).update({'is_active': True})
+        db.session.query(User).filter(User.id == user_id).update({'content_filter_enabled': True})
         db.session.commit()
         return 
     
     def de_activate_filter(self, user_id):
-        db.session.query(User).filter(User.id == user_id).update({'is_active': False})
+        db.session.query(User).filter(User.id == user_id).update({'content_filter_enabled': False})
         db.session.commit()
         return
 

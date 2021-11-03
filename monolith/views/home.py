@@ -40,11 +40,11 @@ def content_filter():
     print("this is user object")
     print(user)
 
-    if user.is_active == True:
+    if user.content_filter_enabled == True:
         cfl.de_activate_filter(user.id)
         msg = "Your content filter has been deactivated"
 
-    elif user.is_active == False:
+    elif user.content_filter_enabled == False:
         cfl.activate_filter(user.id)
         msg = "Your content filter has been activated"    
 
