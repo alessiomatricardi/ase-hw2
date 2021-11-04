@@ -41,3 +41,10 @@ class MessageForm(FlaskForm):
 class UnregisterForm(FlaskForm):
     password = f.PasswordField('password', validators=[DataRequired()])
     display = ['password']
+
+class ReportForm(FlaskForm):
+    message_id = f.TextField()
+
+    def __init__(self, message_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.message_id.data = message_id

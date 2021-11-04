@@ -10,7 +10,8 @@ from monolith.views import blueprints
 from monolith import errors
 
 def create_app():
-    app = Flask(__name__, static_folder='/home/davide/Scrivania/ase-hw2/Static/')
+    #app = Flask(__name__, static_folder='/home/davide/Scrivania/ase-hw2/static/')
+    app = Flask(__name__)
     app.config['WTF_CSRF_SECRET_KEY'] = 'A SECRET KEY'
     app.config['SECRET_KEY'] = 'ANOTHER ONE'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../mmiab.db'

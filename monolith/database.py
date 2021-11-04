@@ -1,7 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.elements import Null
 from werkzeug.security import check_password_hash, generate_password_hash
-import json
 
 # default library salt length is 8
 # adjusting it to 16 allow us to improve the strongness of the password
