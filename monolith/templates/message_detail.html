@@ -1,10 +1,26 @@
+<!-- 
+  davide: questa pagina html non è più 
+  utilizzata ed è stata sostituita con pending/received/delivered_detail.html
+  per gestire meglio il tasto back
+-->
+
 {% extends "layout.html" %}
 
 {% block title %}Message details{% endblock %}
 
 {% block content %}
+{% if label == 'received' %}
+<h1>Message from</h1>
+<h5>{{sender_name}}</h5>
+{% else %}
+<h1>Message to</h1>
+<h5>{% for user in recipients: %} {{user[0].firstname}} {{user[0].lastname}} 
+    {% if user[1] == False %}
+    <button onclick="location.href = '/block_user?target={{user[0].id}}';" id="blockUserButton" class="float-left submit-button">Block user</button>
+    {% endif %}
+  {% endfor %}</h5>
 
-<h1>Message from {{sender_name}}</h1>
+{% endif %}
 <ul>
   <li>
     <p>Deliver time: {{message.deliver_time}}</p>
@@ -13,7 +29,17 @@
   </li>
     
 </ul>
-<button onclick="location.href = '/block_user?target={{message.sender_id}}';" id="blockUserButton" class="float-left submit-button">Block user</button> 
+{% if label == 'received' %}
+
+  <button onclick="location.href = '/new_message?msg_id={{message.id}}';" id="forwardButton" class="float-left submit-button" >Forward</button>
+  {% if blocked == False %}
+  <button onclick="location.href = '/new_message?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button>
+  <button onclick="location.href = '/block_user?target={{message.sender_id}}';" id="blockUserButton" class="float-left submit-button">Block user</button>
+  {% endif %}
+  
+{% endif %} 
+
+
 <button onclick="location.href = '/bottlebox?value=Received';" id="backButton" class="float-left submit-button" >Home</button>
  
 {% endblock %}

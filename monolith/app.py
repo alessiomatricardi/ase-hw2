@@ -1,19 +1,22 @@
 import datetime
+import os
+import random
 
 from flask import Flask
 
 from monolith.auth import login_manager
-from monolith.database import User, db
+from monolith.database import Message, User, Message_Recipient, db
 from monolith.views import blueprints
 from monolith import errors
 
-
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='/home/davide/Scrivania/ase-hw2/Static/')
     app.config['WTF_CSRF_SECRET_KEY'] = 'A SECRET KEY'
     app.config['SECRET_KEY'] = 'ANOTHER ONE'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../mmiab.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # app.config['UPLOAD_FOLDER'] = app.static_folder # !! SET THE PROPER PATH TO THE UPLOAD FOLDER !! 
+
 
     # This allows us to test forms without WTForm token
     app.config['WTF_CSRF_ENABLED'] = False
@@ -33,9 +36,11 @@ def create_app():
 
     # create a first admin user
     with app.app_context():
+        
         q = db.session.query(User).filter(User.email == 'example@example.com')
         user = q.first()
-        if user is None:
+        #print(user)
+        if user is None:            
             example = User()
             example.firstname = 'Admin'
             example.lastname = 'Admin'
