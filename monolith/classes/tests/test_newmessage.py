@@ -116,10 +116,11 @@ class TestNewMessage(unittest.TestCase):
         data = { 
             'content' : 'ININFLUENT FOR THE TEST' ,
             'deliver_time' : "2021-11-01T15:45",
-            'submit': 'ININFLUENT FOR THE TEST'
+            'submit': 'ININFLUENT FOR THE TEST',
+            'attach_image': ''
         }
         response = tested_app.post("/new_message", data = data, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        assert b'<p>Please select at least 1 reecipient</p>' in response.data
+        assert b'<p>Please select at least 1 recipient</p>' in response.data
 
         # test that the message is saved as a draft, so the rendered page is the index.html
         data = { 

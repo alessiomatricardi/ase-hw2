@@ -1,8 +1,3 @@
-<!-- 
-  davide: questa pagina html non è più utilizzata 
-  ed è stata sostituita con bottlebox_pending/received/delivered.html per 
-  gestire meglio il tasto back
--->
 
 {% extends "layout.html" %}
 
@@ -13,20 +8,30 @@
 <h1>{{ label }} Bottlebox</h1>
 <ul>
   {% for msg in messages: %}
-    <li>
-
+  <li>
+    
     <p>{% for user in users: %} {% if user.id == msg.sender_id %}  From: {{user.email}} {% endif %} {% endfor %}</p>
-
+    
     <p>{% for recipient in msg.recipients: %} {% for user in users: %} {% if user.id == recipient.recipient_id %}  to: {{user.email}} {% endif %} {% endfor %} {% endfor %}</p>
-
+    
     <p>Deliver time: {{msg.deliver_time}}</p>
-
+    
     <p>{{msg.content}}</p>
-    <p> <button onclick="location.href = '/message/{{msg.id}}'" id="openButton" class="float-left submit-button" >Open</button></p>
+
+    {% if label == 'Pending' %}
+    <p> <button onclick="location.href = '/message/pending/{{msg.id}}'" id="openButton" class="float-left submit-button" >Open</button></p>
+    
+    {% elif label == 'Received' %}
+    <p> <button onclick="location.href = '/message/received/{{msg.id}}'" id="openButton" class="float-left submit-button" >Open</button></p>
+    
+    {% elif label == 'Delivered' %}
+    <p> <button onclick="location.href = '/message/delivered/{{msg.id}}'" id="openButton" class="float-left submit-button" >Open</button></p>
+
+    {% endif %}
 
     </li>
   {% endfor %}
 </ul>
-<button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
+<button onclick="location.href = '/bottlebox';" id="backButton" class="float-left submit-button" >Back</button>
 
 {% endblock %}
