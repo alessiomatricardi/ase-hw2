@@ -6,7 +6,7 @@ from warnings import resetwarnings
 
 #from flask import app
 from flask.signals import message_flashed
-from flask_wtf.recaptcha.widgets import RECAPTCHA_SCRIPT
+# from flask_wtf.recaptcha.widgets import RECAPTCHA_SCRIPT
 from monolith.database import Message_Recipient, db, Message
 from monolith.message_logic import MessageLogic
 from monolith.app import create_app
@@ -117,10 +117,10 @@ class TestNewMessage(unittest.TestCase):
             'content' : 'ININFLUENT FOR THE TEST' ,
             'deliver_time' : "2021-11-01T15:45",
             'submit': 'ININFLUENT FOR THE TEST',
-            'attach_image': ''
         }
         response = tested_app.post("/new_message", data = data, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        assert b'<p>Please select at least 1 recipient</p>' in response.data
+        print(response.data)
+        assert b'Please select at least 1 recipient' in response.data
 
         # test that the message is saved as a draft, so the rendered page is the index.html
         data = { 

@@ -70,18 +70,11 @@ def new_message():
             message.content = form['content']
             message.deliver_time = datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M') # !!! DO NOT TOUCH !!!
 
-            """if request.files: # if the user passes it, save a file in a reposistory and set the field message.image to the filename
-
-                file = request.files['attach_image']
-
-                if msg_logic.control_file(file): # proper controls on the given file
-                    
-                    s_filename = secure_filename(file.filename)
-                    file.save(os.path.join(current_app.root_path, 'static/' + str(3), s_filename))
-                    message.image = s_filename"""
-
             # validate message content
             if msg_logic.validate_message_fields(message):
+                
+                id = None
+                
                 # add message in the db
 
                 if request.files: # if the user passes it, save a file in a reposistory and set the field message.image to the filename
@@ -91,12 +84,13 @@ def new_message():
                     if msg_logic.control_file(file): # proper controls on the given file
 
                         message.image = secure_filename(file.filename)
-
-                #print(message.image)
-                id = msg_logic.create_new_message(message) 
-                path_to_folder = os.getcwd() + '/monolith/static/attached/' + str(id)
-                os.mkdir(path_to_folder)    
-                file.save(os.path.join(path_to_folder, message.image))
+                        id = msg_logic.create_new_message(message)
+                        path_to_folder = os.getcwd() + '/monolith/static/attached/' + str(id)
+                        os.mkdir(path_to_folder)    
+                        file.save(os.path.join(path_to_folder, message.image))
+                else:
+                    id = msg_logic.create_new_message(message)
+   
 
             else:
                 # TODO handle incorrect message fields
