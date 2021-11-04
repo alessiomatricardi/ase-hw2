@@ -103,8 +103,11 @@ class Message_Recipient(db.Model):
 
     id = db.Column(db.Integer, db.ForeignKey('message.id'), nullable=False)
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    is_read = db.Column(db.Boolean, default=False)
+    is_read = db.Column(db.Boolean, default = False)
     read_time = db.Column(db.DateTime)
+
+    # message has been cancelled by the recipient
+    is_hide = db.Column(db.Boolean, default = False)
 
     __table_args__ = (
         db.PrimaryKeyConstraint(
