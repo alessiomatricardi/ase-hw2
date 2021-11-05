@@ -11,7 +11,7 @@
 <h5>{% for user in recipients: %} {{user[0].firstname}} {{user[0].lastname}} 
     {% if user[1] == False %}
     <form action="/block" method="POST">
-      {{ blockForm.hidden_tag() }}
+      {{ blockForms[0].hidden_tag() }}
       <input type="submit" value="Block user">
     </form>
     {% endif %}
@@ -32,7 +32,7 @@
   {% if blocked == False %} <!-- va messo fuori -->
   <button onclick="location.href = '/new_message?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button>
   <form action="/block" method="POST">
-    {{ blockForm.hidden_tag() }}
+    {{ blockForms[0].hidden_tag() }}
     <input type="submit" value="Block user">
   </form>
   {% endif %}
