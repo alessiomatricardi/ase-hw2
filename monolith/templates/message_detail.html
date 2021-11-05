@@ -37,6 +37,11 @@
   <button onclick="location.href = '/new_message?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button>
   <button onclick="location.href = '/block_user?target={{message.sender_id}}';" id="blockUserButton" class="float-left submit-button">Block user</button>
   {% endif %}
+
+  <form action="/report">
+    <input type="submit" value="Report this sender">
+  </form>
+
   
 {% endif %} 
 
