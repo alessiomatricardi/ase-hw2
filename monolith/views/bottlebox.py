@@ -85,13 +85,11 @@ def delivered_detail(label, id):
 
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
-        
-
+ 
         recipients = None
         blocked_info = []
         detailed_message = None
         blocked = None
-
 
         # checking the value of the label
         if label == 'received':
@@ -101,7 +99,6 @@ def delivered_detail(label, id):
             message_recipient = [ob for ob in message_recipient]
             if not message_recipient:
                 abort(404)
-
 
             detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True)
             detailed_message = [ob for ob in detailed_message]
@@ -158,8 +155,6 @@ def delivered_detail(label, id):
                     blocked_info.append([recipients[i], False])
                 else:
                     blocked_info.append([recipients[i], True])
-
-
 
         sender = User.query.where(User.id == detailed_message.sender_id)[0]
         sender_name = sender.firstname + ' ' + sender.lastname 

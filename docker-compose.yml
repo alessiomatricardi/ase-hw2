@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  monolith:
+    container_name: monolith
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+
+  celery:
+    container_name: celery
+    build:
+      context: .
+      dockerfile: Dockerfile-celery
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+    links:
+      - redis
+
+  redis:
+      container_name: redis
+      image: "redis:alpine"
+      ports:
+        - "6379:6379"
