@@ -43,8 +43,4 @@ class UnregisterForm(FlaskForm):
     display = ['password']
 
 class ReportForm(FlaskForm):
-    message_id = f.TextField()
-
-    def __init__(self, message_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.message_id.data = message_id
+    message_id = f.HiddenField()

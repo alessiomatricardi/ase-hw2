@@ -19,7 +19,6 @@ from monolith.message_logic import MessageLogic # gestisce la logica dei messagg
                                                 # richiesta al db + ritorna oggetto json per fare il test
 
 
-
 messages = Blueprint('messages', __name__)
 
 @messages.route('/new_message', methods=['POST', 'GET'])

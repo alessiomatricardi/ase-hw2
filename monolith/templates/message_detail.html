@@ -38,7 +38,8 @@
   <button onclick="location.href = '/block_user?target={{message.sender_id}}';" id="blockUserButton" class="float-left submit-button">Block user</button>
   {% endif %}
 
-  <form action="/report">
+  <form action="/report" method="POST">
+    {{ form.hidden_tag() }}
     <input type="submit" value="Report this sender">
   </form>
 

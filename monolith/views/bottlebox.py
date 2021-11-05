@@ -1,9 +1,8 @@
 from flask import Blueprint, redirect, render_template, request, abort
 from flask.globals import current_app
 from sqlalchemy.sql.elements import Null
-
 from monolith.database import User, db, Blacklist, Message, Message_Recipient
-from monolith.forms import UserForm
+from monolith.forms import ReportForm
 from flask_login import current_user
 from monolith.bottlebox_logic import BottleBoxLogic
 from sqlalchemy.sql import or_,and_
@@ -54,22 +53,6 @@ def show_delivered():
     msg = bottlebox_logic.retrieving_messages(current_user.id,3)
 
     return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Delivered')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @bottlebox.route('/message/<label>/<id>', methods=['GET'])
 def delivered_detail(label, id):
@@ -159,7 +142,9 @@ def delivered_detail(label, id):
         sender = User.query.where(User.id == detailed_message.sender_id)[0]
         sender_name = sender.firstname + ' ' + sender.lastname 
 
-        return render_template('/message_detail.html', message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, recipients = blocked_info, label = label)
+        form = ReportForm(message_id = id)
+
+        return render_template('/message_detail.html', form = form, message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, recipients = blocked_info, label = label)
         #return render_template('/delivered_detail.html', message = detailed_message, sender_name = sender_name)
 
     else:
