@@ -14,9 +14,9 @@ from monolith.auth import current_user
 
 
 
-from monolith.message_logic import MessageLogic # gestisce la logica dei messaggi. 
-                                                # Ad esempio, la creazione di un nuovo messaggio + 
-                                                # richiesta al db + ritorna oggetto json per fare il test
+from monolith.message_logic import MessageLogic # gestisce la logica dei messaggi.
+# Ad esempio, la creazione di un nuovo messaggio +
+# richiesta al db + ritorna oggetto json per fare il test
 
 
 messages = Blueprint('messages', __name__)
@@ -26,41 +26,41 @@ def new_message():
     # verify that the user is logged in
     if current_user is not None and hasattr(current_user, 'id'):
 
-        msg_logic = MessageLogic() 
+        msg_logic = MessageLogic()
 
         # the user clicks the "new message" in the homepage
-        if request.method == 'GET': 
+        if request.method == 'GET':
             form = MessageForm()
-            form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id) 
+            form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id)
             single_recipient = request.args.get('single_recipient') # used to set a checkbox as checked if the recipient is choosen from the recipient list page
             msg_id = request.args.get('msg_id')
-            
+
             print(msg_id)
             if msg_id: # if a message id has been given as argument
-                
+
                 msg = msg_logic.is_my_message(current_user.id, msg_id)
                 if msg: # the list is not empty
-            
+
                     # text builder
                     sender = db.session.query(User).where(User.id == msg[0].sender_id)[0]
                     recipient = db.session.query(User).where(User.id == current_user.id)[0]
                     "Sent by " + sender.firstname + " " + sender.lastname + "\nto " + recipient.firstname + " " + recipient.lastname + "\non " + str(msg[0].deliver_time) + "\n\n\n\"" + msg[0].content + "\"\n"
                     form.content.data = "Sent by " + sender.firstname + " " + sender.lastname + "\nto " + recipient.firstname + " " + recipient.lastname + "\non " + str(msg[0].deliver_time) + "\n\n\n\"" + msg[0].content + "\"\n" # fill the content with the forward message
                     #####
-                
+
             #
             # TODO add multiple_recipients in case a draft with more than 1 recipient has been saved
             #      json_var = request.get_json()
             #      multiple_recipients = json_var['NOME_DELLA_VARIABILE_JSON']
-            #      
+            #
             #      pass multiple recipients into render_template
             #
-            
+
             return render_template('new_message.html', form=form, single_recipient=single_recipient)
 
         # the user submits the form to create the new message ("Send bottle" option)
-        elif request.method == 'POST': 
-            
+        elif request.method == 'POST':
+
             form = request.form
 
             # take message content from form
@@ -72,11 +72,11 @@ def new_message():
 
             # validate message content
             if msg_logic.validate_message_fields(message):
-                
-                
+
+
                 # add message in the db
                 if not request.files['attach_image'].filename == '': # if the user passes it, save a file in a reposistory and set the field message.image to the filename
-                    
+
                     file = request.files['attach_image']
 
                     if msg_logic.control_file(file): # proper controls on the given file
@@ -84,20 +84,20 @@ def new_message():
                         message.image = secure_filename(file.filename)
                         id = msg_logic.create_new_message(message)['id']
                         path_to_folder = os.getcwd() + '/monolith/static/attached/' + str(id)
-                        os.mkdir(path_to_folder)    
+                        os.mkdir(path_to_folder)
                         file.save(os.path.join(path_to_folder, message.image))
 
                     else:
                         flash('Insert an image with extention: .png , .jpg, .jpeg, .gif')
                         return redirect('/new_message')
-                
+
                 else:
                     id = msg_logic.create_new_message(message)['id']
 
             else:
                 # TODO handle incorrect message fields
                 return render_template('/error_page.html')
-            
+
             if len(form.getlist('recipients')) > 0: # if no recipients have been selected
                 for recipient_email in form.getlist('recipients'): # list of selected recipients emails
                     message_recipient = Message_Recipient()
@@ -112,14 +112,14 @@ def new_message():
                     #msg_logic.create_new_message_recipient(message_recipient)
 
                 if form['submit'] == 'Send bottle': # if it is a draft, the is_sent flag will not be set to True
-                    msg_logic.send_bottle(message) 
-                
+                    msg_logic.send_bottle(message)
+
                 """elif form['submit'] == 'Save draft':
                     pass"""
-                    # seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
-                    # msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
-                
-                return render_template("index.html") 
+                # seconds = (message.deliver_time - datetime.datetime.now()).total_seconds()
+                # msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
+
+                return render_template("index.html")
 
             else:
                 #msg = json.dumps({"msg":"Condition failed on page baz"})
@@ -146,19 +146,48 @@ def new_message():
     else: # user not logged
         return redirect('/login') # TODO print an error
 
+# this route allow a user to hide a message
+@messages.route('/hide', methods=['POST'])
+def _hide_message():
+    # verify that the user is logged in
+    if current_user is not None and hasattr(current_user, 'id'):
+
+        message_id = 0
+        try:
+            # retrieve message id from the form
+            message_id = request.form.get('message_id', type=int)
+        except:
+            abort(500) # internal server error
+
+        try:
+            # check if that user is a recipient of that message
+            query = db.session.query(Message_Recipient).filter(
+                Message_Recipient.recipient_id == current_user.id,
+                Message_Recipient.id == message_id,
+                Message_Recipient.is_hide == False
+                )
+            if query is None:
+                abort(403) # that user can't do this action
+
+            message_recipient = query.first()
+            message_recipient.is_hide = True
+            db.session.commit()
+        except:
+            # error occurred with the database
+            abort(500)
+
+        return redirect('/bottlebox/received')
+    else:
+        abort(401) #user should login
+
 # utility to show an image, do not change
 @messages.route('/show/<msg_id>/<filename>')
 def send_file(msg_id, filename):
 
     msg_logic = MessageLogic()
 
-    if msg_logic.control_rights_on_image(msg_id, current_user.id): 
+    if msg_logic.control_rights_on_image(msg_id, current_user.id):
         return send_from_directory(os.getcwd() + '/monolith/static/attached/' + str(msg_id), filename)
     else:
         # TODO handle no suorce requested
         abort(403)
-
-    
-
-    
-   

@@ -16,7 +16,7 @@ class UserForm(FlaskForm):
     firstname = f.StringField('First name', validators=[DataRequired()])
     lastname = f.StringField('Last name', validators=[DataRequired()])
     password = f.PasswordField('Password', validators=[
-        DataRequired(), 
+        DataRequired(),
         # this allow us to check the password on server-side
         Length(min = 8, message = 'Password must be at least %(min)d characters'),
         ],
@@ -37,10 +37,13 @@ class MessageForm(FlaskForm):
     content = f.TextAreaField('content', validators=[DataRequired()])
     deliver_time = f.DateTimeField('deliver_time', validators=[DataRequired()], format="%d-%m-%Y, %H:%M")
 
-    
+
 class UnregisterForm(FlaskForm):
     password = f.PasswordField('password', validators=[DataRequired()])
     display = ['password']
 
 class ReportForm(FlaskForm):
+    message_id = f.HiddenField()
+
+class HideForm(FlaskForm):
     message_id = f.HiddenField()

@@ -39,8 +39,13 @@
   {% endif %}
 
   <form action="/report" method="POST">
-    {{ form.hidden_tag() }}
+    {{ reportForm.hidden_tag() }}
     <input type="submit" value="Report this sender">
+  </form>
+
+  <form action="/hide" method="POST">
+    {{ hideForm.hidden_tag() }}
+    <input type="submit" value="Hide this message">
   </form>
 
   

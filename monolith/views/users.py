@@ -31,7 +31,7 @@ def _users():
 
 
 @users.route('/register', methods=['POST', 'GET'])
-def register():
+def _register():
     # if the user is already logged in, redirect him to homepage
     if current_user is not None and hasattr(current_user, 'id'):
         return redirect('/')
