@@ -32,7 +32,7 @@
 {% if label == 'received' %}
 
   <button onclick="location.href = '/new_message?msg_id={{message.id}}';" id="forwardButton" class="float-left submit-button" >Forward</button>
-  {% if blocked == False %}
+  {% if blocked == False %} <!-- va messo fuori -->
   <button onclick="location.href = '/new_message?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button>
   <button onclick="location.href = '/block_user?target={{message.sender_id}}';" id="blockUserButton" class="float-left submit-button">Block user</button>
   {% endif %}

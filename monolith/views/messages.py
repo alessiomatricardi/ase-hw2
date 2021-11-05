@@ -69,28 +69,31 @@ def new_message():
             message.sender_id = current_user.id
             message.content = form['content']
             message.deliver_time = datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M') # !!! DO NOT TOUCH !!!
+            id = message.id
 
             # validate message content
             if msg_logic.validate_message_fields(message):
                 
-                id = None
                 
                 # add message in the db
-
-                if request.files: # if the user passes it, save a file in a reposistory and set the field message.image to the filename
-
+                if not request.files['attach_image'].filename == '': # if the user passes it, save a file in a reposistory and set the field message.image to the filename
+                    
                     file = request.files['attach_image']
 
                     if msg_logic.control_file(file): # proper controls on the given file
 
                         message.image = secure_filename(file.filename)
-                        id = msg_logic.create_new_message(message)
+                        id = msg_logic.create_new_message(message)['id']
                         path_to_folder = os.getcwd() + '/monolith/static/attached/' + str(id)
                         os.mkdir(path_to_folder)    
                         file.save(os.path.join(path_to_folder, message.image))
+
+                    else:
+                        flash('Insert an image with extention: .png , .jpg, .jpeg, .gif')
+                        return redirect('/new_message')
+                
                 else:
-                    id = msg_logic.create_new_message(message)
-   
+                    id = msg_logic.create_new_message(message)['id']
 
             else:
                 # TODO handle incorrect message fields
@@ -103,15 +106,17 @@ def new_message():
                     recipient_id = msg_logic.email_to_id(recipient_email)
 
                     # initialize the Message_Recipient object
-                    message_recipient.id = id 
+                    message_recipient.id = id
+                    print(id)
                     message_recipient.is_read = False # redundant because the db automatically set it to False
-                    message_recipient.read_time = datetime.datetime(2020, 10, 6) # TODO it should be better to set a null vallue, but if done an error occurr
                     message_recipient.recipient_id = recipient_id
-                    msg_logic.create_new_message_recipient(message_recipient)
+                    #msg_logic.create_new_message_recipient(message_recipient)
 
                 if form['submit'] == 'Send bottle': # if it is a draft, the is_sent flag will not be set to True
                     msg_logic.send_bottle(message) 
-
+                
+                """elif form['submit'] == 'Save draft':
+                    pass"""
                     # seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
                     # msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
                 
@@ -122,7 +127,7 @@ def new_message():
                 #db.session['msg'] = msg
                 #return redirect(url_for('.do_foo', messages=messages))
                 flash("Please select at least 1 recipient")
-                return redirect(url_for('.new_message'))
+                #return redirect(url_for('.new_message'))
                 return redirect('/new_message') # TODO VEDIAMO COSA SUCCEDE con questo
 
             """

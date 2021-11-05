@@ -3,6 +3,7 @@ from monolith.database import Blacklist, db, Message, Message_Recipient, User, B
 import datetime
 from .background import celery  
 from monolith.list_logic import ListLogic
+from sqlalchemy import func
 #from monolith.app import ALLOWED_EXTENSIONS
 
 class MessageLogic:
@@ -31,7 +32,7 @@ class MessageLogic:
         
         db.session.add(message)
         db.session.commit()
-
+        
         return message.get_obj() 
 
     # given an email it returns the id of the user associated to that email
@@ -69,9 +70,9 @@ class MessageLogic:
         return Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today).where(Message_Recipient.recipient_id == user_id).where(Message.id == msg_id).all()
 
     def control_file(self, file):
-        if file and file.filename != '' and file.filename.split('.')[1] in ['png', 'jpg', 'jpeg', 'gif']:
+        if file and file.filename != '' and file.filename.split('.')[-1] in ['png', 'jpg', 'jpeg', 'gif']:
             return True
-        else: 
+        else:
             return False
 
     def control_rights_on_image(self, msg_id, user_id):
