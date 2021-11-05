@@ -23,7 +23,7 @@ class BottleBoxLogic:
         today = datetime.datetime.now()
 
         if type == 1: #pending
-            msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == False).where(Message.deliver_time > today)
+            msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == False)
             
             #if the content filter is active, all the messages will be displayed censored
             if user.content_filter_enabled:

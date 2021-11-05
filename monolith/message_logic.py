@@ -78,9 +78,13 @@ class MessageLogic:
     def control_rights_on_image(self, msg_id, user_id):
         
         messages_sent = db.session.query(Message).filter(Message.sender_id == user_id).where(Message.id == msg_id).all()
-        messages_recived = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id == msg_id).all()
+        messages_received = db.session.query(Message_Recipient).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id==msg_id).all()
+        #Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id == msg_id).all()
  
-        if messages_sent or messages_recived:
+        print(messages_sent)
+        print(messages_received)
+        
+        if messages_sent or messages_received:
             return True
         return False
 
