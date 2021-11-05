@@ -127,6 +127,7 @@ def new_message():
 
                 recipient_id = msg_logic.email_to_id(recipient_email)
 
+
                 # initialize the Message_Recipient object
                 message_recipient.id = id
                 print('Siamo in recipients > 0, linea 123')
@@ -134,28 +135,15 @@ def new_message():
                 message_recipient.recipient_id = recipient_id
                 msg_logic.create_new_message_recipient(message_recipient)
 
+
             if form['submit'] == 'Send bottle': # if it is a draft, the is_sent flag will not be set to True
                 msg_logic.send_bottle(message) 
-            
-            """elif form['submit'] == 'Save draft':
-                pass"""
+
                 # seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
                 # msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
             
             return render_template("index.html") 
-
-        
-            """
-            TEST
-            import unittest
-            import monolith.Message_logic as m
-            class TestAdd(unittest.TestCase):
-                def test_NAME(self):
-                    # il db è vuoto
-                    result = m.new_message(message)
-                    self.assertEqual(result, {message_id: 1})
-            """
-
+          
         else:
             raise RuntimeError('This should not happen!')
 

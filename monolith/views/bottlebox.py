@@ -1,12 +1,15 @@
+from celery.utils.functional import first
 from flask import Blueprint, redirect, render_template, request, abort
 from flask.globals import current_app
 from sqlalchemy.sql.elements import Null
+from sqlalchemy.sql.expression import false
 
 from monolith.database import User, db, Blacklist, Message, Message_Recipient
 from monolith.forms import UserForm
 from flask_login import current_user
 from monolith.bottlebox_logic import BottleBoxLogic
 from sqlalchemy.sql import or_,and_
+from monolith.emails import send_email
 
 import datetime
 import os
@@ -99,6 +102,16 @@ def delivered_detail(label, id):
             message_recipient = [ob for ob in message_recipient]
             if not message_recipient:
                 abort(404)
+
+            
+            # check if is_read == False. If so, set it to True and send notification to sender
+            if message_recipient[0].is_read == False:
+                db.session.query(Message_Recipient).where(and_(Message_Recipient.id == id,Message_Recipient.recipient_id == current_user.id)).update({'is_read': True})
+                db.session.commit()
+                msg = "Subject: Message notification\n\nThe message you sent to " + current_user.firstname + " has been read."
+                message_sender_id = db.session.query(Message).filter(Message.id == id).first().sender_id
+                email = db.session.query(User).filter(User.id == message_sender_id).first().email
+                send_email(email, msg)
 
             detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True)
             detailed_message = [ob for ob in detailed_message]
