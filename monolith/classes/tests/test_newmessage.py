@@ -113,33 +113,33 @@ class TestNewMessage(unittest.TestCase):
         assert b'<input type="checkbox" name="recipients" value=prova@mail.com checked>' in response.data
 
         # test that if no recipients are selected the page is re-rendered with a warning
-        data = { 
-            'content' : 'ININFLUENT FOR THE TEST' ,
-            'deliver_time' : "2021-11-01T15:45",
-            'recipients': '',
+        dataForm1 = { 
+            'content' : 'ININFLUENT FOR THE TEST',
+            'deliver_time' : '2025-11-01T15:45',
             'submit': 'Send bottle'
         }
-        response = tested_app.post("/new_message", data = data, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = tested_app.post("/new_message", data = dataForm1, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        #self.assertEqual(400, response.status_code)
         assert b'<p>Please select at least 1 recipient</p>' in response.data
 
         # test that the message is saved as a draft, so the rendered page is the index.html
-        data = { 
+        dataForm2 = { 
             'content' : 'ININFLUENT FOR THE TEST' ,
             'deliver_time' : "2021-11-01T15:45",
             'recipients': 'prova@mail.com',
             'submit': 'Save draft'
         }
-        response = tested_app.post("/new_message", data = data, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = tested_app.post("/new_message", data = dataForm2, content_type='application/x-www-form-urlencoded', follow_redirects=True)
         assert b'Hi Barbara!' in response.data 
 
         # test that the message is sent correctly, so the rendered page is the index.html
-        data = { 
+        dataForm3 = { 
             'content' : 'ININFLUENT FOR THE TEST' ,
             'deliver_time' : "2021-11-01T15:45",
             'recipients': 'prova@mail.com',
             'submit': 'Send bottle'
         }
-        response = tested_app.post("/new_message", data = data, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = tested_app.post("/new_message", data = dataForm3, content_type='application/x-www-form-urlencoded', follow_redirects=True)
         assert b'Hi Barbara!' in response.data 
 
         #
