@@ -1,4 +1,5 @@
 from os import name
+import os
 import re
 from celery import Celery
 from celery.schedules import crontab
@@ -11,7 +12,12 @@ import random
 _APP = None
 MIN_LOTTERY_POINTS = 1
 MAX_LOTTERY_POINTS = 5
-BACKEND = BROKER = 'redis://localhost:6379'
+
+if os.environ.get('DOCKER_IN_USE') is not None:
+    BACKEND = BROKER = 'redis://redis:6379'
+else:
+    BACKEND = BROKER = 'redis://localhost:6379'
+
 celery = Celery(__name__, backend=BACKEND, broker=BROKER,
                 include=['monolith.tasks.new_message_tasks', 'monolith.message_logic']) # include these files in the tasks of celery
 
