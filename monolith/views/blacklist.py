@@ -16,7 +16,7 @@ blacklist_logic = BlacklistLogic()
 
 @blacklist.route('/blacklist',methods=['GET'])
 def retrieve_blacklist():
-    
+
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
         blacklist = blacklist_logic.retrieving_blacklist(current_user.id)
@@ -28,13 +28,18 @@ def retrieve_blacklist():
 
 
 # to change with a POST method
-@blacklist.route('/block_user', methods=['GET'])
-def blocking():
+@blacklist.route('/block', methods=['POST'])
+def _block_user():
 
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
-        
-        target = request.args.get('target')
+
+        target = 0
+        try:
+            # retrieve the user id from the form
+            target = request.form.get('user_id', type=int)
+        except:
+            abort(500)  # internal server error
 
         # checkig if the given id is the id of an existing user
         if blacklist_logic.check_existing_user(target):

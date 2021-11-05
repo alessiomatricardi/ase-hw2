@@ -47,3 +47,6 @@ class ReportForm(FlaskForm):
 
 class HideForm(FlaskForm):
     message_id = f.HiddenField()
+
+class BlockForm(FlaskForm):
+    user_id = f.HiddenField()
