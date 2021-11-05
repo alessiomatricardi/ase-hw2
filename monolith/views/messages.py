@@ -110,7 +110,7 @@ def new_message():
                     print(id)
                     message_recipient.is_read = False # redundant because the db automatically set it to False
                     message_recipient.recipient_id = recipient_id
-                    #msg_logic.create_new_message_recipient(message_recipient)
+                    msg_logic.create_new_message_recipient(message_recipient)
 
                 if form['submit'] == 'Send bottle': # if it is a draft, the is_sent flag will not be set to True
                     msg_logic.send_bottle(message) 
