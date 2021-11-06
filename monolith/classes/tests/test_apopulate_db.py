@@ -42,6 +42,7 @@ class TestPopulateDB(unittest.TestCase):
             example.lastname = 'Verdi'
             example.date_of_birth = datetime.datetime(random.randint(1960, 2000), random.randint(1,12), random.randint(1,29))
             example.is_admin = False
+            example.lottery_points = 15
             example.set_password('prova123')
             db.session.add(example)
 

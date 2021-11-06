@@ -19,6 +19,8 @@ from monolith.message_logic import MessageLogic # gestisce la logica dei messagg
                                                 # richiesta al db + ritorna oggetto json per fare il test
 
 
+# state how many points are required to delete a (sent) message
+DELETING_MESSAGE_COST = 10
 
 messages = Blueprint('messages', __name__)
 
@@ -155,7 +157,59 @@ def send_file(msg_id, filename):
         # TODO handle no suorce requested
         abort(403)
 
-    
 
+@messages.route('/delete_message/<id>', methods=['GET', 'POST'])
+def delete_message(id):
+
+    # verify that the user is logged in
+    if current_user is not None and hasattr(current_user, 'id'):
+
+        # checks if <id> is not a number, otherwise abort
+        try:
+            int(id)
+        except:
+            abort(404)
+
+        message_to_delete = db.session.query(Message).filter(Message.id == int(id)).first()
+        
+        # check that the doesn't message or the messages hasn't been sent 
+        # or the message has been delivered or the message is sent by another user
+        if not message_to_delete or not message_to_delete.is_sent or message_to_delete.is_delivered or message_to_delete.sender_id != current_user.id:
+            abort(404)
+        
+        # check that the user has enough lottery points
+        lottery_points = db.session.query(User).filter(User.id == current_user.id).first().lottery_points
+
+        if lottery_points < DELETING_MESSAGE_COST:
+            flash("Not enough points to delete a message")
+            return redirect(f'/message/pending/{id}')
+        
+        # decrement lottery points
+        print(lottery_points)
+        lottery_points = lottery_points - DELETING_MESSAGE_COST
+        print(lottery_points)
+        db.session.query(User).filter(User.id == current_user.id).update({'lottery_points': lottery_points})
+
+        # deleting instances of recipients
+        db.session.query(Message_Recipient).where(Message_Recipient.id == message_to_delete.id).delete()
+
+        # deleting previously attached image, if it exists
+        if message_to_delete.image != '':
+            
+            # directory to the folder in which is stored the image
+            directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attached', str(message_to_delete.id))
+            myfile = os.path.join(directory, message_to_delete.image)
+
+            # deleting image and directory
+            if os.path.isfile(myfile):
+                os.remove(myfile)
+                os.rmdir(directory)
+
+        # deleting the draft from database and committing all changes
+        db.session.query(Message).where(Message.id == message_to_delete.id).delete()
+        db.session.commit()
+
+        return render_template("index.html")  
     
-   
+    else:
+        redirect('/login')
