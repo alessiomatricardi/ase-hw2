@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}New message{% endblock %}
+
+{% block content %}
+
+<h1>Calendar</h1>
+<ul>
+    <li>
+        <button onclick="location.href = '/calendar/sent_messages';" id="calendar_button" class="float-left submit-button">Calendar of sent messages</button> 
+    </li>
+    <li>
+        <button onclick="location.href = '/calendar/received_messages';" id="calendar_button" class="float-left submit-button">Calendar of received messages</button> 
+    </li>
+</ul>
+<button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
+
+  
+{% endblock %}
