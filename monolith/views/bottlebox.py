@@ -58,19 +58,15 @@ def show_delivered():
 
     return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Delivered')
 
+@bottlebox.route('/bottlebox/drafts', methods=['GET'])
+def show_drafts():
 
+    bottlebox_logic = BottleBoxLogic()
 
+    all_users = bottlebox_logic.retrieving_all_users()
+    msg = bottlebox_logic.retrieving_messages(current_user.id,4)
 
-
-
-
-
-
-
-
-
-
-
+    return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Drafts')
 
 
 
@@ -82,7 +78,7 @@ def delivered_detail(label, id):
     except:
         abort(404)
     
-    if label != 'received' and label != 'delivered' and label != 'pending':
+    if label != 'received' and label != 'delivered' and label != 'pending' and label != 'draft':
         abort(404)
 
 
@@ -134,6 +130,31 @@ def delivered_detail(label, id):
             else:
                 blocked = True
         
+        # case label is draft
+        if label == 'draft': 
+
+            # retrieving the message
+            detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == False)
+            detailed_message = [ob for ob in detailed_message]
+            if not detailed_message:
+                abort(404)
+
+            detailed_message = detailed_message[0]
+
+            # checking if the current user is the sender, retrieving recipients of draft
+            if detailed_message.sender_id == current_user.id:
+            
+                recipients_id = db.session.query(Message_Recipient).where(Message_Recipient.id == id)
+                recipients_id = [ob.recipient_id for ob in recipients_id]
+                recipients = User.query.filter(User.id.in_(recipients_id))
+                recipients = [ob for ob in recipients]
+
+            else:
+                abort(404)
+            
+            # handle send and modify activity
+
+            pass
 
         else: # case label is pending or delivered
 

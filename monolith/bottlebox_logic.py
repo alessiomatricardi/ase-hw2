@@ -49,3 +49,12 @@ class BottleBoxLogic:
                    message.content = censored_content
 
             return msg
+        elif type == 4: #drafts
+            msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == False)
+
+            if user.content_filter_enabled:
+                for message in msg:
+                   censored_content = filter.check_message_content(message.content)
+                   message.content = censored_content
+
+            return msg
