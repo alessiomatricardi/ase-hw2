@@ -13,7 +13,7 @@ class BottleBoxLogic:
     def retrieving_all_users(self):
         return db.session.query(User).where(User.is_admin == False)
 
-    # utility to retrieve messages from db: type 1 for pending, type 2 for received, type 3 for delivered
+    # utility to retrieve messages from db: type 1 for pending, type 2 for received, type 3 for delivered, type 4 for drafts
     def  retrieving_messages(self,user_id,type):
 
         user = db.session.query(User).filter(User.id == user_id).first()
