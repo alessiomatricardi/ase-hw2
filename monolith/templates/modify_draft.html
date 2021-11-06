@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+
+{% block title %}New message{% endblock %}
+
+{% block content %}
+
+<h1>Modify Draft</h1>
+<form method="post" enctype="multipart/form-data">
+    {% with msg = get_flashed_messages() %}
+      {% if msg %}
+          {% for message in msg: %}
+            <p>{{ message }}</p>
+          {% endfor %}
+      {% endif %}
+
+    {% endwith %}
+    <!-- c'era un hidden tag da qualche parte dove-->
+    <p> Select one or more recipients:</p>
+    <ul>
+      {% for checkbox in form.recipients %}
+      <li>
+        {% if checkbox.data in recipients_emails %}
+          <input type="checkbox" name="recipients" value={{checkbox.data}} checked>
+        {% else %}
+            {{ checkbox }}
+        {% endif %}
+        {{ checkbox.data }}
+      </li>
+      {% endfor %}
+    </ul>
+    <p> Insert the text of the message:</p>
+    <textarea id="content" name="content"  required = "">{{content}}</textarea>
+    <p>
+      <label for="deliver_time">Deliver time</label>
+      <input type="datetime-local" id="deliver_time" name="deliver_time" value = "{{deliver_time}}">
+    </p>
+    <p>
+        {% if attached != '' %}
+        <p><img src = "{{url_for('messages.send_file', msg_id = message_id, filename = attached)}}" width="480" height="270"></p>
+        <label for="attach_image">Otherwise send another image!</label>
+        <input type="file" id="attach_image" name="attach_image">
+        {% else %}
+        <label for="attach_image">Send an image!</label>
+        <input type="file" id="attach_image" name="attach_image">
+        {% endif %}
+    </p>
+    <p>
+      <input type="submit" name="submit" value="Send bottle" onclick="location.href = '/bottlebox';"></input>
+    </p>
+    <p>
+      <input type="submit" name="submit" value="Save draft changes" onclick="location.href = '/bottlebox';"></input>
+    </p>
+    <p>
+        <input type="submit" name="submit" value="Delete draft" onclick="location.href = '/bottlebox';"></input>
+    </p>
+</form>
+<form method="get" action="/">
+  <input type="submit" value="Back"></input>
+</form>
+  
+{% endblock %}
+
+<!--
+<html>
+ <body>
+  <form action="" method="POST">
+    {{ form.hidden_tag() }}
+    <dl>
+     {% for field in form.display %}
+     <dt>{{ form[field].label }}</dt>
+     <dd>{{ form[field]() }}</dd>
+       {% if form[field].errors %}
+          {% for e in form[field].errors %}
+           <p class="help-block">{{ e }}</p>
+          {% endfor %}
+       {% endif %}
+     {% endfor %}
+    </dl>
+    <p>
+    <input type=submit value="Publish">
+    TODO: add the input bottons to save the draft and to go back in the previous page
+  </form>
+</body>
+</html>
+-->
+

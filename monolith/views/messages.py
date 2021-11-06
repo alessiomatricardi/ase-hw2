@@ -36,7 +36,6 @@ def new_message():
             single_recipient = request.args.get('single_recipient') # used to set a checkbox as checked if the recipient is choosen from the recipient list page
             msg_id = request.args.get('msg_id')
             
-            print("siamo nel GET, linea 39")
             if msg_id: # if a message id has been given as argument
                 
                 msg = msg_logic.is_my_message(current_user.id, msg_id)
@@ -61,7 +60,6 @@ def new_message():
 
         # the user submits the form to create the new message ("Send bottle" option)
         elif request.method == 'POST': 
-            print("siamo nel POST, linea 63")
             form = request.form
 
             # take message content from form
@@ -71,7 +69,6 @@ def new_message():
             message.deliver_time = datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M') # !!! DO NOT TOUCH !!!
             id = message.id
 
-            print("siamo a linea 74")
             # validate message content
             if msg_logic.validate_message_fields(message):
                 
@@ -80,44 +77,41 @@ def new_message():
                     #db.session['msg'] = msg
                     #return redirect(url_for('.do_foo', messages=messages))
                     flash("Please select at least 1 recipient")
-                    print("Siamo in recipients < 0, linea 143")
                     #return redirect(url_for('.new_message'))
                     return redirect('/new_message') # TODO VEDIAMO COSA SUCCEDE con questo
 
-                print("siamo a linea 78")
-                print(request.form)
                 
-                file_is_attached = False
-                if 'attach_image' in request.form:
-                    print("linea 83")
-                    file_is_attached = True
-                else: 
-                    print("linea 86")
-                    file_is_attached = False
 
                 # add message in the db
-                if request.files['attach_image'].filename != '': # if the user passes it, save a file in a reposistory and set the field message.image to the filename
-                    print("siamo a linea 91")
+                if request.files and request.files['attach_image'].filename != '': # if the user passes it, save a file in a reposistory and set the field message.image to the filename
+                
                     file = request.files['attach_image']
 
                     if msg_logic.control_file(file): # proper controls on the given file
 
                         message.image = secure_filename(file.filename)
                         id = msg_logic.create_new_message(message)['id']
-                        path_to_folder = os.getcwd() + '/monolith/static/attached/' + str(id)
-                        os.mkdir(path_to_folder)    
-                        file.save(os.path.join(path_to_folder, message.image))
+
+                        # TODO trycatch
+                        attached_dir = os.path.join(os.getcwd(),'monolith','static','attached')
+                        if not os.path.exists(attached_dir):
+                            os.makedirs(attached_dir)
+
+
+                        # TODO try catch
+                        os.mkdir(os.path.join(os.getcwd(),'monolith','static','attached',str(id)))
+
+                        file.save(os.path.join(os.getcwd(),'monolith','static','attached',str(id),message.image))
 
                     else:
                         flash('Insert an image with extention: .png , .jpg, .jpeg, .gif')
                         return redirect('/new_message')
                 
                 else:
-                    print("siamo a linea 107")
+                
                     id = msg_logic.create_new_message(message)['id']
 
             else:
-                print("siamo a linea 111")
                 # TODO handle incorrect message fields
                 return render_template('error.html')
             
@@ -130,7 +124,6 @@ def new_message():
 
                 # initialize the Message_Recipient object
                 message_recipient.id = id
-                print('Siamo in recipients > 0, linea 123')
                 message_recipient.is_read = False # redundant because the db automatically set it to False
                 message_recipient.recipient_id = recipient_id
                 msg_logic.create_new_message_recipient(message_recipient)
@@ -157,7 +150,7 @@ def send_file(msg_id, filename):
     msg_logic = MessageLogic()
 
     if msg_logic.control_rights_on_image(msg_id, current_user.id): 
-        return send_from_directory(os.getcwd() + '/monolith/static/attached/' + str(msg_id), filename)
+        return send_from_directory(os.path.join(os.getcwd(),'monolith', 'static', 'attached',str(msg_id)), filename)
     else:
         # TODO handle no suorce requested
         abort(403)
