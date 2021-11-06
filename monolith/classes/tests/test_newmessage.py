@@ -46,10 +46,10 @@ class TestNewMessage(unittest.TestCase):
             message.content = "Ciao! sono l'utente 1"
             message.deliver_time = datetime.datetime.strptime("2021-11-01T15:45", '%Y-%m-%dT%H:%M')
             result = m.create_new_message(message)
-            expected_result = db.session.query(Message).filter(Message.id == 4).first() # 4 because there should be 3 default messages in the db
-            self.assertEqual(result['sender_id'], message.sender_id)
-            self.assertEqual(result['content'],  message.content)
-            self.assertEqual(result['deliver_time'],  message.deliver_time)
+            expected_result = db.session.query(Message).filter(Message.id == 8).first() # 8 because there should be 7 default messages in the db
+            self.assertEqual(expected_result.sender_id, result['sender_id'])
+            self.assertEqual(expected_result.content, result['content'])
+            self.assertEqual(expected_result.deliver_time, result['deliver_time'])
 
     def test_email_to_id(self):
         with self.app.app_context():
@@ -65,7 +65,6 @@ class TestNewMessage(unittest.TestCase):
             result = m.create_new_message_recipient(message_recipient)
             expected_result = db.session.query(Message_Recipient).filter(Message_Recipient.id == 4).first()
             self.assertEqual(expected_result.id, result['id'])
-            # self.assertEqual(expected_result.read_time, result['read_time'])
             self.assertEqual(expected_result.recipient_id, result['recipient_id'])
             self.assertEqual(expected_result.is_read, False)
 
