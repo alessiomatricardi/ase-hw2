@@ -140,7 +140,7 @@ def new_message():
             raise RuntimeError('This should not happen!')
 
     else: # user not logged
-        return redirect('/login') # TODO print an error
+        return redirect('/login') 
 
 # utility to show an image, do not change
 @messages.route('/show/<msg_id>/<filename>')
@@ -183,4 +183,4 @@ def delete_message(id):
         return render_template("index.html")  
     
     else:
-        redirect('/login')
+        return redirect('/login')

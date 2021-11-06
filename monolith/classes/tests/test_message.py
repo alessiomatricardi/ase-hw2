@@ -171,6 +171,9 @@ class TestMessage(unittest.TestCase):
         # check that if the user is not logged, the rendered page is the login page
         response = app.get("/new_message", content_type='html/text', follow_redirects=True)
         assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
+
+        response = app.get("/delete_message/1", content_type='html/text', follow_redirects=True)
+        assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
         
 
         # do the login otherwise the sending of a new message can't take place
@@ -222,6 +225,14 @@ class TestMessage(unittest.TestCase):
         response = app.post("/new_message", data = dataForm3, content_type='application/x-www-form-urlencoded', follow_redirects=True)
         assert b'Hi Barbara!' in response.data 
 
+
+        # a user wants to delete a message but passing an incorrect URI
+        response = app.get("/delete_message/INCORRECT", content_type='html/text', follow_redirects=True)
+        self.assertEqual(404, response.status_code)
+
+        # remove a non existing message
+        response = app.get("/delete_message/20", content_type='html/text', follow_redirects=True)
+        self.assertEqual(404, response.status_code)
         
         # user 4 delete the previously sent message (it has 15 points, so he can do it)
         response = app.get(f'/delete_message/{11}', content_type='html/text', follow_redirects=True)
