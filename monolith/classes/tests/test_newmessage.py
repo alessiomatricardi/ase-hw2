@@ -71,9 +71,9 @@ class TestNewMessage(unittest.TestCase):
     
     def test_send_bottle(self):
         with self.app.app_context():
-            message = db.session.query(Message).filter(Message.id == 4).first()
+            message = db.session.query(Message).filter(Message.id == 8).first()
             result = m.send_bottle(message)
-            expected_result = db.session.query(Message).filter(Message.id == 4).first().is_sent
+            expected_result = db.session.query(Message).filter(Message.id == 8).first().is_sent
             self.assertEqual(expected_result, result)
 
 
