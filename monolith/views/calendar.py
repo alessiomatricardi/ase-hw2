@@ -10,6 +10,8 @@ calendar = Blueprint('calendar', __name__)
 def which_calendar():
     if current_user is not None and hasattr(current_user, 'id'):
         return render_template('which_calendar.html')
+    else:
+        return redirect('/login')
 
 
 @calendar.route('/calendar/sent_messages',methods=['GET'])
@@ -22,6 +24,8 @@ def calendar_of_sent_messages():
         messages = cl.get_list_of_sent_messages(current_user.id)
 
         return render_template('calendar.html', messages=messages)
+    else:
+        return redirect('/login')
 
 
 @calendar.route('/calendar/received_messages',methods=['GET'])
@@ -34,3 +38,5 @@ def calendar_of_received_messages():
         messages = cl.get_list_of_received_messages(current_user.id)
 
         return render_template('calendar.html', messages=messages)
+    else:
+        return redirect('/login')

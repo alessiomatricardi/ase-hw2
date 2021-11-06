@@ -59,11 +59,11 @@ class TestNewMessage(unittest.TestCase):
     def test_create_new_message_recipient(self):
         with self.app.app_context():
             message_recipient = Message_Recipient()
-            message_recipient.id = 4 # create recipients for the previously insterted message
+            message_recipient.id = 8 # create recipients for the previously insterted message
             # message_recipient.read_time = datetime.datetime(2020, 10, 6) # TODO it should be better to set a null vallue, but if done an error occurr
             message_recipient.recipient_id = 2
             result = m.create_new_message_recipient(message_recipient)
-            expected_result = db.session.query(Message_Recipient).filter(Message_Recipient.id == 4).first()
+            expected_result = db.session.query(Message_Recipient).filter(Message_Recipient.id == 8).first()
             self.assertEqual(expected_result.id, result['id'])
             self.assertEqual(expected_result.recipient_id, result['recipient_id'])
             self.assertEqual(expected_result.is_read, False)

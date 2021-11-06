@@ -127,6 +127,11 @@ class TestPopulateDB(unittest.TestCase):
             message.deliver_time = datetime.datetime(2021,11,2,18,30)
             db.session.add(message)
             db.session.add(message_recipient)
+            message_recipient = Message_Recipient()
+            message_recipient.id = 4
+            message_recipient.recipient_id = 1
+            message_recipient.is_read = False
+            db.session.add(message_recipient)
 
             message = Message()
             message.content = 'Messaggio da Barbara'
