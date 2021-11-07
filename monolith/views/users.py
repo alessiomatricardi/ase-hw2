@@ -77,7 +77,7 @@ def _user_details(user_id):
     # get the user
     # if <id> is not a number, render 404 page
     try:
-        int(user_id)
+        user_id = int(user_id)
     except:
         abort(404)
 
@@ -91,10 +91,10 @@ def _user_details(user_id):
     if user is None:
         abort(404)
 
-    blockForm = BlockForm(user_id = user.id)
+    block_form = BlockForm(user_id = user.id)
 
     # render the page
-    return render_template('user_details.html', user = user, blockForm = blockForm)
+    return render_template('user_details.html', user = user, block_form = block_form)
 
 
 # show the account information
@@ -145,3 +145,6 @@ def _content_filter():
 
     else:
         abort(403) # no one apart of the logged user can do this action
+
+#@users.route('/profile/picture/update', methods=['GET', 'POST'])
+

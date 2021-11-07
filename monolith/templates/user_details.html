@@ -27,7 +27,7 @@ Birth date : {{user.date_of_birth.strftime('%d/%m/%Y')}} <br>
   <button onclick="location.href = '/new_message?single_recipient={{user.email}}';" id="writeToButton"
     class="float-left submit-button">Write a message</button>
   <form action="/block" method="POST">
-    {{ blockForm.hidden_tag() }}
+    {{ block_form.hidden_tag() }}
     <input type="submit" value="Block user">
   </form>
 
