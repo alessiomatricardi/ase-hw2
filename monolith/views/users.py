@@ -50,7 +50,7 @@ def _register():
             except EmailAlreadyUsedError:
                 # this add an error message that will be printed on screen
                 form.email.errors.append(new_user.email + " is not available, \
-                        please register with another email."                                                                                                                                                                                    )
+                        please register with another email."                                                                                                                                                                                                                                                )
                 return render_template('register.html', form=form)
 
             new_user.set_password(form.password.data)

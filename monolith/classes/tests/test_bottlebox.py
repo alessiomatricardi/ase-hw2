@@ -133,8 +133,7 @@ class TestBottlebox(unittest.TestCase):
         # checking the rendering of a delivered message to a non blocking/blocked user
         response = tested_app.get("/message/delivered/2", data = data1 , content_type='html/text', follow_redirects=True)
         assert b'<h1>Message to</h1>' in response.data
-        assert b'Carlo Neri' in response.data 
-        assert b'Block user' in response.data
+        assert b'Carlo Neri' in response.data
        
         # checking that the opening of a message not yet delivered is not possible
         response = tested_app.get("/message/delivered/1", data = data1 , content_type='html/text', follow_redirects=True)
