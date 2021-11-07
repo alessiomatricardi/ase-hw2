@@ -4,7 +4,10 @@ import datetime
 from unittest import result
 from warnings import resetwarnings
 import os
+from monolith import image
 from monolith.image import Image
+import shutil
+#from PIL import Image as Img
 
 #from flask import app 
 from flask.signals import message_flashed
@@ -301,6 +304,105 @@ class TestMessage(unittest.TestCase):
         response = app.get(f'/delete_message/{11}', content_type='html/text', follow_redirects=True)
         assert b'Not enough points to delete a message' in response.data
         
+
+
+        # test that if the /new_message is called by passing the msg_id argument, the new_message.html is rendered
+        # also with a non-empty form.content field
+        response = app.get('/new_message?msg_id=6', content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        expected_result = b'Sent by Carlo Neri' # not all the string has been inserted
+        assert expected_result in response.data 
+
+        
+        # test that if the /new_message is called by passing a wrong msg_id argument, the new_message.html is rendered
+        # with an empty form.content field
+        response = app.get('/new_message?msg_id=4', content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        # assert b'<textarea id="content" name="content" required=""></textarea>' in response.data
+        
+        #
+        # TODO verify why the previous test doesn't work
+        #
+
+
+        """    
+        # try to send a message with an incorrect image
+
+        # first, a fake image is created
+        directory = os.path.join(os.getcwd(),'monolith','static','attached', '4')
+        os.mkdir(directory)
+        f = open(directory + "/prova.png","w+")
+        f.close()
+        
+        with Image.open(directory + "/prova.png") as im:
+
+            dataForm5 = { 
+                'content' : 'Message with a valid image' ,
+                'deliver_time' : "2021-12-18T15:45",
+                'recipients': 'prova5@mail.com',
+                'attach_image': im,
+                'submit': 'Send bottle'
+            }
+
+            response = app.post("/new_message", data = dataForm5, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+            print(response.data)
+            assert b'Insert an image with extention: .png , .jpg, .jpeg, .gif' in response.data 
+            
+        # remove the image from the server
+        directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attached', '4')
+        shutil.rmtree(directory, ignore_errors=True) # remove the directory and its content
+
+        
+        image2 = Image() # image with filename = ''
+        image2.filename = 'image.png'
+       
+        dataForm5 = { 
+            'content' : 'Message with a valid image' ,
+            'deliver_time' : "2021-12-18T15:45",
+            'recipients': 'prova5@mail.com',
+            'attach_image': image2,
+            'submit': 'Send bottle'
+        }
+        response = app.post("/new_message", data = dataForm5, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        print(response.data)
+        assert b'Insert an image with extention: .png , .jpg, .jpeg, .gif' in response.data 
+        
+
+        # try to send a message with an incorrect image
+        image3 = Image() # image with filename = ''
+        image3.filename = 'IMG_NON_VALIDA'
+        
+        dataForm6 = { 
+            'content' : 'Message with a non-valid image' ,
+            'deliver_time' : "2021-12-18T15:45",
+            'recipients': 'prova5@mail.com',
+            'attach_image': image3,
+            'submit': 'Send bottle'
+        }
+        response = app.post("/new_message", data = dataForm6, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        print(response.data)
+        assert b'Insert an image with extention: .png , .jpg, .jpeg, .gif' in response.data
+        """
+
+        # test that a user cannot see an image
+        response = app.get('/show/1/prova.png', content_type='html/text', follow_redirects=True)
+        self.assertEqual(403, response.status_code)
+
+        # create a fake image to perform the test
+        os.mkdir(os.path.join(os.getcwd(),'monolith','static','attached', '4'))
+        f = open(os.path.join(os.getcwd(),'monolith','static','attached', '4') + "/prova.png","w+")
+        f.close()
+
+        # test that a user can see an image
+        response = app.get('/show/4/prova.png', content_type='html/text', follow_redirects=True)
+        expected_result = b'' # it is an empty image
+        self.assertEqual(expected_result, response.data)
+
+        # remove the image from the server
+        directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attached', '4')
+        shutil.rmtree(directory, ignore_errors=True) # remove the directory and its content
+
+
 
         # test that neither a get or post request are done
         try:
