@@ -9,6 +9,13 @@
 {% block title %}Message details{% endblock %}
 
 {% block content %}
+
+{% with msg = get_flashed_messages() %}
+  {% if msg %}
+      <p>{{ msg[0] }}</p>
+  {% endif %}
+{% endwith %}
+
 {% if label == 'received' %}
 <h1>Message from</h1>
 <h5>{{sender_name}}</h5>
@@ -41,6 +48,10 @@
   <button onclick="location.href = '/block_user?target={{message.sender_id}}';" id="blockUserButton" class="float-left submit-button">Block user</button>
   {% endif %}
   
+{% endif %} 
+
+{% if label == 'pending' %}
+  <button onclick="location.href = '/delete_message/{{message.id}}';" id="deleteMessage" class="float-left submit-button" >Delete message</button>
 {% endif %} 
 
 

@@ -37,10 +37,10 @@
       <input type="file" id="attach_image" name="attach_image">
     </p>
     <p>
-      <input type="submit" name="submit" value="Send bottle" onclick="location.href = '/bottlebox/delivered';"></input>
+      <input type="submit" name="submit" value="Send bottle"></input>
     </p>
     <p>
-      <input type="submit" name="submit" value="Save draft" onclick="location.href = '/bottlebox';"></input>
+      <input type="submit" name="submit" value="Save draft"></input>
     </p>
 </form>
 <form method="get" action="/">
@@ -48,28 +48,3 @@
 </form>
   
 {% endblock %}
-
-<!--
-<html>
- <body>
-  <form action="" method="POST">
-    {{ form.hidden_tag() }}
-    <dl>
-     {% for field in form.display %}
-     <dt>{{ form[field].label }}</dt>
-     <dd>{{ form[field]() }}</dd>
-       {% if form[field].errors %}
-          {% for e in form[field].errors %}
-           <p class="help-block">{{ e }}</p>
-          {% endfor %}
-       {% endif %}
-     {% endfor %}
-    </dl>
-    <p>
-    <input type=submit value="Publish">
-    TODO: add the input bottons to save the draft and to go back in the previous page
-  </form>
-</body>
-</html>
--->
-

@@ -19,7 +19,6 @@ from monolith.message_logic import MessageLogic # gestisce la logica dei messagg
                                                 # richiesta al db + ritorna oggetto json per fare il test
 
 
-
 messages = Blueprint('messages', __name__)
 
 @messages.route('/new_message', methods=['POST', 'GET'])
@@ -141,7 +140,7 @@ def new_message():
             raise RuntimeError('This should not happen!')
 
     else: # user not logged
-        return redirect('/login') # TODO print an error
+        return redirect('/login') 
 
 # utility to show an image, do not change
 @messages.route('/show/<msg_id>/<filename>')
@@ -155,7 +154,33 @@ def send_file(msg_id, filename):
         # TODO handle no suorce requested
         abort(403)
 
-    
 
+@messages.route('/delete_message/<id>', methods=['GET'])
+def delete_message(id):
+
+    # verify that the user is logged in
+    if current_user is not None and hasattr(current_user, 'id'):
+
+        # checks if <id> is not a number, otherwise abort
+        try:
+            int(id)
+        except:
+            abort(404)
+
+        message_to_delete = db.session.query(Message).filter(Message.id == int(id)).first()
+        
+        # check that the message exists or the messages hasn't been sent 
+        # or the message has been delivered or the message is sent by another user
+        if not message_to_delete or not message_to_delete.is_sent or message_to_delete.is_delivered or message_to_delete.sender_id != current_user.id:
+            abort(404)
+
+        msg_logic = MessageLogic()
+
+        if not msg_logic.delete_message(message_to_delete):
+            flash("Not enough points to delete a message")
+            return redirect(f'/message/pending/{id}')
+
+        return render_template("index.html")  
     
-   
+    else:
+        return redirect('/login')

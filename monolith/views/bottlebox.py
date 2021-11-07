@@ -325,6 +325,7 @@ def delivered_detail(label, id):
 
                 return render_template("index.html")
 
+
         else: # case label is pending or delivered
 
             # checks that message exists
