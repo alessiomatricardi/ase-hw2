@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from operator import methodcaller
 from flask import Blueprint, redirect, render_template, request, abort
+from flask.helpers import flash
 from flask.signals import message_flashed
 from flask_wtf import form
 
@@ -175,17 +176,14 @@ def modify_personal_data():
             form = request.form
 
             if user_logic.modify_personal_data(current_user.id, form):
-                # TODO check if current_user has been updated (eventually update it)
-
                 return redirect('/profile')
 
             else: # something went wrong in the modification of the personal data
-                # TODO handle the incorrect modification of data
-                return redirect('/profile')
-
+                flash('Please insert correct data')
+                return redirect('/profile/modify_personal_data')
         
         else:
             raise RuntimeError('This should not happen!')
 
     else:
-        abort(403) # no one apart of the logged user can do this action
+        return redirect('/login')

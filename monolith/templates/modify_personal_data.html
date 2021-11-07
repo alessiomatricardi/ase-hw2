@@ -9,6 +9,12 @@
   <form action="" method="POST">
 
     {{ form.hidden_tag() }}
+    {% with msg = get_flashed_messages() %}
+      {% if msg %}
+          <p>{{ msg[0] }}</p>
+      {% endif %}
+
+    {% endwith %}
 
     <img class="mb-4" src="TODO LOGO" alt="" width="72" height="57">
     <h1 class="h3 mb-3 fw-normal">Modify your personal data</h1>
