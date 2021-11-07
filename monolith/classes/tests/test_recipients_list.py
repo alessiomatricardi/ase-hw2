@@ -68,7 +68,7 @@ class TestRecipientsList(unittest.TestCase):
         tested_app = app.test_client()
         
         # checking that accessing the recipients list redirects to the login page if not already logged in
-        response = tested_app.get("/recipients_list", content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/users", content_type='html/text', follow_redirects=True)
         assert b'<label for="email">E-mail</label>' in response.data 
 
         # logging in
@@ -77,7 +77,7 @@ class TestRecipientsList(unittest.TestCase):
         assert b'Hi Damiano' in response.data 
           
         # checking the presence of the correct button to write to specific recipient
-        response = tested_app.get("/recipients_list", data = data1 , content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/users", data = data1 , content_type='html/text', follow_redirects=True)
         assert b'id="writeToButton"' in response.data 
 
         # checking the presence of the correct user in recipients list

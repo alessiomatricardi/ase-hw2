@@ -56,9 +56,7 @@ class TestAuthAndReg(unittest.TestCase):
         response = app.post("/register", data = data1 , content_type='application/x-www-form-urlencoded',follow_redirects=True)
         
         self.assertEqual(response.status_code, 200)
-
-
-        assert b"Mario Rossi" in response.data
+        assert b'Hi Anonymous' in response.data
         
         # try to register again the same user  
         response = app.post("/register", data = data1 , content_type='application/x-www-form-urlencoded',follow_redirects=True)

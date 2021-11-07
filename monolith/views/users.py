@@ -3,6 +3,7 @@ from flask import Blueprint, redirect, render_template, request, abort
 from monolith.database import User, db
 from monolith.forms import ContentFilterForm, UserForm, BlockForm
 from monolith.content_filter_logic import ContentFilterLogic
+from monolith.list_logic import ListLogic
 
 from flask_login import current_user
 
@@ -50,13 +51,13 @@ def _register():
             except EmailAlreadyUsedError:
                 # this add an error message that will be printed on screen
                 form.email.errors.append(new_user.email + " is not available, \
-                        please register with another email."                                                                                                                                                                                                                                                )
+                        please register with another email."                                                                                                                                                                                                                                                                                                                                                                                                                                    )
                 return render_template('register.html', form=form)
 
             new_user.set_password(form.password.data)
             db.session.add(new_user)
             db.session.commit()
-            return redirect('/users')
+            return redirect('/')
         # validation failed, when the page reloads it will show the specific error message
         return render_template('register.html', form=form)
     elif request.method == 'GET':
@@ -68,33 +69,54 @@ def _register():
 # retrieve the list of all users
 @users.route('/users', methods=['GET'])
 def _users():
-    _users = db.session.query(User)
-    return render_template("users.html", users=_users)
+    # checking if there is a logged user
+    if current_user is not None and hasattr(current_user, 'id'):
+
+        list_logic = ListLogic()
+
+        recipients = list_logic.retrieving_recipients(current_user.id)
+
+        # rendering the template
+        # update result whit template
+        return render_template("users.html", users=recipients)
+
+    else:
+        # there is no logged user, redirect to login
+        return redirect('/login')
 
 
 @users.route('/users/<user_id>', methods=['GET'])
 def _user_details(user_id):
-    # get the user
-    # if <id> is not a number, render 404 page
-    try:
-        user_id = int(user_id)
-    except:
-        abort(404)
-
-    # if the user is logged in and try to access this page, redirect him to /profile
+    # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
+
+        # get the user
+        # if <id> is not a number, render 404 page
+        try:
+            user_id = int(user_id)
+        except:
+            abort(404)
+
+        # if the user is logged in and try to access this page, redirect him to /profile
         if (current_user.id == user_id):
             return redirect('/profile')
 
-    # retrieve user from the database
-    user = db.session.query(User).filter(User.id == user_id).first()
-    if user is None:
-        abort(404)
+        list_logic = ListLogic()
 
-    block_form = BlockForm(user_id = user.id)
+        # retrieve user from the database
+        all_recipients = [ob.id for ob in list_logic.retrieving_recipients(current_user.id)]
+        if user_id not in all_recipients:
+            abort(404)
 
-    # render the page
-    return render_template('user_details.html', user = user, block_form = block_form)
+        user = db.session.query(User).filter(User.id == user_id).first()
+
+        block_form = BlockForm(user_id = user.id)
+
+        # render the page
+        return render_template('user_details.html', user = user, block_form = block_form)
+
+    else:
+        return redirect('/login')
 
 
 # show the account information
@@ -147,4 +169,3 @@ def _content_filter():
         abort(403) # no one apart of the logged user can do this action
 
 #@users.route('/profile/picture/update', methods=['GET', 'POST'])
-

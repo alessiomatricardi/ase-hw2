@@ -56,7 +56,7 @@ class TestBlacklist(unittest.TestCase):
         # check rendering
 
         # check that the recipients list is now empty (user 3 has blocked everyone)
-        response = app.get("/recipients_list", content_type='html/text', follow_redirects=True)
+        response = app.get("/users", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         assert b'Carlo Neri' not in response.data
         assert b'Alessio Bianchi' not in response.data
