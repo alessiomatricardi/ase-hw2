@@ -1,8 +1,13 @@
+from datetime import date, datetime
+from operator import methodcaller
 from flask import Blueprint, redirect, render_template, request, abort
+from flask.signals import message_flashed
+from flask_wtf import form
 
 from monolith.database import User, db
-from monolith.forms import ContentFilterForm, UserForm, BlockForm
+from monolith.forms import ContentFilterForm, UserForm, BlockForm, ModifyPersonalDataForm
 from monolith.content_filter_logic import ContentFilterLogic
+from monolith.user_logic import UserLogic
 
 from flask_login import current_user
 
@@ -148,3 +153,39 @@ def _content_filter():
 
 #@users.route('/profile/picture/update', methods=['GET', 'POST'])
 
+@users.route('/profile/modify_personal_data', methods=['GET', 'POST'])
+def modify_personal_data():
+    if current_user is not None and hasattr(current_user, 'id'):
+
+        # TODO if needed, create an instance of UserLogic
+
+        if request.method == 'GET':
+            form = ModifyPersonalDataForm()
+
+            # populate the form with the existing data of the user
+            form.firstname.data = current_user.firstname
+            form.lastname.data = current_user.lastname
+
+            return render_template('modify_personal_data.html', form=form, date_of_birth=current_user.date_of_birth)
+        
+        elif request.method == 'POST':
+
+            user_logic = UserLogic()
+
+            form = request.form
+
+            if user_logic.modify_personal_data(current_user.id, form):
+                # TODO check if current_user has been updated (eventually update it)
+
+                return redirect('/profile')
+
+            else: # something went wrong in the modification of the personal data
+                # TODO handle the incorrect modification of data
+                return redirect('/profile')
+
+        
+        else:
+            raise RuntimeError('This should not happen!')
+
+    else:
+        abort(403) # no one apart of the logged user can do this action

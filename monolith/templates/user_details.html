@@ -21,6 +21,10 @@ Birth date : {{user.date_of_birth.strftime('%d/%m/%Y')}} <br>
   </form>
   <button onclick="location.href = '/unregister';" id="unregister_button"
     class="float-left submit-button">Unregister</button>
+  
+    <!-- CHECK POSITION OF THE BUTTONS -->
+  <button onclick="location.href = '/profile/modify_personal_data';" id="modify_personal_data_button"
+  class="float-left submit-button">Modify personal data</button>
 
   {% else %}
 

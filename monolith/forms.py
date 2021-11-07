@@ -56,3 +56,9 @@ class BlockForm(FlaskForm):
 
 class ContentFilterForm(FlaskForm):
     filter_enabled = f.BooleanField()
+
+class ModifyPersonalDataForm(FlaskForm):
+    firstname = f.StringField('First name', validators=[DataRequired()])
+    lastname = f.StringField('Last name', validators=[DataRequired()])
+    date_of_birth = f.DateField('Date of birth', render_kw = {'type' : 'date'})
+    display = ['firstname', 'lastname', 'date_of_birth']
