@@ -120,7 +120,7 @@ class TestNewMessage(unittest.TestCase):
             'submit': 'Send bottle'
         }
         response = tested_app.post("/new_message", data = data, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        assert b'1 recipient' in response.data
+        assert b'Please select at least 1 recipient' in response.data
 
         # test that the message is saved as a draft, so the rendered page is the index.html
         data = {
