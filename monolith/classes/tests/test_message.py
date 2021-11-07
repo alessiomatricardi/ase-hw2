@@ -123,7 +123,7 @@ class TestMessage(unittest.TestCase):
             db.session.commit()
 
             # create the directory
-            os.mkdir(os.path.join(os.getcwd(),'monolith','static','attached',str(id)))
+            os.makedirs(os.path.join(os.getcwd(),'monolith','static','attached',str(id)))
             
             # retrieve the message from db (so to verify that it has correctly been created)
             message_to_delete = db.session.query(Message).filter(Message.id == message.id).first()
