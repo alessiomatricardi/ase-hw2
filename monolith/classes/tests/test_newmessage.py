@@ -69,7 +69,7 @@ class TestNewMessage(unittest.TestCase):
             self.assertEqual(expected_result.recipient_id, result['recipient_id'])
             self.assertEqual(expected_result.is_read, False)
 
-    
+
     def test_send_bottle(self):
         with self.app.app_context():
             message = db.session.query(Message).filter(Message.id == 4).first()
@@ -79,7 +79,7 @@ class TestNewMessage(unittest.TestCase):
 
 
     #
-    # 
+    #
     # TODO test the update of is_delivered attribute
     # TODO test the sending of emails
     #
@@ -91,13 +91,13 @@ class TestNewMessage(unittest.TestCase):
         # check that if the user is not logged, the rendered page is the login page
         response = tested_app.get("/new_message", content_type='html/text', follow_redirects=True)
         assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
-        
+
 
         # do the login otherwise the sending of a new message can't take place
-        data = { 'email' : 'prova4@mail.com' , 'password' : 'prova123' } 
+        data = { 'email' : 'prova4@mail.com' , 'password' : 'prova123' }
         response = tested_app.post(
-            "/login", 
-            data = data , 
+            "/login",
+            data = data ,
             content_type='application/x-www-form-urlencoded',
             follow_redirects=True
             )
@@ -113,34 +113,34 @@ class TestNewMessage(unittest.TestCase):
         assert b'<input type="checkbox" name="recipients" value=prova@mail.com checked>' in response.data
 
         # test that if no recipients are selected the page is re-rendered with a warning
-        data = { 
+        data = {
             'content' : 'ININFLUENT FOR THE TEST' ,
             'deliver_time' : "2021-11-01T15:45",
             'recipients': '',
             'submit': 'Send bottle'
         }
         response = tested_app.post("/new_message", data = data, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        assert b'Please select' in response.data
+        assert b'1 recipient' in response.data
 
         # test that the message is saved as a draft, so the rendered page is the index.html
-        data = { 
+        data = {
             'content' : 'ININFLUENT FOR THE TEST' ,
             'deliver_time' : "2021-11-01T15:45",
             'recipients': 'prova@mail.com',
             'submit': 'Save draft'
         }
         response = tested_app.post("/new_message", data = data, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        assert b'Hi Barbara!' in response.data 
+        assert b'Hi Barbara!' in response.data
 
         # test that the message is sent correctly, so the rendered page is the index.html
-        data = { 
+        data = {
             'content' : 'ININFLUENT FOR THE TEST' ,
             'deliver_time' : "2021-11-01T15:45",
             'recipients': 'prova@mail.com',
             'submit': 'Send bottle'
         }
         response = tested_app.post("/new_message", data = data, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        assert b'Hi Barbara!' in response.data 
+        assert b'Hi Barbara!' in response.data
 
         #
         # TODO line 83 in messages.py
