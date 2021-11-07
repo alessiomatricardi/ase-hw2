@@ -4,6 +4,7 @@ import datetime
 from unittest import result
 from warnings import resetwarnings
 import os
+from monolith.image import Image
 
 #from flask import app 
 from flask.signals import message_flashed
@@ -76,6 +77,55 @@ class TestMessage(unittest.TestCase):
             result = m.send_bottle(message)
             expected_result = db.session.query(Message).filter(Message.id == 8).first().is_sent
             self.assertEqual(expected_result, result)
+
+
+    def test_is_my_message(self):
+        with tested_app.app_context():
+            # verify that user 4 has rights on message 5 (he should NOT have them)
+            result = m.is_my_message(4,5)
+            expected_result = []
+            self.assertEqual(expected_result, result)
+        
+            #  # verify that user 4 has rights on message 6 (he should have them)
+            result = m.is_my_message(4,6)
+            expected_result = db.session.query(Message).filter(Message.id == 6).all()
+            self.assertEqual(expected_result, result)
+
+
+    def test_control_file(self):
+        with tested_app.app_context():
+            # test that a correct image has been received.
+            # NB: to simply perform the test, it has been assumed that an image is represented by an object in the following format
+            image = Image()
+            image.filename = "IMAGE_NAME.jpg"
+            
+            # check that the name is correctly returned (so that image.py file is tested)
+            self.assertEqual("IMAGE_NAME.jpg", image.get_filename())
+
+            # the content of the file is meaningful for the check
+
+            result = m.control_file(image)
+            self.assertEqual(True, result) # we expect that the image is recognized as good
+
+            image.filename = ''
+            result = m.control_file(image)
+            self.assertEqual(False, result) # we expect that the image is recognized as bad
+
+
+    def test_control_rights_on_image(self):
+        with tested_app.app_context():
+            # check that the user 4 has rights to see image (even if not present) of message 1
+            # it shouldn't have the privileges, so the check should fail
+            result = m.control_rights_on_image(1, 4)
+            self.assertEqual(False, result)
+
+            # user 4 has sent message 4, so it should have the privileges to see the image
+            result = m.control_rights_on_image(4, 4)
+            self.assertEqual(True, result)
+
+            # user 4 has received message 6, so it should have the privileges to see the image
+            result = m.control_rights_on_image(6, 4)
+            self.assertEqual(True, result)
 
 
     def test_delete_message(self):

@@ -142,7 +142,7 @@ def new_message():
     else: # user not logged
         return redirect('/login') 
 
-# utility to show an image, do not change
+# utility to show an image
 @messages.route('/show/<msg_id>/<filename>')
 def send_file(msg_id, filename):
 
