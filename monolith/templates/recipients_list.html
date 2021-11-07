@@ -10,7 +10,6 @@
       <li>
       {{user.firstname}} {{user.lastname}} {{user.email}}  
       <button onclick="location.href = '/new_message?single_recipient={{user.email}}';" id="writeToButton" class="float-left submit-button">Write to</button> 
-      <button onclick="location.href = '/block_user?target={{user.id}}';" id="blockUserButton" class="float-left submit-button">Block user</button> 
       </li>
       {% endfor %}
     </ul>

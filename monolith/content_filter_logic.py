@@ -1,6 +1,7 @@
 from monolith.database import db, User
 from profanity_filter import ProfanityFilter
 
+from flask_login import current_user
 
 
 class ContentFilterLogic:
@@ -8,13 +9,9 @@ class ContentFilterLogic:
     def __init__(self):
         pass
 
-    def activate_filter(self, user_id):
-        db.session.query(User).filter(User.id == user_id).update({'content_filter_enabled': True})
-        db.session.commit()
-        return 
-    
-    def de_activate_filter(self, user_id):
-        db.session.query(User).filter(User.id == user_id).update({'content_filter_enabled': False})
+    def toggle_filter(self, is_filter_enabled):
+        db.session.query(User).filter(User.id == current_user.id)\
+            .update({'content_filter_enabled': is_filter_enabled})
         db.session.commit()
         return
 

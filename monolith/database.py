@@ -1,7 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.elements import Null
 from werkzeug.security import check_password_hash, generate_password_hash
-import json
 
 # default library salt length is 8
 # adjusting it to 16 allow us to improve the strongness of the password
@@ -117,6 +116,9 @@ class Message_Recipient(db.Model):
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     is_read = db.Column(db.Boolean, default=False)
     # read_time = db.Column(db.DateTime, default=Null)
+
+    # message has been cancelled by the recipient
+    is_hide = db.Column(db.Boolean, default = False)
 
     __table_args__ = (
         db.PrimaryKeyConstraint(

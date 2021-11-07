@@ -3,10 +3,8 @@ from celery.utils.functional import first
 from flask import Blueprint, redirect, render_template, request, abort
 from flask.globals import current_app
 from sqlalchemy.sql.elements import Null
-from sqlalchemy.sql.expression import false
-
 from monolith.database import User, db, Blacklist, Message, Message_Recipient
-from monolith.forms import UserForm, MessageForm
+from monolith.forms import HideForm, ReportForm, MessageForm
 from flask_login import current_user
 from monolith.bottlebox_logic import BottleBoxLogic, DraftLogic
 from sqlalchemy.sql import or_,and_
@@ -79,7 +77,7 @@ def show_drafts():
 
 
 
-@bottlebox.route('/message/<label>/<id>', methods=['GET', 'POST'])
+@bottlebox.route('/message/<label>/<id>', methods=['GET'])
 def delivered_detail(label, id):
 
     # checks if <id> is not a number, otherwise abort
@@ -303,7 +301,10 @@ def delivered_detail(label, id):
         sender_name = sender.firstname + ' ' + sender.lastname 
         sender_name = bottlebox_logic.retrieve_sender_info(detailed_message)
 
-        return render_template('/message_detail.html', message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, recipients = blocked_info, label = label)
+        reportForm = ReportForm(message_id = id)
+        hideForm = HideForm(message_id = id)
+
+        return render_template('/message_detail.html', hideForm = hideForm, reportForm = reportForm, message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, recipients = blocked_info, label = label)
 
     else:
         # there is no logged user, redirect to login

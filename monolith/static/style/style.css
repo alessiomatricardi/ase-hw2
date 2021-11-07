@@ -4,11 +4,19 @@ body {
 }
 
 .body-default {
-  display: flex;
   align-items: center;
   padding-top: 40px;
   padding-bottom: 40px;
   background-color: #f5f5f5;
+}
+
+.center {
+  width: 100%;
+  margin: 0 auto;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
 }
 
 .form-signin {
@@ -79,4 +87,11 @@ body {
   margin-bottom: 10px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+}
+
+.error-page {
+  background-color: orange;
+  color: cornsilk;
+  font-weight: bold;
+  font-family: 'Quicksand', sans-serif;
 }

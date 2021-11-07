@@ -128,13 +128,11 @@ class TestBottlebox(unittest.TestCase):
         assert b'<h1>Message from</h1>' in response.data
         assert b'<h5>Alessio Bianchi</h5>' in response.data 
         assert b'Reply' not in response.data
-        assert b'Block user' not in response.data
 
         # checking the rendering of a delivered message to a non blocking/blocked user
         response = tested_app.get("/message/delivered/2", data = data1 , content_type='html/text', follow_redirects=True)
         assert b'<h1>Message to</h1>' in response.data
-        assert b'Carlo Neri' in response.data 
-        assert b'Block user' in response.data
+        assert b'Carlo Neri' in response.data
        
         # checking that the opening of a message not yet delivered is not possible
         response = tested_app.get("/message/delivered/1", data = data1 , content_type='html/text', follow_redirects=True)
@@ -159,7 +157,6 @@ class TestBottlebox(unittest.TestCase):
         assert b'<h1>Message from</h1>' in response.data
         assert b'<h5>Damiano Rossi</h5>' in response.data 
         assert b'Reply' in response.data
-        assert b'Block user' in response.data
 
          # logout
         response = tested_app.get("/logout", content_type='html/text', follow_redirects=True)
@@ -176,7 +173,6 @@ class TestBottlebox(unittest.TestCase):
         assert b'<h1>Message to</h1>' in response.data
         assert b'Damiano Rossi' in response.data 
         assert b'Reply' not in response.data
-        assert b'Block user' not in response.data
 
         # checking that opening a message with wrong URL args redirects to the Home Page
         response = tested_app.get("/message/received/not_an_int_arg", data = data1 , content_type='html/text', follow_redirects=True)

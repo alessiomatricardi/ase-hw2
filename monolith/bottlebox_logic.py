@@ -38,7 +38,7 @@ class BottleBoxLogic:
             
             return msg
         elif type == 2: #received
-            msg = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message_Recipient.recipient_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today)
+            msg = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message_Recipient.recipient_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today).where(Message_Recipient.is_hide == False)
 
             if user.content_filter_enabled:
                 for message in msg:
