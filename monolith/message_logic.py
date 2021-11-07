@@ -4,7 +4,11 @@ import datetime
 from .background import celery  
 from monolith.list_logic import ListLogic
 from sqlalchemy import func
-#from monolith.app import ALLOWED_EXTENSIONS
+import os
+import shutil
+
+# state how many points are required to delete a (sent) message
+DELETING_MESSAGE_COST = 10
 
 class MessageLogic:
     
@@ -70,7 +74,7 @@ class MessageLogic:
         return Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today).where(Message_Recipient.recipient_id == user_id).where(Message.id == msg_id).all()
 
     def control_file(self, file):
-        if file and file.filename != '' and file.filename.split('.')[-1] in ['png', 'jpg', 'jpeg', 'gif']:
+        if file and file.filename != '' and file.filename.split('.')[-1] in ['png', 'jpg', 'jpeg', 'gif', 'PNG', 'JPG', 'JPEG', 'GIF']:
             return True
         else:
             return False
@@ -78,17 +82,39 @@ class MessageLogic:
     def control_rights_on_image(self, msg_id, user_id):
         
         messages_sent = db.session.query(Message).filter(Message.sender_id == user_id).where(Message.id == msg_id).all()
-        messages_recived = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id == msg_id).all()
+        messages_received = db.session.query(Message_Recipient).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id==msg_id).all()
+        #Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id == msg_id).all()
  
-        if messages_sent or messages_recived:
+        print(messages_sent)
+        print(messages_received)
+        
+        if messages_sent or messages_received:
             return True
         return False
 
-"""
-    @celery.task(name="send_notification")
-    def send_notification(sender_email, recipients_list):
-        for recipient_email in recipients_list:
-            print("email sent to: " + recipient_email) # TODO send email OR popup
+    def delete_message(self, message_to_delete):
+        # check that the user has enough lottery points
+        lottery_points = db.session.query(User).filter(User.id == message_to_delete.sender_id).first().lottery_points
+
+        if lottery_points < DELETING_MESSAGE_COST:
+            return False # Not enough points to delete a message
+        
+        # decrement lottery points
+        lottery_points = lottery_points - DELETING_MESSAGE_COST
+        db.session.query(User).filter(User.id == message_to_delete.sender_id).update({'lottery_points': lottery_points})
+
+        # deleting instances of recipients
+        db.session.query(Message_Recipient).where(Message_Recipient.id == message_to_delete.id).delete()
+
+        # deleting previously attached image, if it exists
+        if message_to_delete.image != '':
             
-        return "Notifications sent"
-"""
+            # directory to the folder in which is stored the image
+            directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attached', str(message_to_delete.id))
+            shutil.rmtree(directory, ignore_errors=True) # remove the directory and its content
+
+        # deleting the draft from database and committing all changes
+        db.session.query(Message).where(Message.id == message_to_delete.id).delete()
+        db.session.commit()
+
+        return True # Message successfully deleted

@@ -18,7 +18,6 @@ from monolith.message_logic import MessageLogic # gestisce la logica dei messagg
 # Ad esempio, la creazione di un nuovo messaggio +
 # richiesta al db + ritorna oggetto json per fare il test
 
-
 messages = Blueprint('messages', __name__)
 
 @messages.route('/new_message', methods=['POST', 'GET'])
@@ -34,8 +33,7 @@ def new_message():
             form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id)
             single_recipient = request.args.get('single_recipient') # used to set a checkbox as checked if the recipient is choosen from the recipient list page
             msg_id = request.args.get('msg_id')
-
-            print(msg_id)
+            
             if msg_id: # if a message id has been given as argument
 
                 msg = msg_logic.is_my_message(current_user.id, msg_id)
@@ -72,79 +70,77 @@ def new_message():
 
             # validate message content
             if msg_logic.validate_message_fields(message):
+                
+                if len(form.getlist('recipients')) == 0: # if no recipients have been selected
+                    #msg = json.dumps({"msg":"Condition failed on page baz"})
+                    #db.session['msg'] = msg
+                    #return redirect(url_for('.do_foo', messages=messages))
+                    flash("Please select at least 1 recipient")
+                    #return redirect(url_for('.new_message'))
+                    return redirect('/new_message') # TODO VEDIAMO COSA SUCCEDE con questo
 
+                
 
                 # add message in the db
-                if not request.files['attach_image'].filename == '': # if the user passes it, save a file in a reposistory and set the field message.image to the filename
-
+                if request.files and request.files['attach_image'].filename != '': # if the user passes it, save a file in a reposistory and set the field message.image to the filename
+                
                     file = request.files['attach_image']
 
                     if msg_logic.control_file(file): # proper controls on the given file
 
                         message.image = secure_filename(file.filename)
                         id = msg_logic.create_new_message(message)['id']
-                        path_to_folder = os.getcwd() + '/monolith/static/attached/' + str(id)
-                        os.mkdir(path_to_folder)
-                        file.save(os.path.join(path_to_folder, message.image))
+
+                        # TODO trycatch
+                        attached_dir = os.path.join(os.getcwd(),'monolith','static','attached')
+                        if not os.path.exists(attached_dir):
+                            os.makedirs(attached_dir)
+
+
+                        # TODO try catch
+                        os.mkdir(os.path.join(os.getcwd(),'monolith','static','attached',str(id)))
+
+                        file.save(os.path.join(os.getcwd(),'monolith','static','attached',str(id),message.image))
 
                     else:
                         flash('Insert an image with extention: .png , .jpg, .jpeg, .gif')
                         return redirect('/new_message')
 
                 else:
+                
                     id = msg_logic.create_new_message(message)['id']
 
             else:
                 # TODO handle incorrect message fields
-                return render_template('/error_page.html')
+                return render_template('error.html')
+            
+           
+            for recipient_email in form.getlist('recipients'): # list of selected recipients emails
+                message_recipient = Message_Recipient()
 
-            if len(form.getlist('recipients')) > 0: # if no recipients have been selected
-                for recipient_email in form.getlist('recipients'): # list of selected recipients emails
-                    message_recipient = Message_Recipient()
+                recipient_id = msg_logic.email_to_id(recipient_email)
 
-                    recipient_id = msg_logic.email_to_id(recipient_email)
 
-                    # initialize the Message_Recipient object
-                    message_recipient.id = id
-                    print(id)
-                    message_recipient.is_read = False # redundant because the db automatically set it to False
-                    message_recipient.recipient_id = recipient_id
-                    #msg_logic.create_new_message_recipient(message_recipient)
+                # initialize the Message_Recipient object
+                message_recipient.id = id
+                message_recipient.is_read = False # redundant because the db automatically set it to False
+                message_recipient.recipient_id = recipient_id
+                msg_logic.create_new_message_recipient(message_recipient)
 
-                if form['submit'] == 'Send bottle': # if it is a draft, the is_sent flag will not be set to True
-                    msg_logic.send_bottle(message)
 
-                """elif form['submit'] == 'Save draft':
-                    pass"""
-                # seconds = (message.deliver_time - datetime.datetime.now()).total_seconds()
+            if form['submit'] == 'Send bottle': # if it is a draft, the is_sent flag will not be set to True
+                msg_logic.send_bottle(message) 
+
+                # seconds = (message.deliver_time - datetime.datetime.now()).total_seconds() 
                 # msg_logic.send_notification.apply_async(countdown=seconds, kwargs={'sender_email': current_user.email, 'recipients_list': form.getlist('recipients')})
-
-                return render_template("index.html")
-
-            else:
-                #msg = json.dumps({"msg":"Condition failed on page baz"})
-                #db.session['msg'] = msg
-                #return redirect(url_for('.do_foo', messages=messages))
-                flash("Please select at least 1 recipient")
-                #return redirect(url_for('.new_message'))
-                return redirect('/new_message') # TODO VEDIAMO COSA SUCCEDE con questo
-
-            """
-            TEST
-            import unittest
-            import monolith.Message_logic as m
-            class TestAdd(unittest.TestCase):
-                def test_NAME(self):
-                    # il db è vuoto
-                    result = m.new_message(message)
-                    self.assertEqual(result, {message_id: 1})
-            """
-
+            
+            return render_template("index.html") 
+          
         else:
             raise RuntimeError('This should not happen!')
 
     else: # user not logged
-        return redirect('/login') # TODO print an error
+        return redirect('/login') 
 
 # this route allow a user to hide a message
 @messages.route('/hide', methods=['POST'])
@@ -186,8 +182,39 @@ def send_file(msg_id, filename):
 
     msg_logic = MessageLogic()
 
-    if msg_logic.control_rights_on_image(msg_id, current_user.id):
-        return send_from_directory(os.getcwd() + '/monolith/static/attached/' + str(msg_id), filename)
+    if msg_logic.control_rights_on_image(msg_id, current_user.id): 
+        return send_from_directory(os.path.join(os.getcwd(),'monolith', 'static', 'attached',str(msg_id)), filename)
     else:
         # TODO handle no suorce requested
         abort(403)
+
+
+@messages.route('/delete_message/<id>', methods=['GET'])
+def delete_message(id):
+
+    # verify that the user is logged in
+    if current_user is not None and hasattr(current_user, 'id'):
+
+        # checks if <id> is not a number, otherwise abort
+        try:
+            int(id)
+        except:
+            abort(404)
+
+        message_to_delete = db.session.query(Message).filter(Message.id == int(id)).first()
+        
+        # check that the message exists or the messages hasn't been sent 
+        # or the message has been delivered or the message is sent by another user
+        if not message_to_delete or not message_to_delete.is_sent or message_to_delete.is_delivered or message_to_delete.sender_id != current_user.id:
+            abort(404)
+
+        msg_logic = MessageLogic()
+
+        if not msg_logic.delete_message(message_to_delete):
+            flash("Not enough points to delete a message")
+            return redirect(f'/message/pending/{id}')
+
+        return render_template("index.html")  
+    
+    else:
+        return redirect('/login')

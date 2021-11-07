@@ -3,6 +3,13 @@
 {% block title %}Message details{% endblock %}
 
 {% block content %}
+
+{% with msg = get_flashed_messages() %}
+  {% if msg %}
+      <p>{{ msg[0] }}</p>
+  {% endif %}
+{% endwith %}
+
 {% if label == 'received' %}
 <h1>Message from</h1>
 <h5>{{sender_name}}</h5>
@@ -19,6 +26,10 @@
   <li>
     <p>Deliver time: {{message.deliver_time}}</p>
     <p>{{message.content}}</p>
+
+    {% if message.image != '' %}
+      <p><img src = "{{url_for('messages.send_file', msg_id = message.id, filename = message.image)}}" width="480" height="270"></p>
+    {% endif %}
   </li>
     
 </ul>
@@ -40,6 +51,10 @@
   </form>
 
   
+{% endif %} 
+
+{% if label == 'pending' %}
+  <button onclick="location.href = '/delete_message/{{message.id}}';" id="deleteMessage" class="float-left submit-button" >Delete message</button>
 {% endif %} 
 
 

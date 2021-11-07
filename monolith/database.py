@@ -21,11 +21,11 @@ class User(db.Model):
     date_of_birth = db.Column(db.Date)
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
-    is_anonymous = False
     has_picture = db.Column(db.Boolean, default=False)  # has the user a personal profile picture
     lottery_points = db.Column(db.Integer, default=0)
     content_filter_enabled = db.Column(db.Boolean, default=False)
 
+    is_anonymous = False
 
     # Relatioships with other classes
     sent_messages = db.relationship('Message', backref='sender', lazy=True)

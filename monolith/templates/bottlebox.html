@@ -25,6 +25,9 @@
     
     {% elif label == 'Delivered' %}
     <p> <button onclick="location.href = '/message/delivered/{{msg.id}}'" id="openButton" class="float-left submit-button" >Open</button></p>
+    
+    {% elif label == 'Drafts' %}
+    <p> <button onclick="location.href = '/message/draft/{{msg.id}}'" id="openButton" class="float-left submit-button" >Modify Draft</button></p>
 
     {% endif %}
 
