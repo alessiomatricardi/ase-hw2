@@ -13,39 +13,3 @@ def index():
     else:
         welcome = None
     return render_template("index.html", welcome = welcome)
-
-# show the account information
-@home.route('/profile', methods=['GET','POST'])
-def _show_profile():
-    if request.method == 'GET':
-        if current_user is not None and hasattr(current_user, 'id'):
-            # show user informations
-            return render_template("user_details.html", user = current_user)
-        else:
-            # TODO
-            # user does not exists
-            return redirect("/login")
-
-    elif request.method == 'POST':
-
-        return redirect(url_for('.content_filter'))
-
-@home.route('/profile/content_filter', methods=['GET'])
-def content_filter():
-    cfl = ContentFilterLogic()
-
-    user = User()
-  
-    user = db.session.query(User).filter(User.id == current_user.id).first()
-    print("this is user object")
-    print(user)
-
-    if user.content_filter_enabled == True:
-        cfl.de_activate_filter(user.id)
-        msg = "Your content filter has been deactivated"
-
-    elif user.content_filter_enabled == False:
-        cfl.activate_filter(user.id)
-        msg = "Your content filter has been activated"    
-
-    return render_template('content_filter.html', messages = msg)

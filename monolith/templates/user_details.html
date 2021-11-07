@@ -15,8 +15,10 @@ Birth date : {{user.date_of_birth.strftime('%d/%m/%Y')}} <br>
 
   {% if user.id == current_user.id %}
 
-  <button onclick="location.href = '/profile/content_filter';" id="bad_filter_button"
-    class="float-left submit-button">Activate/disactivate Bad words filter</button>
+  <form action="/profile/content_filter" method="POST">
+    {{ content_filter_form.filter_enabled() }}
+    <input type="submit" value="Update">
+  </form>
   <button onclick="location.href = '/unregister';" id="unregister_button"
     class="float-left submit-button">Unregister</button>
 

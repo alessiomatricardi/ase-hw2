@@ -33,20 +33,26 @@ class MultiCheckboxField(SelectMultipleField):
     option_widget = widgets.CheckboxInput()
 
 class MessageForm(FlaskForm):
-    recipients = MultiCheckboxField('recipients', choices=[]) # TODO write javascript script that set/remove the required attribute from the checkist
-    content = f.TextAreaField('content', validators=[DataRequired()])
-    deliver_time = f.DateTimeField('deliver_time', validators=[DataRequired()], format="%d-%m-%Y, %H:%M")
+    recipients = MultiCheckboxField('Recipients', choices=[]) # TODO write javascript script that set/remove the required attribute from the checkist
+    content = f.TextAreaField('Content', validators=[DataRequired()])
+    deliver_time = f.DateTimeField('Delivery time', validators=[DataRequired()], format="%d-%m-%Y, %H:%M")
 
 
 class UnregisterForm(FlaskForm):
-    password = f.PasswordField('password', validators=[DataRequired()])
+    password = f.PasswordField('Password', validators=[DataRequired()])
     display = ['password']
 
 class ReportForm(FlaskForm):
-    message_id = f.HiddenField()
+    message_id = f.HiddenField(validators=[DataRequired()])
+
 
 class HideForm(FlaskForm):
-    message_id = f.HiddenField()
+    message_id = f.HiddenField(validators=[DataRequired()])
+
 
 class BlockForm(FlaskForm):
-    user_id = f.HiddenField()
+    user_id = f.HiddenField(validators=[DataRequired()])
+
+
+class ContentFilterForm(FlaskForm):
+    filter_enabled = f.BooleanField()
