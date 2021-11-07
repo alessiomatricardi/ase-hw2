@@ -32,53 +32,74 @@ def bottlebox_home():
 
 @bottlebox.route('/bottlebox/pending', methods=['GET'])
 def show_pending():
-    
-    bottlebox_logic = BottleBoxLogic()
+    # checking if there is a logged user
+    if current_user is not None and hasattr(current_user, 'id'):
 
-    all_users = bottlebox_logic.retrieving_all_users()
-    # retrieving all pending messages(type:1) sent by current_user
-    msg = bottlebox_logic.retrieving_messages(current_user.id,1)
+        bottlebox_logic = BottleBoxLogic()
 
-    return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Pending')
+        all_users = bottlebox_logic.retrieving_all_users()
+        # retrieving all pending messages(type:1) sent by current_user
+        msg = bottlebox_logic.retrieving_messages(current_user.id,1)
+
+        return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Pending')
+    else:
+        return redirect('/login')
 
 
 @bottlebox.route('/bottlebox/received', methods=['GET'])
 def show_received():
+    # checking if there is a logged user
+    if current_user is not None and hasattr(current_user, 'id'):
 
-    bottlebox_logic = BottleBoxLogic()
+        bottlebox_logic = BottleBoxLogic()
 
-    all_users = bottlebox_logic.retrieving_all_users()
-    # retrieving all received messages(type:2)
-    msg = bottlebox_logic.retrieving_messages(current_user.id,2)
+        all_users = bottlebox_logic.retrieving_all_users()
+        # retrieving all received messages(type:2)
+        msg = bottlebox_logic.retrieving_messages(current_user.id,2)
 
-    return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Received')
+        return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Received')
+
+    else:
+        return redirect('/login')
+
 
 @bottlebox.route('/bottlebox/delivered', methods=['GET'])
 def show_delivered():
+    # checking if there is a logged user
+    if current_user is not None and hasattr(current_user, 'id'):
+        
+        bottlebox_logic = BottleBoxLogic()
 
-    bottlebox_logic = BottleBoxLogic()
+        bottlebox_logic = BottleBoxLogic()
 
-    all_users = bottlebox_logic.retrieving_all_users()
-    # retrieving all delivered messages(type:3) sent by current_user
-    msg = bottlebox_logic.retrieving_messages(current_user.id,3)
+        all_users = bottlebox_logic.retrieving_all_users()
+        # retrieving all delivered messages(type:3) sent by current_user
+        msg = bottlebox_logic.retrieving_messages(current_user.id,3)
 
-    return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Delivered')
+        return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Delivered')
+    else:
+        return redirect('/login')
+
 
 @bottlebox.route('/bottlebox/drafts', methods=['GET'])
 def show_drafts():
+    # checking if there is a logged user
+    if current_user is not None and hasattr(current_user, 'id'):
 
-    bottlebox_logic = BottleBoxLogic()
+        bottlebox_logic = BottleBoxLogic()
 
-    all_users = bottlebox_logic.retrieving_all_users()
-    # retrieving all drafts(type:4) stored by current_user
-    msg = bottlebox_logic.retrieving_messages(current_user.id,4)
+        all_users = bottlebox_logic.retrieving_all_users()
+        # retrieving all drafts(type:4) stored by current_user
+        msg = bottlebox_logic.retrieving_messages(current_user.id,4)
 
-    return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Drafts')
+        return render_template('bottlebox.html', messages = msg, users = all_users, label = 'Drafts')
+
+    else:
+        return redirect('/login')
 
 
-
-@bottlebox.route('/message/<label>/<id>', methods=['GET'])
-def delivered_detail(label, id):
+@bottlebox.route('/message/<label>/<id>', methods=['GET', 'POST'])
+def _message_detail(label, id):
 
     # checks if <id> is not a number, otherwise abort
     try:
@@ -90,13 +111,13 @@ def delivered_detail(label, id):
     if label != 'received' and label != 'delivered' and label != 'pending' and label != 'draft':
         abort(404)
 
-    # POST method is only allowed for drafts, being possible to modify or send them 
+    # POST method is only allowed for drafts, being possible to modify or send them
     if label != 'draft' and request.method == 'POST':
         abort(404)
 
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
- 
+
         recipients = None
         blocked_info = []
         detailed_message = None
@@ -112,18 +133,18 @@ def delivered_detail(label, id):
             # checking that the <id> message exists
             if not detailed_message:
                 abort(404)
-        
+
             detailed_message = detailed_message[0]
 
             # checking if the current_user is into recipients of the message
             message_recipient = bottlebox_logic.is_recipient(id,current_user.id)
-            
+
             if not message_recipient:
                 abort(404)
 
             # check if is_read == False. If so, set it to True and send notification to sender
             if message_recipient[0].is_read == False:
-                
+
                 if not bottlebox_logic.notify_on_read(id,current_user):
                     abort(404)
 
@@ -131,23 +152,23 @@ def delivered_detail(label, id):
 
             # checking if the message is from a blocked or blocking user
             blacklist_istance = bottlebox_logic.user_blacklist_status(other_id,current_user.id)
-            
+
             # blocked variable is passed to render_template in order to display or not the reply and block buttons
             if not blacklist_istance:
                 blocked = False
             else:
                 blocked = True
-        
+
         # case label is draft
-        elif label == 'draft': 
-            
+        elif label == 'draft':
+
             msg_logic = MessageLogic()
             draft_logic = DraftLogic()
 
             # rendering the draft detail
             if request.method == 'GET':
                 form = MessageForm()
-                form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id) 
+                form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id)
 
                 # retrieving the message, if exists
                 detailed_message = draft_logic.retrieve_draft(id)
@@ -184,8 +205,8 @@ def delivered_detail(label, id):
                 # returning the draft html page
                 return render_template("modify_draft.html", form = form, recipients_emails = recipients_emails, content = detailed_message.content, deliver_time = deliver_time, attached = detailed_message.image, message_id = detailed_message.id)
 
-            # else = Drafts POST method: deleting draft or submitting modification/send request 
-            else: 
+            # else = Drafts POST method: deleting draft or submitting modification/send request
+            else:
                 form = request.form
 
                 # retrieving the draft to send, modifiy or delete it
@@ -203,9 +224,9 @@ def delivered_detail(label, id):
                 # checking if the current user is the sender of draft
                 if not detailed_message.sender_id == current_user.id:
                     abort(404)
-             
-                # delete draft from db, eventual image in filesystem and all message_recipients instances 
-                if form['submit'] == 'Delete draft': 
+
+                # delete draft from db, eventual image in filesystem and all message_recipients instances
+                if form['submit'] == 'Delete draft':
 
                     if not draft_logic.delete_draft(detailed_message):
                         abort(404)
@@ -216,7 +237,7 @@ def delivered_detail(label, id):
 
                 # checking if there's new recipients for the draft
                 for recipient_email in form.getlist('recipients'):
-                    
+
                     # retrieving id of recipient
                     recipient_id = msg_logic.email_to_id(recipient_email)
 
@@ -230,8 +251,8 @@ def delivered_detail(label, id):
                 # update the deliver time for the draft
                 if not draft_logic.update_deliver_time(detailed_message,form):
                     abort(404)
-                
-                # checking if there is a new attached image in the form 
+
+                # checking if there is a new attached image in the form
                 if request.files and request.files['attach_image'].filename != '':
 
                     # checking if there's a previous attached image, if so we delete it
@@ -239,12 +260,12 @@ def delivered_detail(label, id):
 
                         if not draft_logic.delete_previously_attached_image(detailed_message):
                             abort(404)
-                    
+
                     # retrieving newly attached image
                     file = request.files['attach_image']
 
                     # proper controls on the given file
-                    if msg_logic.control_file(file): 
+                    if msg_logic.control_file(file):
 
                         if not draft_logic.update_attached_image(detailed_message,file):
                             abort(404)
@@ -270,7 +291,7 @@ def delivered_detail(label, id):
                 detailed_message = bottlebox_logic.retrieve_pending_message(id)
             elif label == 'delivered':
                 detailed_message = bottlebox_logic.retrieve_delivered_message(id)
-        
+
             if not detailed_message:
                 abort(404)
 
@@ -281,16 +302,16 @@ def delivered_detail(label, id):
                 recipients = bottlebox_logic.retrieve_recipients(id)
             else:
                 abort(404)
-            
+
             other_id = None
 
             # checks if a recipient has blocked the current_user or has been blocked
             for i in range(len(recipients)):
                 other_id = recipients[i].id
-                
+
                 blacklist_istance = bottlebox_logic.user_blacklist_status(other_id,current_user.id)
 
-                # appends to blocked_info a tuple to link the respective recipient and its blacklist status 
+                # appends to blocked_info a tuple to link the respective recipient and its blacklist status
                 if not blacklist_istance:
                     blocked_info.append([recipients[i], False])
                 else:
@@ -298,7 +319,7 @@ def delivered_detail(label, id):
 
         # retrieving sender info from db
         sender = User.query.where(User.id == detailed_message.sender_id)[0]
-        sender_name = sender.firstname + ' ' + sender.lastname 
+        sender_name = sender.firstname + ' ' + sender.lastname
         sender_name = bottlebox_logic.retrieve_sender_info(detailed_message)
 
         reportForm = ReportForm(message_id = id)

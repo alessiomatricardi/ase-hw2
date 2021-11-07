@@ -7,6 +7,10 @@
                 {% if user.id == bl.blocked_user_id %}
                     <li>
                     {{user.firstname}} {{user.lastname}} {{user.email}}
+                      <form action="/unblock" method="POST">
+                        <input type="hidden" name="user_id" value="{{user.id}}" required>
+                        <input type="submit" value="Unblock user">
+                      </form>
                     </li>
                 {% endif %}
             {% endfor %}
