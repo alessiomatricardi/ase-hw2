@@ -154,7 +154,7 @@ def _content_filter():
 
 #@users.route('/profile/picture/update', methods=['GET', 'POST'])
 
-@users.route('/profile/modify_personal_data', methods=['GET', 'POST'])
+@users.route('/profile/data', methods=['GET', 'POST'])
 def modify_personal_data():
     if current_user is not None and hasattr(current_user, 'id'):
 
@@ -180,7 +180,7 @@ def modify_personal_data():
 
             else: # something went wrong in the modification of the personal data
                 flash('Please insert correct data')
-                return redirect('/profile/modify_personal_data')
+                return redirect('/profile/data')
         
         else:
             raise RuntimeError('This should not happen!')

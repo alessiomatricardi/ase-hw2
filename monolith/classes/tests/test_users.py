@@ -38,7 +38,7 @@ class TestUsers(unittest.TestCase):
             result = ul.modify_personal_data(5, form)
             self.assertEqual(False, result)
     
-    
+
     def rendering(self):
         app = tested_app.test_client()
 
@@ -46,7 +46,7 @@ class TestUsers(unittest.TestCase):
         response = app.get("/profile", content_type='html/text', follow_redirects=True)
         assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
 
-        response = app.get("/profile/modify_personal_data", content_type='html/text', follow_redirects=True)
+        response = app.get("/profile/data", content_type='html/text', follow_redirects=True)
         assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
         
 
@@ -60,7 +60,7 @@ class TestUsers(unittest.TestCase):
             )
         
         # test that the rendered page is a form containing the personal data of the user 5
-        response = app.get("/profile/modify_personal_data", content_type='html/text', follow_redirects=True)
+        response = app.get("/profile/data", content_type='html/text', follow_redirects=True)
         self.assertEqual(200, response.status_code)
         assert b'Carlo' in response.data
         assert b'Neri' in response.data
@@ -71,7 +71,7 @@ class TestUsers(unittest.TestCase):
             'lastname': 'Viola',
             'date_of_birth': '1976-09-20'
         }
-        response = app.post('/profile/modify_personal_data', data=form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = app.post('/profile/data', data=form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
         self.assertEqual(200, response.status_code)
         assert 'First name : Ferdinando' in response.data
         assert 'Last name : Viola' in response.data
@@ -82,6 +82,6 @@ class TestUsers(unittest.TestCase):
             'lastname': 'Viola',
             'date_of_birth': 'INVALID_DATE'
         }
-        response = app.post('/profile/modify_personal_data', data=form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = app.post('/profile/data', data=form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
         self.assertEqual(200, response.status_code)
         assert b'Please insert correct data' in response.data
