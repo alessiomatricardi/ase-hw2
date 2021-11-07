@@ -110,7 +110,7 @@ class MessageLogic:
         if message_to_delete.image != '':
             
             # directory to the folder in which is stored the image
-            directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attached', str(message_to_delete.id))
+            directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attachments', str(message_to_delete.id))
             shutil.rmtree(directory, ignore_errors=True) # remove the directory and its content
 
         # deleting the draft from database and committing all changes

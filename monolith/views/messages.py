@@ -92,15 +92,15 @@ def new_message():
                         id = msg_logic.create_new_message(message)['id']
 
                         # TODO trycatch
-                        attached_dir = os.path.join(os.getcwd(),'monolith','static','attached')
-                        if not os.path.exists(attached_dir):
-                            os.makedirs(attached_dir)
+                        attachments_dir = os.path.join(os.getcwd(),'monolith','static','attachments')
+                        if not os.path.exists(attachments_dir):
+                            os.makedirs(attachments_dir)
 
 
                         # TODO try catch
-                        os.mkdir(os.path.join(os.getcwd(),'monolith','static','attached',str(id)))
+                        os.mkdir(os.path.join(os.getcwd(),'monolith','static','attachments',str(id)))
 
-                        file.save(os.path.join(os.getcwd(),'monolith','static','attached',str(id),message.image))
+                        file.save(os.path.join(os.getcwd(),'monolith','static','attachments',str(id),message.image))
 
                     else:
                         flash('Insert an image with extention: .png , .jpg, .jpeg, .gif')
@@ -183,7 +183,7 @@ def send_file(msg_id, filename):
     msg_logic = MessageLogic()
 
     if msg_logic.control_rights_on_image(msg_id, current_user.id): 
-        return send_from_directory(os.path.join(os.getcwd(),'monolith', 'static', 'attached',str(msg_id)), filename)
+        return send_from_directory(os.path.join(os.getcwd(),'monolith', 'static', 'attachments',str(msg_id)), filename)
     else:
         # TODO handle no suorce requested
         abort(403)
