@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}Account Info{% endblock %}
+
+{% block content %}
+
+<h1>{{user.firstname}} {{user.lastname}} info</h1>
+
+First name : {{ user.firstname }} <br>
+Last name : {{user.lastname}} <br>
+E-mail : {{user.email}} <br>
+Birth date : {{user.date_of_birth.strftime('%d/%m/%Y')}} <br>
+
+{% if current_user.is_authenticated %}
+
+  {% if user.id == current_user.id %}
+
+  <button onclick="location.href = '/profile/content_filter';" id="bad_filter_button"
+    class="float-left submit-button">Activate/disactivate Bad words filter</button>
+  <button onclick="location.href = '/unregister';" id="unregister_button"
+    class="float-left submit-button">Unregister</button>
+
+  {% else %}
+
+  <button onclick="location.href = '/new_message?single_recipient={{user.email}}';" id="writeToButton"
+    class="float-left submit-button">Write a message</button>
+  <form action="/block" method="POST">
+    {{ blockForm.hidden_tag() }}
+    <input type="submit" value="Block user">
+  </form>
+
+  {% endif %}
+
+{% endif %}
+
+{% endblock %}

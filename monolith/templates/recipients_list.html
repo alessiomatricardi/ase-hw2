@@ -10,10 +10,6 @@
       <li>
       {{user.firstname}} {{user.lastname}} {{user.email}}  
       <button onclick="location.href = '/new_message?single_recipient={{user.email}}';" id="writeToButton" class="float-left submit-button">Write to</button> 
-      <form action="/block" method="POST">
-        {{ blockForms[0].hidden_tag() }}
-        <input type="submit" value="Block user">
-      </form>
       </li>
       {% endfor %}
     </ul>

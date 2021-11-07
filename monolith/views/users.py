@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, abort
 
 from monolith.database import User, db
-from monolith.forms import UserForm
+from monolith.forms import UserForm, BlockForm
 
 from flask_login import current_user
 
@@ -24,10 +24,36 @@ def check_existing_user(email):
 
 users = Blueprint('users', __name__)
 
-@users.route('/users')
+# retrieve the list of all users
+@users.route('/users', methods=['GET'])
 def _users():
     _users = db.session.query(User)
     return render_template("users.html", users=_users)
+
+
+@users.route('/users/<user_id>', methods=['GET'])
+def _user_details(user_id):
+    # get the user
+    # if <id> is not a number, render 404 page
+    try:
+        int(user_id)
+    except:
+        abort(404)
+
+    # if the user is logged in and try to access this page, redirect him to /profile
+    if current_user is not None and hasattr(current_user, 'id'):
+        if (current_user.id == user_id):
+            return redirect('/profile')
+
+    # retrieve user from the database
+    user = db.session.query(User).filter(User.id == user_id).first()
+    if user is None:
+        abort(404)
+
+    blockForm = BlockForm(user_id = user.id)
+
+    # render the page
+    return render_template('user_details.html', user = user, blockForm = blockForm)
 
 
 @users.route('/register', methods=['POST', 'GET'])
@@ -47,7 +73,7 @@ def _register():
             where x is in [md5, sha1, bcrypt], the hashed_password should be = x(password + s) where
             s is a secret key.
             """
-        
+
             # checking if the given email has already been used and aborting if so
             try:
                 check_existing_user(new_user.email)

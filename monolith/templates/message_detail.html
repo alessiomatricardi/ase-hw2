@@ -8,13 +8,9 @@
 <h5>{{sender_name}}</h5>
 {% else %}
 <h1>Message to</h1>
-<h5>{% for user in recipients: %} {{user[0].firstname}} {{user[0].lastname}} 
-    {% if user[1] == False %}
-    <form action="/block" method="POST">
-      {{ blockForms[0].hidden_tag() }}
-      <input type="submit" value="Block user">
-    </form>
-    {% endif %}
+<h5>
+  {% for user in recipients: %}
+    {{user[0].firstname}} {{user[0].lastname}} 
   {% endfor %}
 </h5>
 
@@ -31,10 +27,6 @@
   <button onclick="location.href = '/new_message?msg_id={{message.id}}';" id="forwardButton" class="float-left submit-button" >Forward</button>
   {% if blocked == False %} <!-- va messo fuori -->
   <button onclick="location.href = '/new_message?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button>
-  <form action="/block" method="POST">
-    {{ blockForms[0].hidden_tag() }}
-    <input type="submit" value="Block user">
-  </form>
   {% endif %}
 
   <form action="/report" method="POST">
