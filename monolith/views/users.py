@@ -6,7 +6,7 @@ from flask.signals import message_flashed
 from flask_wtf import form
 
 from monolith.database import User, db
-from monolith.forms import ContentFilterForm, UserForm, BlockForm, ModifyPersonalDataForm
+from monolith.forms import ContentFilterForm, UserForm, BlockForm, ModifyPersonalDataForm, ModifyPasswordForm
 from monolith.content_filter_logic import ContentFilterLogic
 from monolith.user_logic import UserLogic
 
@@ -158,8 +158,6 @@ def _content_filter():
 def modify_personal_data():
     if current_user is not None and hasattr(current_user, 'id'):
 
-        # TODO if needed, create an instance of UserLogic
-
         if request.method == 'GET':
             form = ModifyPersonalDataForm()
 
@@ -185,5 +183,44 @@ def modify_personal_data():
         else:
             raise RuntimeError('This should not happen!')
 
+    else:
+        return redirect('/login')
+
+
+@users.route('/profile/password', methods=['GET', 'POST'])
+def modify_password():
+    if current_user is not None and hasattr(current_user, 'id'):
+        
+        if request.method == 'GET':
+            form = ModifyPasswordForm()
+            return render_template('modify_password.html', form=form)
+
+        
+        elif request.method == 'POST':
+
+            user_logic = UserLogic()
+
+            form = request.form
+
+            # check if the old password is the same of the one stored in the database
+            # check that the old and new password are not the same
+            # check that the new password and the repeated new password are equal
+            result = user_logic.check_form_password(current_user.id, form['old_password'], form['new_password'], form['repeat_new_password'])
+
+            if result == 1:
+                flash("The old password you inserted is incorrect. Please insert the correct one.")
+                return redirect('/profile/password')
+            elif result == 2:
+                flash("Please insert a password different from the old one.")
+                return redirect('/profile/password')
+            elif result == 3:
+                flash("The new password and its repetition must be equal.")
+                return redirect('/profile/password')
+            else: 
+                # proceed to the modification of the password
+                user_logic.modify_password(current_user.id, form['new_password'])
+                        
+                return redirect('/profile')
+                
     else:
         return redirect('/login')
