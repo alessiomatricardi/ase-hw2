@@ -85,8 +85,8 @@ class MessageLogic:
         messages_received = db.session.query(Message_Recipient).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id==msg_id).all()
         #Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id == msg_id).all()
  
-        print(messages_sent)
-        print(messages_received)
+        '''print(messages_sent)
+        print(messages_received)'''
         
         if messages_sent or messages_received:
             return True

@@ -137,7 +137,7 @@ class DraftLogic:
         if detailed_message.image != '':
             
             # directory to the folder in which is stored the image
-            directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attached', str(detailed_message.id))
+            directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attachments', str(detailed_message.id))
             shutil.rmtree(directory, ignore_errors=True)
 
             '''myfile = os.path.join(directory, detailed_message.image)
@@ -234,7 +234,7 @@ class DraftLogic:
 
     def delete_previously_attached_image(self, detailed_message):
         # directory where is stored the attached imaged
-        directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attached', str(detailed_message.id))
+        directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attachments', str(detailed_message.id))
         myfile = os.path.join(directory, detailed_message.image)
         
         # deleting the previously attached image
@@ -252,7 +252,7 @@ class DraftLogic:
         
         id = detailed_message.id
 
-        attached_dir = os.path.join(os.getcwd(),'monolith','static','attached')
+        attached_dir = os.path.join(os.getcwd(),'monolith','static','attachments')
         
         # creating attached folder, if it doesn't already exist
         if not os.path.exists(attached_dir):
@@ -264,13 +264,13 @@ class DraftLogic:
         # creating attached image folder, if it doesn't already exist
         if not os.path.exists(os.path.join(attached_dir, str(id))):
             try:
-                os.mkdir(os.path.join(os.getcwd(),'monolith','static','attached',str(id)))
+                os.mkdir(os.path.join(os.getcwd(),'monolith','static','attachments',str(id)))
             except Exception:
                 return False
 
         # saving the attached image
         try:
-            file.save(os.path.join(os.getcwd(),'monolith','static','attached',str(id),secure_filename(file.filename)))
+            file.save(os.path.join(os.getcwd(),'monolith','static','attachments',str(id),secure_filename(file.filename)))
         except Exception:
                 return False
 

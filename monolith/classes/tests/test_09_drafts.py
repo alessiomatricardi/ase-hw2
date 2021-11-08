@@ -90,7 +90,7 @@ class TestDrafts(unittest.TestCase):
             'content' : 'NEW MODIFIED TEXT' ,
             'deliver_time' : new_deliver_time,
             'recipients': 'prova2@mail.com',
-            'submit': 'Save draft changes'
+            'submit': 'Save draft changes',
         }
         response = tested_app.post(
             "/message/draft/10",

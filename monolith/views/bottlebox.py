@@ -203,7 +203,7 @@ def _message_detail(label, id):
                 deliver_time = detailed_message.deliver_time.strftime("%Y-%m-%dT%H:%M")
 
                 # returning the draft html page
-                return render_template("modify_draft.html", form = form, recipients_emails = recipients_emails, content = detailed_message.content, deliver_time = deliver_time, attached = detailed_message.image, message_id = detailed_message.id)
+                return render_template("modify_draft.html", form = form, recipients_emails = recipients_emails, content = detailed_message.content, deliver_time = deliver_time, attachment = detailed_message.image, message_id = detailed_message.id)
 
             # else = Drafts POST method: deleting draft or submitting modification/send request
             else:

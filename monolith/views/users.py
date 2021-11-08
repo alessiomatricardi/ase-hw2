@@ -167,9 +167,9 @@ def _content_filter():
 
             return redirect('/profile')
 
-            return render_template('user_details.html',
+            '''return render_template('user_details.html',
                                    user=current_user,
-                                   content_filter_form = form)
+                                   content_filter_form = form)'''
 
         else:
             return redirect('/profile')
