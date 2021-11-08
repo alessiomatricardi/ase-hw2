@@ -1,61 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/list/main.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container my-3">
-        <div id="calendar"></div>
-    </div>
-    <div class="container my-3">
-        <button onclick="location.href = '/';" id="homeButton" class="submit-button" >Home</button>
-    </div>
+{% extends "layout.html" %}
 
-    <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>
-    <script src="https://unpkg.com/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-    <script src="https://unpkg.com/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/list/main.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.min.js"></script>
-    <script type="text/javascript">
-        var messages = {{ messages|safe }}
+{% block title %}Calendar{% endblock %}
 
-        var events = []
-        for(message of messages){
-            console.log(message)
-            events.push({
-                title: message[0],
-                start: message[1],
-                backgroundColor: message[2] ? '#00b7ff' : '#ff6000'
-            })
-        }
+{% block add_head %}
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/list/main.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.min.css" rel="stylesheet">
+{% endblock %}
 
-        var el = document.getElementById('calendar')
+{% block content %}
 
-        var calendar = new FullCalendar.Calendar(el, {
-            plugins: ['dayGrid', 'list', 'bootstrap'], //  'timeGrid'
-            themeSystem: 'bootstrap',
-            weekNumbers: true,
-            eventLimit: true,
-            events: events,
-            header: {
-                left: 'dayGridMonth, listYear',
-                center: 'title',
-                right: 'today prev,next'
-            }
+<h1>Calendar</h1>
+
+<div class="container my-3" style="padding-bottom: 100px;">
+    <div id="calendar"></div>
+</div>
+
+<script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>
+<script src="https://unpkg.com/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://unpkg.com/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/list/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.min.js"></script>
+<script type="text/javascript">
+    var messages = {{ messages|safe }}
+
+    var events = []
+    for(message of messages){
+        console.log(message)
+        events.push({
+            title: message[0],
+            start: message[1],
+            backgroundColor: message[2] ? '#00b7ff' : '#ff6000'
         })
+    }
 
-        calendar.render()
-    </script>
-</body>
-</html>
+    var el = document.getElementById('calendar')
+
+    var calendar = new FullCalendar.Calendar(el, {
+        plugins: ['dayGrid', 'list', 'bootstrap'], //  'timeGrid'
+        themeSystem: 'bootstrap',
+        weekNumbers: true,
+        eventLimit: true,
+        events: events,
+        header: {
+            left: 'dayGridMonth, listYear',
+            center: 'title',
+            right: 'today prev,next'
+        }
+    })
+
+    calendar.render()
+</script>
+
+{% endblock %}

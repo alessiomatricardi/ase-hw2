@@ -213,7 +213,7 @@ class TestMessage(unittest.TestCase):
             'submit': 'Save draft'
         }
         response = app.post("/new_message", data = dataForm2, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        assert b'Hi Barbara!' in response.data 
+        assert b'Hi Barbara Verdi!' in response.data 
 
         # test that the message is sent correctly, so the rendered page is the index.html
         dataForm3 = { 
@@ -223,7 +223,7 @@ class TestMessage(unittest.TestCase):
             'submit': 'Send bottle'
         }
         response = app.post("/new_message", data = dataForm3, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        assert b'Hi Barbara!' in response.data 
+        assert b'Hi Barbara Verdi!' in response.data 
 
 
         # a user wants to delete a message but passing an incorrect URI
@@ -236,7 +236,7 @@ class TestMessage(unittest.TestCase):
         
         # user 4 delete the previously sent message (it has 15 points, so he can do it)
         response = app.get(f'/delete_message/{11}', content_type='html/text', follow_redirects=True)
-        assert b'Hi Barbara!' in response.data # the rendered page is the homepage
+        assert b'Hi Barbara Verdi!' in response.data # the rendered page is the homepage
 
         # add another message to the db
         dataForm4 = { 
