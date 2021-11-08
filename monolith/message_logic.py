@@ -73,7 +73,7 @@ class MessageLogic:
         
         return Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today).where(Message_Recipient.recipient_id == user_id).where(Message.id == msg_id).all()
 
-    def control_file(self, file):
+    def validate_file(self, file):
         if file and file.filename != '' and file.filename.split('.')[-1] in ['png', 'jpg', 'jpeg', 'gif', 'PNG', 'JPG', 'JPEG', 'GIF']:
             return True
         else:

@@ -86,7 +86,7 @@ def new_message():
                 
                     file = request.files['attach_image']
 
-                    if msg_logic.control_file(file): # proper controls on the given file
+                    if msg_logic.validate_file(file): # proper controls on the given file
 
                         message.image = secure_filename(file.filename)
                         id = msg_logic.create_new_message(message)['id']

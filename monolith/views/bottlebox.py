@@ -265,7 +265,7 @@ def _message_detail(label, id):
                     file = request.files['attach_image']
 
                     # proper controls on the given file
-                    if msg_logic.control_file(file):
+                    if msg_logic.validate_file(file):
 
                         if not draft_logic.update_attached_image(detailed_message,file):
                             abort(404)

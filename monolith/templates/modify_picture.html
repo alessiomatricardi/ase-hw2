@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% from "macros.html" import render_form_field %}
+
+{% block title %}Modify profile picture{% endblock %}
+
+{% block content %}
+
+{% if form.image.errors %}
+{% for error in form.image.errors %}
+<div class="alert alert-danger" role="alert">
+    {{ error }}
+</div>
+{% endfor %}
+{% endif %}
+
+<form action="/profile/picture" method="POST" enctype="multipart/form-data">
+    {{ form.image }}
+    <input type="submit" value="Invia">
+</form>
+
+{% endblock %}
