@@ -5,20 +5,12 @@
 {% block content %}
 
 <h1>BottleBoxes</h1>
-<ul>
-    <li>
-        <button onclick="location.href = '/bottlebox/pending';" id="bottlebox_button" class="float-left submit-button">Pending Bottles</button> 
-    </li>
-    <li>
-        <button onclick="location.href = '/bottlebox/received';" id="bottlebox_button" class="float-left submit-button">Received Bottles</button> 
-    </li>
-    <li>
-        <button onclick="location.href = '/bottlebox/delivered';" id="bottlebox_button" class="float-left submit-button">Delivered Bottles</button> 
-    </li>
-    <li>
-        <button onclick="location.href = '/bottlebox/drafts';" id="bottlebox_button" class="float-left submit-button">Drafts</button> 
-    </li>
-</ul>
-<button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
+
+<div class="btn-group btn-group-lg" role="group" aria-label="Elenco bottlebox">
+    <a href="/bottlebox/received" class="btn btn-primary">Received</a>
+    <a href="/bottlebox/drafts" class="btn btn-secondary">Drafts</a>
+    <a href="/bottlebox/pending" class="btn btn-warning">Pending</a>
+    <a href="/bottlebox/delivered" class="btn btn-success">Delivered</a>
+</div>
 
 {% endblock %}

@@ -1,0 +1,54 @@
+{% extends "layout.html" %}ß
+
+{% block title %}{{user.firstname}} {{user.lastname}}{% endblock %}
+
+{% block content %}
+
+<div style="text-align: center;">
+  <img src="/static/pictures/default.jpg" class="img-fluid rounded-circle img-thumbnail" alt="{{user.email}}">
+</div>
+
+<div>
+  <h1>{{user.firstname}} {{user.lastname}}</h1>
+  <h3>E-mail : {{user.email}}</h3>
+  <h3>Birth date : {{user.date_of_birth.strftime('%d/%m/%Y')}}</h3>
+  <h4>Lottery Points : {{user.lottery_points}}</h4>  
+</div>
+
+<br>
+
+{% if current_user.is_authenticated %}
+
+  {% if user.id == current_user.id %}
+
+    <h2>Content filter</h2>
+    <form action="/profile/content_filter" method="POST">
+      <div class="form-check form-switch form-switch-lg">
+        {{ content_filter_form.filter_enabled(class="form-check-input") }}
+      </div>
+      <input type="submit"  class="btn btn-lg btn-warning fw-bold" value="Update">
+    </form>
+
+    <hr class="dropdown-divider">
+
+    <p class="lead">
+      <a href="/profile/data" class="btn btn-lg btn-primary fw-bold border-white">Modify personal data</a>
+      <a href="/profile/password" class="btn btn-lg btn-primary fw-bold border-white">Modify password</a>
+      <a href="/profile/picture" class="btn btn-lg btn-primary fw-bold border-white">Modify profile picture</a>
+      <a href="/unregister" class="btn btn-lg btn-danger fw-bold">Unregister</a>
+    </p>
+
+  {% else %}
+
+  <a href="/new_message?single_recipient={{user.email}}" class="btn btn-lg btn-primary fw-bold">Write a message</a>
+  <br><br>
+  <form action="/block" method="POST">
+    {{ block_form.hidden_tag() }}
+    <input type="submit" class="btn btn-lg btn-danger fw-bold" value="Block this user">
+  </form>
+
+  {% endif %}
+
+{% endif %}
+
+{% endblock %}

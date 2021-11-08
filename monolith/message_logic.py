@@ -80,7 +80,7 @@ class MessageLogic:
         
         return messages
 
-    def control_file(self, file):
+    def validate_file(self, file):
         if file and file.filename != '' and file.filename.split('.')[-1] in ['png', 'jpg', 'jpeg', 'gif', 'PNG', 'JPG', 'JPEG', 'GIF']:
             return True
         else:
@@ -92,8 +92,8 @@ class MessageLogic:
         messages_received = db.session.query(Message_Recipient).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id==msg_id).all()
         #Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id == msg_id).all()
  
-        #print(messages_sent)
-        #print(messages_received)
+        '''print(messages_sent)
+        print(messages_received)'''
         
         if messages_sent or messages_received:
             return True
@@ -117,7 +117,7 @@ class MessageLogic:
         if message_to_delete.image != '':
             
             # directory to the folder in which is stored the image
-            directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attached', str(message_to_delete.id))
+            directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attachments', str(message_to_delete.id))
             shutil.rmtree(directory, ignore_errors=True) # remove the directory and its content
 
         # deleting the draft from database and committing all changes

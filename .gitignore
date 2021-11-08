@@ -2,11 +2,18 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,macos,flask,visualstudiocode,jupyternotebooks,linux,pycharm+all,virtualenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,macos,flask,visualstudiocode,jupyternotebooks,linux,pycharm+all,virtualenv
 
-### Images ###
-*.jpg
-*.jpeg
-*.gif
-*.png
+### Attached images ###
+monolith/static/attachments
+monolith/static/attachments/*
+monolith/static/old_attachments
+monolith/static/old_attachments/*
+
+### Don't save all pictures ###
+monolith/static/pictures/*
+
+### Default profile pictures should be saved ###
+!monolith/static/pictures/default.jpg
+!monolith/static/pictures/default_100.jpg
 
 ### Flask ###
 instance/*
@@ -185,7 +192,7 @@ cython_debug/
 .LSOverride
 
 # Icon must end with two \r
-Icon
+# Icon
 
 
 # Thumbnails

@@ -5,6 +5,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {# block title must be defined inside each child #}
     <title>{% block title %}{% endblock %} - My message in a bottle</title>
@@ -15,6 +16,28 @@
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>
     <link href="{{ url_for('static',filename='style/style.css') }}" type="text/css" rel="stylesheet">
+
+    <!-- Icon stuff -->
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static',filename='icon/apple-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ url_for('static',filename='icon/apple-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static',filename='icon/apple-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static',filename='icon/apple-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static',filename='icon/apple-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static',filename='icon/apple-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static',filename='icon/apple-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static',filename='icon/apple-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static',filename='icon/apple-icon-180x180.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static',filename='icon/android-icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static',filename='icon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static',filename='icon/favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static',filename='icon/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static',filename='icon/manifest.json') }}">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="{{ url_for('static',filename='icon/ms-icon-144x144.png') }}">
+    <meta name="theme-color" content="#ffffff">
+
+    {# additional head elements from other pages #}
+    {% block add_head %}{% endblock %}
 
 </head>
 
@@ -29,7 +52,7 @@
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap">
-                        {# TODO LOGO?? #}
+                        <img src="{{ url_for('static',filename='logo/header_logo.png') }}" alt="my message in a bottle" width="40" height="32">
                         <use xlink:href="#bootstrap"></use>
                     </svg>
                 </a>
@@ -44,10 +67,16 @@
                 <div class="dropdown text-end">
                     <a href="#" class="d-block link-light text-decoration-none dropdown-toggle" id="dropdownUser1"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+                        
+                        {% if current_user.has_picture %}
+                        <img src="{{ url_for('static',filename='pictures/' + current_user.id|string + '_100.jpg') }}" alt="mdo" width="40" height="40" class="rounded-circle">
+                        {% else %}
+                        <img src="{{ url_for('static',filename='pictures/default_100.jpg') }}" alt="mdo" width="40" height="40"
+                            class="rounded-circle">
+                        {% endif %}
                     </a>
                     <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1" style="">
-                        <li><a class="dropdown-item" href="/account_info">Profile</a></li>
+                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -72,35 +101,12 @@
     <!-- end header -->
 
     <!-- start content -->
-    <div class="container">
+    <div class="container h-100" style="padding-top: 25px;">
         {# block content must be defined inside each child #}
         {% block content %}{% endblock %}
     </div>
     <!-- end content -->
-
-    <!-- start footer -->
-    {% block footer %}
-<!--
-    <div class="container fixed-bottom">
-        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-            <p class="col-md-4 mb-0 text-muted">© 2021 Advanced Software Engineering - Squad 4</p>
-        
-            <a href="/"
-                class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-                <svg class="bi me-2" width="40" height="32">
-                    <use xlink:href="#bootstrap"></use>
-                </svg>
-            </a>
-        
-            <ul class="nav col-md-4 justify-content-end">
-                <li class="nav-item"><a href="/" class="nav-link px-2 text-muted">Home</a></li>
-                <li class="nav-item"><a href="/users" class="nav-link px-2 text-muted">Users</a></li>
-            </ul>
-        </footer>
-    </div>
--->
-    {% endblock %}
-    <!-- end footer -->
+    
 </body>
 
 </html>

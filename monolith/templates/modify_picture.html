@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}Modify profile picture{% endblock %}
+
+{% block content %}
+
+<div style="text-align: center;">
+    <img src="/static/pictures/default.jpg" class="img-fluid rounded-circle img-thumbnail" alt="{{current_user.email}}">
+
+    {% if form.image.errors %}
+        {% for error in form.image.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <h2>Seleziona una nuova immagine del profilo</h2>
+    <br><br>
+
+    <form action="/profile/picture" method="POST" enctype="multipart/form-data">
+        {{ form.image() }}
+        <br><br>
+        <input type="submit" class="btn btn-lg btn-warning fw-bold" value="Invia">
+    </form>
+</div>
+
+{% endblock %}

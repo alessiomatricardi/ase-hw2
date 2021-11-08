@@ -56,15 +56,26 @@ class TestAuthAndReg(unittest.TestCase):
         response = app.post("/register", data = data1 , content_type='application/x-www-form-urlencoded',follow_redirects=True)
         
         self.assertEqual(response.status_code, 200)
-
-
-        assert b"Mario Rossi" in response.data
+        assert b'Hi Anonymous' in response.data
         
         # try to register again the same user  
         response = app.post("/register", data = data1 , content_type='application/x-www-form-urlencoded',follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         assert b"please register with another email." in response.data
 
+        # login
+        data2 = { 'email' : 'prova3@mail.com' , 'password' : 'prova123' } # correct password
+        response = app.post(
+            "/login", 
+            data = data2 , 
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+            )
+        assert b'Hi Mario' in response.data 
+
+        # trying to access register router redirects to home page
+        response = app.get("/register",content_type='html/text',follow_redirects=True)
+        assert b'Hi Mario' in response.data
 
     def test_unregister(self):
         app = tested_app.test_client()
@@ -82,7 +93,7 @@ class TestAuthAndReg(unittest.TestCase):
         # unregister with wrong password
         data_unregister = { 'password' : 'xxx' }
         response = app.post("/unregister", data = data_unregister , content_type='application/x-www-form-urlencoded',follow_redirects=True)
-        assert b"Mario, are you sure you really want to unregister yourself? If so insert your password and confirm" in response.data
+        assert b"Mario, are you sure you really want to unregister yourself?" in response.data
 
         # unregister with correct password
         data_unregister = { 'password' : 'prova123' }

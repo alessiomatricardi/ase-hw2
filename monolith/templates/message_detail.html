@@ -1,9 +1,3 @@
-<!-- 
-  davide: questa pagina html non è più 
-  utilizzata ed è stata sostituita con pending/received/delivered_detail.html
-  per gestire meglio il tasto back
--->
-
 {% extends "layout.html" %}
 
 {% block title %}Message details{% endblock %}
@@ -21,17 +15,16 @@
 <h5>{{sender_name}}</h5>
 {% else %}
 <h1>Message to</h1>
-<h5>{% for user in recipients: %} {{user[0].firstname}} {{user[0].lastname}} 
-    {% if user[1] == False %}
-    <button onclick="location.href = '/block_user?target={{user[0].id}}';" id="blockUserButton" class="float-left submit-button">Block user</button>
-    {% endif %}
-  {% endfor %}</h5>
+<h5>
+  {% for user in recipients: %}
+    {{user[0].firstname}} {{user[0].lastname}} 
+  {% endfor %}
+</h5>
 
 {% endif %}
 <ul>
   <li>
     <p>Deliver time: {{message.deliver_time}}</p>
-<!--cdjnvfln f-->
     <p>{{message.content}}</p>
 
     {% if message.image != '' %}
@@ -45,8 +38,18 @@
   <button onclick="location.href = '/new_message?msg_id={{message.id}}';" id="forwardButton" class="float-left submit-button" >Forward</button>
   {% if blocked == False %} <!-- va messo fuori -->
   <button onclick="location.href = '/new_message?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button>
-  <button onclick="location.href = '/block_user?target={{message.sender_id}}';" id="blockUserButton" class="float-left submit-button">Block user</button>
   {% endif %}
+
+  <form action="/report" method="POST">
+    {{ reportForm.hidden_tag() }}
+    <input type="submit" value="Report this sender">
+  </form>
+
+  <form action="/hide" method="POST">
+    {{ hideForm.hidden_tag() }}
+    <input type="submit" value="Hide this message">
+  </form>
+
   
 {% endif %} 
 

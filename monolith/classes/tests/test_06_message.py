@@ -4,16 +4,8 @@ import datetime
 from unittest import result
 from warnings import resetwarnings
 import os
-from monolith import image
-from monolith.image import Image
-import shutil
 import io
-#from PIL import Image as Img
 
-#from flask import app 
-from flask.signals import message_flashed
-from monolith import message_logic
-# from flask_wtf.recaptcha.widgets import RECAPTCHA_SCRIPT
 from monolith.database import Message_Recipient, User, db, Message
 from monolith.message_logic import MessageLogic
 from monolith import app as tested_app
@@ -82,7 +74,6 @@ class TestMessage(unittest.TestCase):
             expected_result = db.session.query(Message).filter(Message.id == 8).first().is_sent
             self.assertEqual(expected_result, result)
 
-
     def test_is_my_message(self):
         with tested_app.app_context():
             # verify that user 4 has rights on message 5 (he should NOT have them)
@@ -94,27 +85,6 @@ class TestMessage(unittest.TestCase):
             result = m.is_my_message(4,6)
             expected_result = db.session.query(Message).filter(Message.id == 6).all()
             self.assertEqual(expected_result, result)
-
-
-    def test_control_file(self):
-        with tested_app.app_context():
-            # test that a correct image has been received.
-            # NB: to simply perform the test, it has been assumed that an image is represented by an object in the following format
-            image = Image()
-            image.filename = "IMAGE_NAME.jpg"
-            
-            # check that the name is correctly returned (so that image.py file is tested)
-            self.assertEqual("IMAGE_NAME.jpg", image.get_filename())
-
-            # the content of the file is meaningful for the check
-
-            result = m.control_file(image)
-            self.assertEqual(True, result) # we expect that the image is recognized as good
-
-            image.filename = ''
-            result = m.control_file(image)
-            self.assertEqual(False, result) # we expect that the image is recognized as bad
-
 
     def test_control_rights_on_image(self):
         with tested_app.app_context():
@@ -130,7 +100,6 @@ class TestMessage(unittest.TestCase):
             # user 4 has received message 6, so it should have the privileges to see the image
             result = m.control_rights_on_image(6, 4)
             self.assertEqual(True, result)
-
 
     def test_delete_message(self):
         with tested_app.app_context():
@@ -177,7 +146,7 @@ class TestMessage(unittest.TestCase):
             db.session.commit()
 
             # create the directory
-            os.mkdir(os.path.join(os.getcwd(),'monolith','static','attached',str(id)))
+            os.makedirs(os.path.join(os.getcwd(),'monolith','static','attachments',str(id)))
             
             # retrieve the message from db (so to verify that it has correctly been created)
             message_to_delete = db.session.query(Message).filter(Message.id == message.id).first()
@@ -267,7 +236,7 @@ class TestMessage(unittest.TestCase):
             'submit': 'Save draft'
         }
         response = app.post("/new_message", data = dataForm2, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        assert b'Hi Barbara!' in response.data 
+        assert b'Hi Barbara Verdi!' in response.data 
 
         # test that the message is sent correctly, so the rendered page is the index.html
         dataForm3 = { 
@@ -277,7 +246,7 @@ class TestMessage(unittest.TestCase):
             'submit': 'Send bottle'
         }
         response = app.post("/new_message", data = dataForm3, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        assert b'Hi Barbara!' in response.data 
+        assert b'Hi Barbara Verdi!' in response.data 
 
 
         # a user wants to delete a message but passing an incorrect URI
@@ -290,7 +259,7 @@ class TestMessage(unittest.TestCase):
         
         # user 4 delete the previously sent message (it has 15 points, so he can do it)
         response = app.get(f'/delete_message/{11}', content_type='html/text', follow_redirects=True)
-        assert b'Hi Barbara!' in response.data # the rendered page is the homepage
+        assert b'Hi Barbara Verdi!' in response.data # the rendered page is the homepage
 
         # add another message to the db
         dataForm4 = { 
@@ -306,6 +275,9 @@ class TestMessage(unittest.TestCase):
         assert b'Not enough points to delete a message' in response.data
         
 
+        # test that neither a get or post request are done
+        response = app.put("/new_message")
+        self.assertEqual(response.status_code, 405)
 
         # test that if the /new_message is called by passing the msg_id argument, the new_message.html is rendered
         # also with a non-empty form.content field
@@ -321,12 +293,6 @@ class TestMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         # assert b'<textarea id="content" name="content" required=""></textarea>' in response.data
         
-        #
-        # TODO verify why the previous test doesn't work
-        #    
-        # try to send a message with an incorrect image
-
-
         # file extension not correct
         dataForm5 = { 
             'content' : 'Message with an invalid image' ,
@@ -376,14 +342,10 @@ class TestMessage(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-        # remove the image from the server
-        directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attached', '4')
-        shutil.rmtree(directory, ignore_errors=True) # remove the directory and its content
-
-
         # test that neither a get or post request are done
         try:
             response = app.put("/new_message")
         except RuntimeError as e:
             self.assertEqual('This should not happen!', e)
         self.assertEqual(response.status_code, 405)
+

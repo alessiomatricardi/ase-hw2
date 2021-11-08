@@ -1,17 +1,32 @@
-<html>
-  <body>
-    <h1>Blacklist</h1>
-    <ul>
-        {% for bl in blacklist: %}
-            {% for user in users: %}
-                {% if user.id == bl.blocked_user_id %}
-                    <li>
-                    {{user.firstname}} {{user.lastname}} {{user.email}}
-                    </li>
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-    </ul>
-    <button onclick="location.href = '/';" id="homeButton" class="float-left submit-button" >Home</button>
-  </body>
-</html>
+{% extends "layout.html" %}
+
+{% block title %}Blacklist{% endblock %}
+
+{% block content %}
+
+<h1>Blacklist</h1>
+
+{% for bl in blacklist: %}
+  {% for user in users: %}
+    {% if user.id == bl.blocked_user_id %}
+        <div class="card mb-3" style="max-width: 540px;">
+          <div class="row g-0">
+            <div class="col-md-3" style="text-align: center;">
+              <img src="/static/pictures/default_100.jpg" class="img-fluid rounded-circle img-thumbnail" alt="{{user.email}}">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">{{user.firstname}} {{user.lastname}} ({{user.email}})</h5>
+                <form action="/unblock" method="POST">
+                  <input type="hidden" name="user_id" value="{{user.id}}" required>
+                  <input type="submit" value="Unblock user" class="btn btn-success">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+    {% endif %}
+  {% endfor %}
+{% endfor %}
+
+{% endblock %}

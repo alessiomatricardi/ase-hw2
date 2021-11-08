@@ -12,6 +12,12 @@ from flask.signals import message_flashed
 from flask_wtf.recaptcha.widgets import RECAPTCHA_SCRIPT
 from monolith import app as tested_app
 
+'''
+                        README!!!!
+This class is used to populate database with some test instances
+in order to allow the testing process
+'''
+
 
 class TestPopulateDB(unittest.TestCase):
 
@@ -50,7 +56,7 @@ class TestPopulateDB(unittest.TestCase):
             example.email = 'prova5@mail.com'
             example.firstname = 'Carlo'
             example.lastname = 'Neri'
-            example.date_of_birth = datetime.datetime(random.randint(1960, 2000), random.randint(1,12), random.randint(1,29))
+            example.date_of_birth = datetime.datetime(1995,6,12)
             example.is_admin = False
             example.lottery_points = 22
             example.set_password('prova123')
@@ -180,4 +186,3 @@ class TestPopulateDB(unittest.TestCase):
             # TODO create default blacklists
 
             #assert b'Ciao' in 'Ciao'
-

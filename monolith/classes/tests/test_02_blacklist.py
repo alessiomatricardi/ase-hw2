@@ -10,52 +10,74 @@ bl = BlacklistLogic()
 class TestBlacklist(unittest.TestCase):
     def test_blacklist_rendering(self):
         app = tested_app.test_client()
-        data2 = { 'email' : 'prova2@mail.com' , 'password' : 'prova123' } 
+        data2 = { 'email' : 'prova2@mail.com' , 'password' : 'prova123' }
         response = app.post(
-            "/login", 
-            data = data2 , 
+            "/login",
+            data = data2 ,
             content_type='application/x-www-form-urlencoded',
             follow_redirects=True
             )
-        assert b'Hi Damiano' in response.data 
+        assert b'Hi Damiano' in response.data
+
+        data_block = { 'user_id' : 10 }
 
         # block unexisting user
-        response = app.get("/block_user?target=10", 
-            content_type='html/text',
+        response = app.post(
+            "/block",
+            data=data_block,
+            content_type='application/x-www-form-urlencoded',
             follow_redirects=True
             )
         self.assertEqual(response.status_code, 400)
         assert b'You are trying to block a non existing user!' in response.data
- 
+
+        data_block = {'user_id': 5}
+
         # block existing user 6
-        response = app.get("/block_user?target=5", content_type='html/text', follow_redirects=True)
+        response = app.post(
+            "/block",
+            data=data_block,
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+            )
         self.assertEqual(response.status_code, 200)
         assert b'Carlo Neri' in response.data
 
         # block again same user
-        response = app.get("/block_user?target=5", content_type='html/text', follow_redirects=True)
+        response = app.post(
+            "/block",
+            data=data_block,
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+            )
         self.assertEqual(response.status_code, 200)
         assert b'Carlo Neri' in response.data
 
         # check rendering
 
         # check that the recipients list is now empty (user 3 has blocked everyone)
-        response = app.get("/recipients_list", content_type='html/text', follow_redirects=True)
+        response = app.get("/users", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         assert b'Carlo Neri' not in response.data
         assert b'Alessio Bianchi' not in response.data
-        
+
         # logging out
         response = app.get("/logout", content_type='html/text', follow_redirects=True)
         assert b'Hi Anonymous' in response.data
 
         # trying to access the blacklist while not being logged in
         response = app.get("/blacklist", content_type='html/text', follow_redirects=True)
-        assert b'<input class="form-control" id="email" name="email" placeholder="nothing" required type="email" value="">' in response.data 
+        assert b'<input class="form-control" id="email" name="email" placeholder="nothing" required type="email" value="">' in response.data
 
         # trying to block a user while not being logged in
-        response = app.get("/block_user?target=6", content_type='html/text', follow_redirects=True)
-        assert b'<input class="form-control" id="email" name="email" placeholder="nothing" required type="email" value="">' in response.data 
+        data_block = {'user_id': 6}
+
+        # block existing user 6
+        response = app.post("/block",
+                            data=data_block,
+                            content_type='application/x-www-form-urlencoded',
+                            follow_redirects=True)
+        assert b'<input class="form-control" id="email" name="email" placeholder="nothing" required type="email" value="">' in response.data
 
         # restoring the db to the previous form
         with tested_app.app_context():
@@ -79,10 +101,10 @@ class TestBlacklist(unittest.TestCase):
 
             # retrieving existing user
             result = bl.check_existing_user(5)
-            self.assertEqual(result,True)    
+            self.assertEqual(result,True)
 
             # adding a blacklist istance to db
-            bl.add_to_blackist(3,5)      
+            bl.add_to_blackist(3,5)
             result = db.session.query(Blacklist).where(Blacklist.blocking_user_id == 3)
             result = [(ob.blocking_user_id,ob.blocked_user_id) for ob in result]
             expected_result = [ (3,2),(3,5) ]
@@ -91,7 +113,7 @@ class TestBlacklist(unittest.TestCase):
             # removing the previously created istance from blacklist table
             db.session.query(Blacklist).where(and_(Blacklist.blocking_user_id==3,Blacklist.blocked_user_id==5)).delete()
             db.session.commit()
- 
+
             # checking the istances on database
             result = db.session.query(Blacklist).where(Blacklist.blocking_user_id == 3)
             result = [(ob.blocking_user_id,ob.blocked_user_id) for ob in result]

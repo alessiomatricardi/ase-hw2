@@ -1,40 +1,52 @@
-
 {% extends "layout.html" %}
 
-{% block title %}TODO AGGIUSTARE{% endblock %}
+{% block title %}{{ label }} Bottlebox{% endblock %}
 
 {% block content %}
 
 <h1>{{ label }} Bottlebox</h1>
-<ul>
-  {% for msg in messages: %}
-  <li>
-    
-    <p>{% for user in users: %} {% if user.id == msg.sender_id %}  From: {{user.email}} {% endif %} {% endfor %}</p>
-    
-    <p>{% for recipient in msg.recipients: %} {% for user in users: %} {% if user.id == recipient.recipient_id %}  to: {{user.email}} {% endif %} {% endfor %} {% endfor %}</p>
-    
-    <p>Deliver time: {{msg.deliver_time}}</p>
-    
-    <p>{{msg.content}}</p>
 
-    {% if label == 'Pending' %}
-    <p> <button onclick="location.href = '/message/pending/{{msg.id}}'" id="openButton" class="float-left submit-button" >Open</button></p>
-    
-    {% elif label == 'Received' %}
-    <p> <button onclick="location.href = '/message/received/{{msg.id}}'" id="openButton" class="float-left submit-button" >Open</button></p>
-    
-    {% elif label == 'Delivered' %}
-    <p> <button onclick="location.href = '/message/delivered/{{msg.id}}'" id="openButton" class="float-left submit-button" >Open</button></p>
-    
-    {% elif label == 'Drafts' %}
-    <p> <button onclick="location.href = '/message/draft/{{msg.id}}'" id="openButton" class="float-left submit-button" >Modify Draft</button></p>
+{% for msg in messages: %}
+  <div class="card" style="margin-bottom: 10px;">
+    <div class="card-header">
+      Deliver time: {{msg.deliver_time.strftime('%d/%m/%Y at %H:%M')}}
+    </div>
+    <div class="card-header">
+      {% for user in users: %}
+        {% if user.id == msg.sender_id %}
+          From: {{user.firstname}} {{user.lastname}} ({{user.email}})
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="card-header">
+      {% for recipient in msg.recipients: %}
+        {% for user in users: %}
+          {% if user.id == recipient.recipient_id %}
+            To: {{user.firstname}} {{user.lastname}} ({{user.email}})
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+    <div class="card-body">
+      <p class="card-text">{{msg.content}}</p>
+      {% if label == 'Pending' %}
+        <a href="/message/pending/{{msg.id}}" class="btn btn-primary">Open</a>
+      
+      {% elif label == 'Received' %}
+        <a href="/message/received/{{msg.id}}" class="btn btn-primary">Open</a>
+      
+      {% elif label == 'Delivered' %}
+        <a href="/message/delivered/{{msg.id}}" class="btn btn-primary">Open</a>
+      
+      {% elif label == 'Drafts' %}
+        <a href="/message/draft/{{msg.id}}" class="btn btn-primary">Open</a>
+      
+      {% endif %}
+    </div>
+  </div>
 
-    {% endif %}
+{% endfor %}
 
-    </li>
-  {% endfor %}
-</ul>
-<button onclick="location.href = '/bottlebox';" id="backButton" class="float-left submit-button" >Back</button>
+<a href="/bottlebox" id="backButton" class="btn btn-success">Back</button>
 
 {% endblock %}
