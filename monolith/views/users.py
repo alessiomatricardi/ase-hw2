@@ -1,11 +1,15 @@
 from flask import Blueprint, redirect, render_template, request, abort
+from flask.helpers import url_for
 
 from monolith.database import User, db
-from monolith.forms import ContentFilterForm, UserForm, BlockForm
+from monolith.forms import ContentFilterForm, ProfilePictureForm, UserForm, BlockForm
 from monolith.content_filter_logic import ContentFilterLogic
 from monolith.list_logic import ListLogic
+from PIL import Image
 
 from flask_login import current_user
+
+# TODO MOVE THESE FUNCTIONS INSIDE USER LOGIC
 
 # defining exception error for handling the registration with duplicate email
 class EmailAlreadyUsedError(Exception):
@@ -51,7 +55,7 @@ def _register():
             except EmailAlreadyUsedError:
                 # this add an error message that will be printed on screen
                 form.email.errors.append(new_user.email + " is not available, \
-                        please register with another email."                                                                                                                                                                                                                                                                                                                                                                                                                                    )
+                        please register with another email."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    )
                 return render_template('register.html', form=form)
 
             new_user.set_password(form.password.data)
@@ -168,4 +172,56 @@ def _content_filter():
     else:
         abort(403) # no one apart of the logged user can do this action
 
-#@users.route('/profile/picture/update', methods=['GET', 'POST'])
+@users.route('/profile/picture', methods=['GET', 'POST'])
+def _profile_picture():
+    if current_user is not None and hasattr(current_user, 'id'):
+
+        if request.method == 'GET':
+            form = ProfilePictureForm()
+
+            return render_template('modify_picture.html', form = form)
+
+        elif request.method == 'POST':
+            # retrieve the form
+            form = ProfilePictureForm()
+
+            if form.validate_on_submit():
+
+                try:
+
+                    # be sure that the file is an image
+                    # TODO
+
+                    # retrieve the image
+                    img_data = form.image.data
+
+                    # save image in 256x256
+                    img = Image.open(img_data)
+                    img.resize([256, 256], Image.ANTIALIAS)
+                    img.save(
+                        './monolith/static/pictures/' + str(current_user.id) + 
+                        '.jpg', "JPEG")
+
+                    # save image in 100x100
+                    img = Image.open(img_data)
+                    img.resize([100, 100], Image.ANTIALIAS)
+                    img.save(
+                        './monolith/static/pictures/' + str(current_user.id) +
+                        '_100.jpg', "JPEG")
+
+                    # now the user has a personal profile picture
+                    user = User()
+                    user = db.session.query(User).filter(User.id == current_user.id).first()
+                    user.has_picture = 1
+                    db.session.commit()
+                
+                except Exception:
+                    abort(500)
+
+                return redirect('/profile')
+
+            else:
+                return render_template('modify_picture.html', form = form)
+
+    else:
+        return redirect('/login')

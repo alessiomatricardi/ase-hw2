@@ -3,6 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired,Email, Length
 from wtforms import widgets, SelectMultipleField
 from wtforms.fields.html5 import EmailField
+from flask_wtf.file import FileAllowed, FileRequired, FileField
 
 
 class LoginForm(FlaskForm):
@@ -42,6 +43,7 @@ class UnregisterForm(FlaskForm):
     password = f.PasswordField('Password', validators=[DataRequired()])
     display = ['password']
 
+
 class ReportForm(FlaskForm):
     message_id = f.HiddenField(validators=[DataRequired()])
 
@@ -60,3 +62,7 @@ class UnblockForm(FlaskForm):
 
 class ContentFilterForm(FlaskForm):
     filter_enabled = f.BooleanField()
+
+
+class ProfilePictureForm(FlaskForm):
+    image = FileField(validators=[FileRequired('File was empty!')])

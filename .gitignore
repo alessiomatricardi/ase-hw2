@@ -2,11 +2,14 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,macos,flask,visualstudiocode,jupyternotebooks,linux,pycharm+all,virtualenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,macos,flask,visualstudiocode,jupyternotebooks,linux,pycharm+all,virtualenv
 
-### Images ###
-*.jpg
-*.jpeg
-*.gif
-*.png
+### Attached images ###
+monolith/static/attachments
+monolith/static/attachments/*
+monolith/static/pictures/*
+
+### Default profile pictures should be saved ###
+!monolith/static/pictures/default.jpg
+!monolith/static/pictures/default_100.jpg
 
 ### Flask ###
 instance/*
