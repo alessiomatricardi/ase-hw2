@@ -7,6 +7,7 @@ from monolith.database import User, db, Blacklist, Message, Message_Recipient
 from monolith.forms import HideForm, ReportForm, MessageForm
 from flask_login import current_user
 from monolith.bottlebox_logic import BottleBoxLogic, DraftLogic
+from monolith.content_filter_logic import ContentFilterLogic
 from sqlalchemy.sql import or_,and_
 from monolith.emails import send_email
 from monolith.message_logic import MessageLogic
@@ -324,6 +325,12 @@ def _message_detail(label, id):
 
         reportForm = ReportForm(message_id = id)
         hideForm = HideForm(message_id = id)
+
+        filter = ContentFilterLogic()
+
+        if filter.filter_enabled(current_user.id):
+            censored_content = filter.check_message_content(detailed_message.content)
+            detailed_message.content = censored_content
 
         return render_template('/message_detail.html', hideForm = hideForm, reportForm = reportForm, message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, recipients = blocked_info, label = label)
 

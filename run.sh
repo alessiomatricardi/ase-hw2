@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+pip3 install -r requirements.txt # --ignore-installed
+python -m spacy download en
 
 export FLASK_APP=monolith
 export FLASK_ENV=development

@@ -31,7 +31,7 @@ class BottleBoxLogic:
             msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == False)
             
             #if the content filter is active, all the messages will be displayed censored
-            if user.content_filter_enabled:
+            if filter.filter_enabled(user.id):
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
                    message.content = censored_content
@@ -40,7 +40,7 @@ class BottleBoxLogic:
         elif type == 2: #received
             msg = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message_Recipient.recipient_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today).where(Message_Recipient.is_hide == False)
 
-            if user.content_filter_enabled:
+            if filter.filter_enabled(user.id):
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
                    message.content = censored_content
@@ -48,7 +48,7 @@ class BottleBoxLogic:
         elif type == 3: #delivered
             msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today)
 
-            if user.content_filter_enabled:
+            if filter.filter_enabled(user.id):
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
                    message.content = censored_content
@@ -74,6 +74,7 @@ class BottleBoxLogic:
     def retrieve_received_message(self, id):
         detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True).where(Message.is_delivered == True)
         detailed_message = [ob for ob in detailed_message]
+
 
         return detailed_message
 
@@ -116,6 +117,7 @@ class BottleBoxLogic:
         try:
             db.session.commit()
         except Exception:
+            db.session.rollback()
             return False
         msg = "Subject: Message notification\n\nThe message you sent to " + current_user.firstname + " has been read."
         message_sender_id = db.session.query(Message).filter(Message.id == id).first().sender_id
