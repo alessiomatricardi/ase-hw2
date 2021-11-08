@@ -78,6 +78,8 @@ class TestUsers(unittest.TestCase):
         response = app.get("/profile/data", content_type='html/text', follow_redirects=True)
         assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
         
+        response = app.get("/profile/password", content_type='html/text', follow_redirects=True)
+        assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
 
         # do the login otherwise the sending of a new message can't take place
         data = { 'email' : 'prova5@mail.com' , 'password' : 'prova123' } 
@@ -95,6 +97,7 @@ class TestUsers(unittest.TestCase):
         assert b'Neri' in response.data
         assert b'1995-06-12' in response.data
 
+        # test that the data of the profile are correctly modified (and so, they are rendered in the /profile page)
         form = {
             'firstname': 'Ferdinando',
             'lastname': 'Viola',
@@ -106,6 +109,7 @@ class TestUsers(unittest.TestCase):
         assert 'Last name : Viola' in response.data
         assert 'Birth date : 20/09/1976' in response.data
 
+        # test that incorrect data has been inserted and an error message is displayed
         form = {
             'firstname': 'Ferdinando',
             'lastname': 'Viola',
@@ -114,3 +118,49 @@ class TestUsers(unittest.TestCase):
         response = app.post('/profile/data', data=form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
         self.assertEqual(200, response.status_code)
         assert b'Please insert correct data' in response.data
+
+
+        # test that the rendered page is the form for the modificaton of the password
+        response = app.get("/profile/data", content_type='html/text', follow_redirects=True)
+        self.assertEqual(200, response.status_code)
+        
+        # test that, if the old password is the same of the one stored in the database, an error message is displayed
+        form = {
+            'old_password': 'prova123',
+            'new_password': 'ININFLUENT FOR TEST',
+            'repeat_new_password': 'ININFLUENT FOR TEST'
+        }
+        # note that the old_password prova123 is not correct because it has been changed in the test_modify_password()
+        response = app.get("/profile/password", content_type='html/text', follow_redirects=True)
+        assert b'The old password you inserted is incorrect. Please insert the correct one.' in response.data
+
+        # test that, if the old and new password are the same, an error message is displayed
+        form = {
+            'old_password': 'prova456',
+            'new_password': 'prova456',
+            'repeat_new_password': 'ININFLUENT FOR TEST'
+        }
+        # note that the old_password prova123 is not correct because it has been changed in the test_modify_password()
+        response = app.get("/profile/password", content_type='html/text', follow_redirects=True)
+        assert b'Please insert a password different from the old one.' in response.data
+
+        # test that, if the new password and the repeated new password are not equal, an error message is displayed
+        form = {
+            'old_password': 'prova456',
+            'new_password': 'prova123',
+            'repeat_new_password': 'prova789'
+        }
+        # note that the old_password prova123 is not correct because it has been changed in the test_modify_password()
+        response = app.get("/profile/password", content_type='html/text', follow_redirects=True)
+        assert b'The new password and its repetition must be equal.' in response.data
+
+        # test that the password is correctly modified, so the rendered page is user_details.html
+        form = {
+            'old_password': 'prova456',
+            'new_password': 'prova123',
+            'repeat_new_password': 'prova123'
+        }
+        # note that the old_password prova123 is not correct because it has been changed in the test_modify_password()
+        response = app.get("/profile/password", content_type='html/text', follow_redirects=True)
+        assert b'info' in response.data
+        assert b'First name : ' in response.data
