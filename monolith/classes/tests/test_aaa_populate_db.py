@@ -56,7 +56,7 @@ class TestPopulateDB(unittest.TestCase):
             example.email = 'prova5@mail.com'
             example.firstname = 'Carlo'
             example.lastname = 'Neri'
-            example.date_of_birth = datetime.datetime(random.randint(1960, 2000), random.randint(1,12), random.randint(1,29))
+            example.date_of_birth = datetime.datetime(1995,6,12)
             example.is_admin = False
             example.lottery_points = 22
             example.set_password('prova123')
