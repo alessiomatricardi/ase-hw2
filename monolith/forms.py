@@ -63,11 +63,10 @@ class UnblockForm(FlaskForm):
 class ContentFilterForm(FlaskForm):
     filter_enabled = f.BooleanField()
 
-<<<<<<< HEAD
 
 class ProfilePictureForm(FlaskForm):
     image = FileField(validators=[FileRequired('File was empty!')])
-=======
+    
 class ModifyPersonalDataForm(FlaskForm):
     firstname = f.StringField('First name', validators=[DataRequired()])
     lastname = f.StringField('Last name', validators=[DataRequired()])
@@ -101,4 +100,3 @@ class ModifyPasswordForm(FlaskForm):
         )
     
     display = ['old_password', 'new_password', 'repeat_new_password']
->>>>>>> modify-account-info
