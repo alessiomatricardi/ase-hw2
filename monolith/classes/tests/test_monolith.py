@@ -80,7 +80,7 @@ class TestAuthAndReg(unittest.TestCase):
         # unregister with wrong password
         data_unregister = { 'password' : 'xxx' }
         response = app.post("/unregister", data = data_unregister , content_type='application/x-www-form-urlencoded',follow_redirects=True)
-        assert b"Mario, are you sure you really want to unregister yourself? If so insert your password and confirm" in response.data
+        assert b"Mario, are you sure you really want to unregister yourself?" in response.data
 
         # unregister with correct password
         data_unregister = { 'password' : 'prova123' }

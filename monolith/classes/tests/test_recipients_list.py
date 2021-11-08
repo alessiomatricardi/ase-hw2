@@ -78,7 +78,7 @@ class TestRecipientsList(unittest.TestCase):
           
         # checking the presence of the correct button to write to specific recipient
         response = tested_app.get("/users", data = data1 , content_type='html/text', follow_redirects=True)
-        assert b'id="writeToButton"' in response.data 
+        assert b'Write to' in response.data 
 
         # checking the presence of the correct user in recipients list
         assert b'Carlo Neri' in response.data

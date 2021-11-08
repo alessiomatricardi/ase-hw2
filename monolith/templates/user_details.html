@@ -1,34 +1,49 @@
-{% extends "layout.html" %}
+{% extends "layout.html" %}ß
 
-{% block title %}Account Info{% endblock %}
+{% block title %}{{user.firstname}} {{user.lastname}}{% endblock %}
 
 {% block content %}
 
-<h1>{{user.firstname}} {{user.lastname}} info</h1>
+<div style="text-align: center;">
+  <img src="/static/pictures/default.jpg" class="img-fluid rounded-circle img-thumbnail" alt="{{user.email}}">
+</div>
 
-First name : {{ user.firstname }} <br>
-Last name : {{user.lastname}} <br>
-E-mail : {{user.email}} <br>
-Birth date : {{user.date_of_birth.strftime('%d/%m/%Y')}} <br>
+<div>
+  <h1>{{user.firstname}} {{user.lastname}}</h1>
+  <h3>E-mail : {{user.email}}</h3>
+  <h3>Birth date : {{user.date_of_birth.strftime('%d/%m/%Y')}}</h3>
+</div>
+
+<br>
 
 {% if current_user.is_authenticated %}
 
   {% if user.id == current_user.id %}
 
-  <form action="/profile/content_filter" method="POST">
-    {{ content_filter_form.filter_enabled() }}
-    <input type="submit" value="Update">
-  </form>
-  <button onclick="location.href = '/unregister';" id="unregister_button"
-    class="float-left submit-button">Unregister</button>
+    <h2>Content filter</h2>
+    <form action="/profile/content_filter" method="POST">
+      <div class="form-check form-switch form-switch-lg">
+        {{ content_filter_form.filter_enabled(class="form-check-input") }}
+      </div>
+      <input type="submit"  class="btn btn-lg btn-warning fw-bold" value="Update">
+    </form>
+
+    <hr class="dropdown-divider">
+
+    <p class="lead">
+      <a href="/profile/data" class="btn btn-lg btn-primary fw-bold border-white">Modify profile</a>
+      <a href="/profile/password" class="btn btn-lg btn-primary fw-bold border-white">Modify password</a>
+      <a href="/profile/picture" class="btn btn-lg btn-primary fw-bold border-white">Modify profile picture</a>
+      <a href="/unregister" class="btn btn-lg btn-danger fw-bold">Unregister</a>
+    </p>
 
   {% else %}
 
-  <button onclick="location.href = '/new_message?single_recipient={{user.email}}';" id="writeToButton"
-    class="float-left submit-button">Write a message</button>
+  <a href="/new_message?single_recipient={{user.email}}" class="btn btn-lg btn-primary fw-bold">Write a message</a>
+  <br><br>
   <form action="/block" method="POST">
     {{ block_form.hidden_tag() }}
-    <input type="submit" value="Block user">
+    <input type="submit" class="btn btn-lg btn-danger fw-bold" value="Block this user">
   </form>
 
   {% endif %}

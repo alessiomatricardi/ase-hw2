@@ -54,8 +54,8 @@ class TestCalendar(unittest.TestCase):
 
         # test that the which_calendat.html page is correctly rendered when "Calendar" button is clicked on the homepage
         response = app.get("/calendar", content_type='html/text', follow_redirects=True)
-        assert b'Calendar of sent messages' in response.data
-        assert b'Calendar of received messages' in response.data
+        assert b'Sent messages' in response.data
+        assert b'Received messages' in response.data
         self.assertEqual(response.status_code, 200)
 
         # test that the calendar.html page is correctly rendered when either "Calendar of sent messages"

@@ -2,23 +2,52 @@
 
 {% block title %}Home{% endblock %}
 
+{% block add_head %}
+
+<link href="{{ url_for('static',filename='style/font/CooperBlack.ttf') }}" rel='stylesheet' type='text/css'>
+
+<style type="text/css">
+
+  h1,h2,h3,h4.customfont {
+    font-family: "CooperBlack", Verdana, Tahoma;
+  }
+</style>
+
+{% endblock %}
+
 {% block content %}
 
-<h1>My Message in a Bottle -- Primer</h1>
+<div class="text-center">
 
-{% if current_user.is_authenticated %}
-  Hi {{ current_user.firstname }}! 
-    <button onclick="location.href = '/users';" id="recipient_list_button" class="float-left submit-button">Recipients List</button>
-    <button onclick="location.href = '/bottlebox';" id="bottlebox_button" class="float-left submit-button">Bottleboxes</button>
-    <button onclick="location.href = '/logout';" id="logout_button" class="float-left submit-button">Logout</button>
-    <button onclick="location.href = '/profile';" id="account_info_button" class="float-left submit-button">Account Info</button>
-    <button onclick="location.href = '/new_message';" id="new_message_button" class="float-left submit-button">New message in a bottle</button>
-    <button onclick="location.href = '/blacklist';" id="blacklist_button" class="float-left submit-button">Blacklist</button>
-    <button onclick="location.href = '/calendar';" id="calendar_button" class="float-left submit-button">Calendar</button>
-    <h2>{{ welcome }}</h2>
+  <div class="cover-container d-flex w-100 p-3 mx-auto flex-column">
 
-{% else %}
-  Hi Anonymous, <a href="/login">Log in</a> or <a href="/register">Register yourself</a>
-{% endif %}
+    <main class="px-3">
+      {% if current_user.is_authenticated %}
+        <h1>Hi {{ current_user.firstname }} {{ current_user.lastname }}!</h1>
+        <h2>My message in a bottle</h2>
+        <p class="lead">What you want to do?</p>
+        <p class="lead">
+          <a href="/profile" class="btn btn-lg btn-primary fw-bold border-white">Show profile</a>
+          <a href="/bottlebox" class="btn btn-lg btn-primary fw-bold border-white">Bottleboxes</a>
+          <a href="/new_message" class="btn btn-lg btn-primary fw-bold border-white">New message in a bottle</a>
+          <a href="/calendar" class="btn btn-lg btn-primary fw-bold border-white">Calendars</a>
+          <a href="/blacklist" class="btn btn-lg btn-warning fw-bold border-white">Blacklist</a>
+        </p>
+        
+      {% else %}
+        <h1>Hi Anonymous!</h1>
+        <h1>Welcome to</h1>
+        <h1>My message in a bottle</h1>
+        <p class="lead">Please</p>
+        <p class="lead">
+          <a href="/login" class="btn btn-lg btn-secondary fw-bold border-white">Login</a>
+          or
+          <a href="/register" class="btn btn-lg btn-secondary fw-bold border-white">Register</a>
+        </p>
+      {% endif %}
+    </main>
+
+  </div>
+</div>
 
 {% endblock %}

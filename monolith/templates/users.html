@@ -5,15 +5,24 @@
 {% block content %}
 
 <h1>Users</h1>
-<ul>
-  {% for user in users: %}
-  <li>
-    <a href="/users/{{user.id}}">{{user.firstname}} {{user.lastname}}</a> ({{user.email}})
-    <button onclick="location.href = '/new_message?single_recipient={{user.email}}';" id="writeToButton"
-      class="float-left submit-button">Write to</button>
-  </li>
-  {% endfor %}
-</ul>
-<button onclick="location.href = '/';" id="homeButton" class="float-left submit-button">Home</button>
+
+{% for user in users: %}
+
+  <div class="card mb-3" style="max-width: 540px;">
+    <div class="row g-0">
+      <div class="col-md-3" style="text-align: center;">
+        <img src="/static/pictures/default_100.jpg" class="img-fluid rounded-circle img-thumbnail" alt="{{user.email}}">
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{user.firstname}} {{user.lastname}} ({{user.email}})</h5>
+          <a href="/users/{{ user.id }}" class="btn btn-success">See profile</a>
+          <a href="/new_message?single_recipient={{user.email}}" class="btn btn-primary">Write to</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endfor %}
 
 {% endblock %}
