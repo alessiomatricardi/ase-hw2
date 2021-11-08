@@ -63,6 +63,42 @@ class UnblockForm(FlaskForm):
 class ContentFilterForm(FlaskForm):
     filter_enabled = f.BooleanField()
 
+<<<<<<< HEAD
 
 class ProfilePictureForm(FlaskForm):
     image = FileField(validators=[FileRequired('File was empty!')])
+=======
+class ModifyPersonalDataForm(FlaskForm):
+    firstname = f.StringField('First name', validators=[DataRequired()])
+    lastname = f.StringField('Last name', validators=[DataRequired()])
+    date_of_birth = f.DateField('Date of birth', render_kw = {'type' : 'date'})
+    display = ['firstname', 'lastname', 'date_of_birth']
+
+class ModifyPasswordForm(FlaskForm):
+    old_password = f.PasswordField('Old password', validators=[
+        DataRequired(),
+        # this allow us to check the password on server-side
+        Length(min = 8, message = 'Password must be at least %(min)d characters'),
+        ],
+        # this add minlength attribute to the <input> rendered, for client-side check
+        render_kw = {'minlength' : '8'}
+        )
+    new_password = f.PasswordField('New password', validators=[
+        DataRequired(),
+        # this allow us to check the password on server-side
+        Length(min = 8, message = 'Password must be at least %(min)d characters'),
+        ],
+        # this add minlength attribute to the <input> rendered, for client-side check
+        render_kw = {'minlength' : '8'}
+        )
+    repeat_new_password = f.PasswordField('Repeat the new password', validators=[
+        DataRequired(),
+        # this allow us to check the password on server-side
+        Length(min = 8, message = 'Password must be at least %(min)d characters'),
+        ],
+        # this add minlength attribute to the <input> rendered, for client-side check
+        render_kw = {'minlength' : '8'}
+        )
+    
+    display = ['old_password', 'new_password', 'repeat_new_password']
+>>>>>>> modify-account-info
