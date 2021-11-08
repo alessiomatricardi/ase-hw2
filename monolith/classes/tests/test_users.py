@@ -1,4 +1,7 @@
 import unittest
+from unittest import result
+
+from werkzeug import test
 from monolith.database import db, User
 from monolith.user_logic import UserLogic
 from monolith import app as tested_app
@@ -38,6 +41,32 @@ class TestUsers(unittest.TestCase):
             result = ul.modify_personal_data(5, form)
             self.assertEqual(False, result)
     
+    def test_check_form_password(self):
+        with tested_app.app_context():
+            # try to change the password of user 5 but with an incorrect inserted old password
+            result = ul.check_form_password(5, '123456789', 'ININFLUENT FOR TEST', 'ININFLUENT FOR TEST')
+            self.assertEqual(1, result)
+
+            # try to change the password of user 5 but with new_password == old_password
+            result = ul.check_form_password(5, 'prova123', 'prova123', 'ININFLUENT FOR TEST')
+            self.assertEqual(2, result)
+
+            # try to change the password of user 5 but with new_password != repeat_new_password
+            result = ul.check_form_password(5, 'prova123', 'prova456', 'prova789')
+            self.assertEqual(3, result)
+
+            # try to correctly change the password of user 5
+            result = ul.check_form_password(5, 'prova123', 'prova456', 'prova456')
+            self.assertEqual(4, result)
+
+
+    def test_modify_password(self):
+        with tested_app.app_context():
+            # test that the password of user 5 is updated in the db
+            ul.modify_password(5, 'prova456')
+            expected_result = db.session.query(User).filter(User.id == 5).first().authenticate('prova456')
+            self.assertEqual(expected_result, True)
+
 
     def rendering(self):
         app = tested_app.test_client()
