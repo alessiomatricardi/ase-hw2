@@ -146,7 +146,7 @@ def _message_detail(label, id):
             if message_recipient[0].is_read == False:
 
                 if not bottlebox_logic.notify_on_read(id,current_user):
-                    abort(404)
+                    abort(500)
 
             other_id = detailed_message.sender_id
 
@@ -194,7 +194,7 @@ def _message_detail(label, id):
                         # the user is no longer available to receive messages from current_user either being inactive or being blocked/blocking
                         flash("The user " + str(recipient.email) + " is no longer avaiable")
                         if not draft_logic.remove_unavailable_recipient(detailed_message.id,recipient.id):
-                            abort(404)
+                            abort(500)
                     else:
                         # the saved recipient is still available
                         recipients_emails.append(recipient.email)
@@ -229,7 +229,7 @@ def _message_detail(label, id):
                 if form['submit'] == 'Delete draft':
 
                     if not draft_logic.delete_draft(detailed_message):
-                        abort(404)
+                        abort(500)
 
                     return render_template("index.html")
 
@@ -243,14 +243,14 @@ def _message_detail(label, id):
 
                     # add recipient to draft if not already stored
                     if not draft_logic.update_recipients(detailed_message,recipient_id):
-                        abort(404)
+                        abort(500)
 
                 # update content of message: if the content is not changed, it'll store the same value
                 if not draft_logic.update_content(detailed_message,form):
-                    abort(404)
+                    abort(500)
                 # update the deliver time for the draft
                 if not draft_logic.update_deliver_time(detailed_message,form):
-                    abort(404)
+                    abort(500)
 
                 # checking if there is a new attached image in the form
                 if request.files and request.files['attach_image'].filename != '':
@@ -259,7 +259,7 @@ def _message_detail(label, id):
                     if detailed_message.image != '':
 
                         if not draft_logic.delete_previously_attached_image(detailed_message):
-                            abort(404)
+                            abort(500)
 
                     # retrieving newly attached image
                     file = request.files['attach_image']
@@ -268,7 +268,7 @@ def _message_detail(label, id):
                     if msg_logic.validate_file(file):
 
                         if not draft_logic.update_attached_image(detailed_message,file):
-                            abort(404)
+                            abort(500)
 
                     else:
                         # control on filename fails
@@ -279,7 +279,7 @@ def _message_detail(label, id):
                 # in order to stop it, it'll be necessary to spend lottery points
                 if form['submit'] == 'Send bottle':
                     if not draft_logic.send_draft(detailed_message):
-                        abort(404)
+                        abort(500)
 
                 return render_template("index.html")
 
@@ -289,7 +289,7 @@ def _message_detail(label, id):
             # checks that message exists
             if label == 'pending':
                 detailed_message = bottlebox_logic.retrieve_pending_message(id)
-            elif label == 'delivered':
+            else:
                 detailed_message = bottlebox_logic.retrieve_delivered_message(id)
 
             if not detailed_message:

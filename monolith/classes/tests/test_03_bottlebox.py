@@ -90,6 +90,11 @@ class TestBottlebox(unittest.TestCase):
             self.assertEqual(result_deliver_time,expected_deliver_time)
             self.assertEqual(result_delivered,expected_delivered)
 
+            # wrong label in retrieving messages
+            result = b.retrieving_messages(2,5)
+            expected_result = False
+            self.assertEqual(result, expected_result)
+    
     def test_rendering(self):
         tested_app = app.test_client()
 

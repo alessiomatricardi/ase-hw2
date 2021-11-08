@@ -63,6 +63,8 @@ class BottleBoxLogic:
                    message.content = censored_content
 
             return msg
+        else:
+            return False
 
     def is_recipient(self,id,current_user_id):
         message_recipient = db.session.query(Message_Recipient).where(and_(Message_Recipient.id == id,Message_Recipient.recipient_id == current_user_id))
