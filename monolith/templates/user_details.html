@@ -5,7 +5,7 @@
 {% block content %}
 
 <div style="text-align: center;">
-  <img src="/static/pictures/default.jpeg" class="img-fluid rounded-circle img-thumbnail" alt="{{user.email}}">
+  <img src="/users/{{user.id}}/picture" class="img-fluid rounded-circle img-thumbnail" alt="{{user.email}}">
 </div>
 
 <div>
@@ -32,15 +32,15 @@
     <hr class="dropdown-divider">
 
     <p class="lead">
-      <a href="/profile/data" class="btn btn-lg btn-primary fw-bold border-white">Modify personal data</a>
-      <a href="/profile/password" class="btn btn-lg btn-primary fw-bold border-white">Modify password</a>
-      <a href="/profile/picture" class="btn btn-lg btn-primary fw-bold border-white">Modify profile picture</a>
+      <a href="/profile/data/edit" class="btn btn-lg btn-primary fw-bold border-white">Modify personal data</a>
+      <a href="/profile/password/edit" class="btn btn-lg btn-primary fw-bold border-white">Modify password</a>
+      <a href="/profile/picture/edit" class="btn btn-lg btn-primary fw-bold border-white">Modify profile picture</a>
       <a href="/unregister" class="btn btn-lg btn-danger fw-bold">Unregister</a>
     </p>
 
   {% else %}
 
-  <a href="/new_message?single_recipient={{user.email}}" class="btn btn-lg btn-primary fw-bold">Write a message</a>
+  <a href="/messages/new?single_recipient={{user.email}}" class="btn btn-lg btn-primary fw-bold">Write a message</a>
   <br><br>
   <form action="/block" method="POST">
     {{ block_form.hidden_tag() }}

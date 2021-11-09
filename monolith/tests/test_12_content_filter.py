@@ -57,7 +57,7 @@ class TestContentFilter(unittest.TestCase):
             response = tested_app.get('/bottlebox/pending', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
 
-            response = tested_app.get('/message/pending/12', content_type = 'html/text', follow_redirects = True)
+            response = tested_app.get('/messages/pending/12', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
 
             # deliver bad message
@@ -71,7 +71,7 @@ class TestContentFilter(unittest.TestCase):
             response = tested_app.get('/bottlebox/delivered', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
             
-            response = tested_app.get('/message/delivered/12', content_type = 'html/text', follow_redirects = True)
+            response = tested_app.get('/messages/delivered/12', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
 
         
@@ -101,6 +101,6 @@ class TestContentFilter(unittest.TestCase):
             response = tested_app.get('/bottlebox/received', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
             
-            response = tested_app.get('/message/received/12', content_type = 'html/text', follow_redirects = True)
+            response = tested_app.get('/messages/received/12', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
         

@@ -23,7 +23,7 @@ bottlebox = Blueprint('bottlebox', __name__)
 
 
 @bottlebox.route('/bottlebox',methods=['GET'])
-def bottlebox_home():
+def _bottlebox_home():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
         return render_template('bottlebox_home.html')
@@ -32,7 +32,7 @@ def bottlebox_home():
         return redirect('/login')
 
 @bottlebox.route('/bottlebox/pending', methods=['GET'])
-def show_pending():
+def _show_pending():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
 
@@ -48,7 +48,7 @@ def show_pending():
 
 
 @bottlebox.route('/bottlebox/received', methods=['GET'])
-def show_received():
+def _show_received():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
 
@@ -65,7 +65,7 @@ def show_received():
 
 
 @bottlebox.route('/bottlebox/delivered', methods=['GET'])
-def show_delivered():
+def _show_delivered():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
         
@@ -83,7 +83,7 @@ def show_delivered():
 
 
 @bottlebox.route('/bottlebox/drafts', methods=['GET'])
-def show_drafts():
+def _show_drafts():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
 
@@ -99,7 +99,7 @@ def show_drafts():
         return redirect('/login')
 
 
-@bottlebox.route('/message/<label>/<id>', methods=['GET', 'POST'])
+@bottlebox.route('/messages/<label>/<id>', methods=['GET', 'POST'])
 def _message_detail(label, id):
 
     # checks if <id> is not a number, otherwise abort
@@ -274,7 +274,7 @@ def _message_detail(label, id):
                     else:
                         # control on filename fails
                         flash('Insert an image with extention: .png , .jpg, .jpeg, .gif')
-                        return redirect('/message/draft/' + str(detailed_message.id))
+                        return redirect('/messages/draft/' + str(detailed_message.id))
 
                 # the draft is sent and its is_sent attribute is set to 1, from now on it's no longer possible to modify it
                 # in order to stop it, it'll be necessary to spend lottery points
@@ -332,7 +332,7 @@ def _message_detail(label, id):
             censored_content = filter.check_message_content(detailed_message.content)
             detailed_message.content = censored_content
 
-        return render_template('/message_detail.html', hideForm = hideForm, reportForm = reportForm, message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, recipients = blocked_info, label = label)
+        return render_template('message_detail.html', hideForm = hideForm, reportForm = reportForm, message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, recipients = blocked_info, label = label)
 
     else:
         # there is no logged user, redirect to login

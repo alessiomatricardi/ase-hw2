@@ -5,7 +5,7 @@
 {% block content %}
 
 <div style="text-align: center;">
-    <img src="/static/pictures/default.jpeg" class="img-fluid rounded-circle img-thumbnail" alt="{{current_user.email}}">
+    <img src="/users/{{current_user.id}}/picture" class="img-fluid rounded-circle img-thumbnail" alt="{{current_user.email}}">
 
     {% if form.image.errors %}
         {% for error in form.image.errors %}
@@ -18,7 +18,7 @@
     <h2>Seleziona una nuova immagine del profilo</h2>
     <br><br>
 
-    <form action="/profile/picture" method="POST" enctype="multipart/form-data">
+    <form action="/profile/picture/edit" method="POST" enctype="multipart/form-data">
         {{ form.image() }}
         <br><br>
         <input type="submit" class="btn btn-lg btn-warning fw-bold" value="Invia">

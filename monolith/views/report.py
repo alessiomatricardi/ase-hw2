@@ -35,7 +35,7 @@ def report_user():
             # this should not happen but we handle it
             abort(409)
 
-        return redirect('/message/received/' + str(message_id))
+        return redirect('/messages/received/' + str(message_id))
 
     else:
         abort(401) # user should login

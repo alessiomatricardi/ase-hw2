@@ -31,19 +31,19 @@ class TestDrafts(unittest.TestCase):
         assert b'Drafts Bottlebox' in response.data 
 
         # accessing to a wrong message route (with a wrong label != pending, received, drafts, delivered) returns an error
-        response = tested_app.get("/message/not_a_label/1", content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/not_a_label/1", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code,404)
 
         # only drafts allow POST method
-        response = tested_app.post("/message/pending/1", content_type='html/text', follow_redirects=True)
+        response = tested_app.post("/messages/pending/1", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code,404) 
 
         # accessing a message as received if you're not a recipient returns an error
-        response = tested_app.get("/message/received/2", content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/received/2", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code,404) 
 
         # accessing to a owned draft
-        response = tested_app.get("/message/draft/10", content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/draft/10", content_type='html/text', follow_redirects=True)
         assert b'<input type="checkbox" name="recipients" value=prova@mail.com checked>' in response.data
         assert b'<textarea id="content" name="content"  required = "">ININFLUENT FOR THE TEST</textarea>' in response.data
         assert b'Send bottle' in response.data
@@ -64,7 +64,7 @@ class TestDrafts(unittest.TestCase):
         assert b'Alessio Bianchi' in response.data
 
         # reopening the draft and checking that the blocked user is removed from draft recipients
-        response = tested_app.get("/message/draft/10", content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/draft/10", content_type='html/text', follow_redirects=True)
         assert b'The user prova@mail.com is no longer avaiable' in response.data
         assert b'<input type="checkbox" name="recipients" value=prova@mail.com checked>' not in response.data
         self.assertEqual(response.status_code,200)
@@ -89,7 +89,7 @@ class TestDrafts(unittest.TestCase):
             'submit': 'Save draft changes',
         }
         response = tested_app.post(
-            "/message/draft/10",
+            "/messages/draft/10",
             data=data_modifying_draft,
             content_type='multipart/form-data',
             follow_redirects=True
@@ -98,7 +98,7 @@ class TestDrafts(unittest.TestCase):
         assert b'Hi Barbara' in response.data
 
         # reopening draft to check changes
-        response = tested_app.get("/message/draft/10", content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/draft/10", content_type='html/text', follow_redirects=True)
         assert b'<input type="checkbox" name="recipients" value=prova2@mail.com checked>' in response.data
         assert b'<textarea id="content" name="content"  required = "">NEW MODIFIED TEXT</textarea>' in response.data
         assert b'<input type="datetime-local" id="deliver_time" name="deliver_time" value = "2025-04-24T17:16">' in response.data
@@ -128,35 +128,35 @@ class TestDrafts(unittest.TestCase):
         assert b'Hi Damiano' in response.data 
 
         # accessing to a non-existing draft
-        response = tested_app.get("/message/draft/15", content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/draft/15", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code,404) 
 
         # accessing to a non-owned draft
-        response = tested_app.get("/message/draft/10", content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/draft/10", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code,404) 
 
         # modifying non-existing draft
-        response = tested_app.post("/message/draft/15", content_type='html/text', follow_redirects=True)
+        response = tested_app.post("/messages/draft/15", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code,404) 
 
         # modifying non-owned draft
-        response = tested_app.post("/message/draft/10", content_type='html/text', follow_redirects=True)
+        response = tested_app.post("/messages/draft/10", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code,404)
 
         # opening non-owned pending message
-        response = tested_app.get('/message/pending/5',content_type='html/text', follow_redirects=True)
+        response = tested_app.get('/messages/pending/5',content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code,404)
 
         # opening non-existing pending message
-        response = tested_app.get('/message/pending/100',content_type='html/text', follow_redirects=True)
+        response = tested_app.get('/messages/pending/100',content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code,404)
 
         # opening non-owned delivered message
-        response = tested_app.get('/message/delivered/4',content_type='html/text', follow_redirects=True)
+        response = tested_app.get('/messages/delivered/4',content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code,404)
 
         # opening non-existing delivered message
-        response = tested_app.get('/message/delivered/100',content_type='html/text', follow_redirects=True)
+        response = tested_app.get('/messages/delivered/100',content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code,404)
 
         # logout
@@ -176,7 +176,7 @@ class TestDrafts(unittest.TestCase):
             'submit': 'Send bottle'
         }
         response = tested_app.post(
-            "/message/draft/10",
+            "/messages/draft/10",
             data=data_send,
             content_type='multipart/form-data',
             follow_redirects=True
