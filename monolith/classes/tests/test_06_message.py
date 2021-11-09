@@ -1,12 +1,9 @@
-import re
 import unittest
 import datetime
-from unittest import result
-from warnings import resetwarnings
 import os
 import io
 
-from monolith.database import Message_Recipient, User, db, Message
+from monolith.database import Message_Recipient, db, Message
 from monolith.message_logic import MessageLogic
 from monolith import app as tested_app
 

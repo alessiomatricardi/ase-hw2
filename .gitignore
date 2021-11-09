@@ -5,8 +5,8 @@
 ### Attached images ###
 monolith/static/attachments
 monolith/static/attachments/*
-monolith/static/old_attachments
-monolith/static/old_attachments/*
+attachments/
+attachments/*
 
 ### Don't save all pictures ###
 monolith/static/pictures/*
