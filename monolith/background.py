@@ -34,7 +34,7 @@ celery.conf.timezone = 'Europe/Rome' # set timezone to Rome # 'UTC'
 celery.conf.beat_schedule = {
     'lottery_notification': {
         'task': 'lottery_notification',   
-        'schedule':  crontab() #crontab(0, 0, day_of_month='15') # frequency of execution
+        'schedule':  crontab(0, 0, day_of_month='15') # frequency of execution: each 15 of the month
     },
     'deliver_message_and_send_notification': {
         'task': 'deliver_message_and_send_notification',    # name of the task to execute
@@ -62,18 +62,15 @@ def lottery_notification():
             recipient_id, recipient_email, recipient_firstname, recipient_lottery_points = user
 
             lottery_points = random.randint(MIN_LOTTERY_POINTS, MAX_LOTTERY_POINTS)
-            print("points: " + str(lottery_points))
 
             message = f'Subject: Monthly lottery prize\n\nHi {recipient_firstname}! You won {lottery_points} points in the lottery.'
             send_email(recipient_email, message)
-            #print(user[1] + ": You earned " + str(lottery_points) + " points!!")
 
             recipient_lottery_points += lottery_points
             # Query to the db to update the total points of a user
             db.session.query(User).filter(User.id == recipient_id).update({'lottery_points': recipient_lottery_points})
             
         db.session.commit()
-        print("emails sent")
 
 
 @celery.task(name="deliver_message_and_send_notification")
