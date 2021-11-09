@@ -1,9 +1,7 @@
 # this class contains all the logic required to handle messages
-from sqlalchemy.sql.functions import user
-from wtforms.form import FormMeta
 from monolith.database import db, User
-from sqlalchemy import func
-from datetime import date, datetime
+from datetime import datetime
+from werkzeug.security import check_password_hash
 
 
 class UserLogic:
@@ -30,18 +28,18 @@ class UserLogic:
         user = db.session.query(User).filter(User.id == user_id).first()
  
         # check if the old password is the same of the one stored in the database
-        if user.authenticate(old_password) == False:
+        if not check_password_hash(user.password, old_password):
             return 1 # this value is handled in the view
 
         # check that the old and new password are not the same
-        if user.authenticate(old_password) == user.authenticate(new_password):
+        if check_password_hash(user.password, new_password):
             return 2 # this value is handled in the view
 
         # check that the new password and the repeated new password are different
         if new_password != repeat_new_password:
             return 3 # this value is handled in the view
 
-        return 4 # no errors
+        return 0 # no errors
     
     def modify_password(self, user_id, new_password):
 
