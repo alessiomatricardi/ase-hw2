@@ -35,9 +35,9 @@
 </ul>
 {% if label == 'received' %}
 
-  <button onclick="location.href = '/new_message?msg_id={{message.id}}';" id="forwardButton" class="float-left submit-button" >Forward</button>
+  <button onclick="location.href = '/messages/new?msg_id={{message.id}}';" id="forwardButton" class="float-left submit-button" >Forward</button>
   {% if blocked == False %} <!-- va messo fuori -->
-  <button onclick="location.href = '/new_message?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button>
+  <button onclick="location.href = '/messages/new?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button>
   {% endif %}
 
   <form action="/report" method="POST">
@@ -54,7 +54,7 @@
 {% endif %} 
 
 {% if label == 'pending' %}
-  <button onclick="location.href = '/delete_message/{{message.id}}';" id="deleteMessage" class="float-left submit-button" >Delete message</button>
+  <button onclick="location.href = '/messages/{{message.id}}/remove';" id="deleteMessage" class="float-left submit-button" >Delete message</button>
 {% endif %} 
 
 

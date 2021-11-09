@@ -68,12 +68,8 @@
                     <a href="#" class="d-block link-light text-decoration-none dropdown-toggle" id="dropdownUser1"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         
-                        {% if current_user.has_picture %}
-                        <img src="{{ url_for('static',filename='pictures/' + current_user.id|string + '_100.jpg') }}" alt="mdo" width="40" height="40" class="rounded-circle">
-                        {% else %}
-                        <img src="{{ url_for('static',filename='pictures/default_100.jpg') }}" alt="mdo" width="40" height="40"
+                        <img src="/users/{{current_user.id}}/picture" alt="mdo" width="40" height="40"
                             class="rounded-circle">
-                        {% endif %}
                     </a>
                     <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1" style="">
                         <li><a class="dropdown-item" href="/profile">Profile</a></li>

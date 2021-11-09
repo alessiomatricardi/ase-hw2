@@ -1,10 +1,15 @@
 from flask import Blueprint, redirect, render_template, request, abort
-from flask.helpers import url_for
+from flask.helpers import flash
+from flask_login import logout_user
+from werkzeug.security import check_password_hash
+from flask.helpers import send_from_directory
+import os
 
 from monolith.database import User, db
-from monolith.forms import ContentFilterForm, ProfilePictureForm, UserForm, BlockForm
+from monolith.forms import ContentFilterForm, ProfilePictureForm, UserForm, BlockForm, ModifyPersonalDataForm, ModifyPasswordForm, UnregisterForm
 from monolith.content_filter_logic import ContentFilterLogic
 from monolith.list_logic import ListLogic
+from monolith.user_logic import UserLogic
 from PIL import Image
 
 from flask_login import current_user
@@ -70,6 +75,38 @@ def _register():
         raise RuntimeError('This should not happen!')
 
 
+@users.route('/unregister', methods=['GET', 'POST'])
+def _unregister():
+
+    # checking if there is a logged user, otherwise redirect to login
+    if current_user is not None and hasattr(current_user, 'id'):
+
+        form = UnregisterForm()
+        # using a form to verify authenticity of the unregistration request through password
+        if form.validate_on_submit():
+            password = form.data['password']
+            q = db.session.query(User).where(User.id == current_user.id)
+            user = q.first()
+
+            # if the password is correct, the user won't be active anymore
+            # the user is not going to be deleted from db because there may be pending messages to be sent from this user
+
+            if user is not None:
+                password_is_right = check_password_hash(user.password, password)
+                if password_is_right:
+                    # TODO check if it works
+                    user.is_active = False
+                    db.session.commit()
+                    logout_user()
+                    return redirect('/')
+                # TODO else: print error message
+
+        # html template for unregistration confirmation
+        return render_template('unregister.html', form=form, user=current_user)
+
+    else:
+        return redirect('/login')
+
 # retrieve the list of all users
 @users.route('/users', methods=['GET'])
 def _users():
@@ -94,7 +131,7 @@ def _user_details(user_id):
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
 
-        # get the user
+        # get the user id
         # if <id> is not a number, render 404 page
         try:
             user_id = int(user_id)
@@ -118,6 +155,42 @@ def _user_details(user_id):
 
         # render the page
         return render_template('user_details.html', user = user, block_form = block_form)
+
+    else:
+        return redirect('/login')
+
+
+@users.route('/users/<user_id>/picture', methods=['GET'])
+def _get_profile_photo(user_id):
+    if current_user is not None and hasattr(current_user, 'id'):
+
+        # get the user id
+        # if <id> is not a number, render 404 page
+        try:
+            user_id = int(user_id)
+        except:
+            abort(404)
+
+        user_logic = UserLogic()
+
+        # get the user
+        user = user_logic.get_user(user_id)
+
+        filename = 'default'
+
+        # if has picture, then his filename is <id>.jpeg
+        if (user.has_picture):
+            filename = str(user_id)
+
+        dimension = request.args.get('dim')
+
+        # if dim=small then filename is <id>_100.jpeg
+        if dimension == 'small':
+            filename += "_100"
+
+        filename += ".jpeg"
+
+        return send_from_directory(os.path.join(os.getcwd(), 'monolith', 'static', 'pictures'), filename)
 
     else:
         return redirect('/login')
@@ -162,9 +235,9 @@ def _content_filter():
 
             return redirect('/profile')
 
-            return render_template('user_details.html',
+            '''return render_template('user_details.html',
                                    user=current_user,
-                                   content_filter_form = form)
+                                   content_filter_form = form)'''
 
         else:
             return redirect('/profile')
@@ -172,8 +245,9 @@ def _content_filter():
     else:
         abort(403) # no one apart of the logged user can do this action
 
-@users.route('/profile/picture', methods=['GET', 'POST'])
-def _profile_picture():
+
+@users.route('/profile/picture/edit', methods=['GET', 'POST'])
+def _modify_profile_picture():
     if current_user is not None and hasattr(current_user, 'id'):
 
         if request.method == 'GET':
@@ -197,17 +271,17 @@ def _profile_picture():
 
                     # save image in 256x256
                     img = Image.open(img_data)
-                    img.resize([256, 256], Image.ANTIALIAS)
-                    img.save(
-                        './monolith/static/pictures/' + str(current_user.id) + 
-                        '.jpg', "JPEG")
+                    img = img.convert('RGB') # in order to support also Alpha transparency images such as PNGs
+                    img = img.resize([256, 256], Image.ANTIALIAS)
+                    img.save('./monolith/static/pictures/' + str(current_user.id) +
+                                '.jpeg', "JPEG", quality=100, subsampling=0)
 
                     # save image in 100x100
                     img = Image.open(img_data)
-                    img.resize([100, 100], Image.ANTIALIAS)
-                    img.save(
-                        './monolith/static/pictures/' + str(current_user.id) +
-                        '_100.jpg', "JPEG")
+                    img = img.convert('RGB')  # in order to support also Alpha transparency images such as PNGs
+                    img = img.resize([100, 100], Image.ANTIALIAS)
+                    img.save('./monolith/static/pictures/' + str(current_user.id) +
+                                '_100.jpeg', "JPEG", quality=100, subsampling=0)
 
                     # now the user has a personal profile picture
                     user = User()
@@ -223,5 +297,77 @@ def _profile_picture():
             else:
                 return render_template('modify_picture.html', form = form)
 
+    else:
+        return redirect('/login')
+
+
+@users.route('/profile/data/edit', methods=['GET', 'POST'])
+def _modify_personal_data():
+    if current_user is not None and hasattr(current_user, 'id'):
+
+        if request.method == 'GET':
+            form = ModifyPersonalDataForm()
+
+            # populate the form with the existing data of the user
+            form.firstname.data = current_user.firstname
+            form.lastname.data = current_user.lastname
+
+            return render_template('modify_personal_data.html', form=form, date_of_birth=current_user.date_of_birth)
+        
+        elif request.method == 'POST':
+
+            user_logic = UserLogic()
+
+            form = request.form
+
+            if user_logic.modify_personal_data(current_user.id, form):
+                return redirect('/profile')
+
+            else: # something went wrong in the modification of the personal data
+                flash('Please insert correct data')
+                return redirect('/profile/data/edit')
+        
+        else:
+            raise RuntimeError('This should not happen!')
+
+    else:
+        return redirect('/login')
+
+
+@users.route('/profile/password/edit', methods=['GET', 'POST'])
+def _modify_password():
+    if current_user is not None and hasattr(current_user, 'id'):
+        
+        if request.method == 'GET':
+            form = ModifyPasswordForm()
+            return render_template('modify_password.html', form=form)
+
+        
+        elif request.method == 'POST':
+
+            user_logic = UserLogic()
+
+            form = request.form
+
+            # check if the old password is the same of the one stored in the database
+            # check that the old and new password are not the same
+            # check that the new password and the repeated new password are equal
+            result = user_logic.check_form_password(current_user.id, form['old_password'], form['new_password'], form['repeat_new_password'])
+
+            if result == 1:
+                flash("The old password you inserted is incorrect. Please insert the correct one.")
+                return redirect('/profile/password/edit')
+            elif result == 2:
+                flash("Please insert a password different from the old one.")
+                return redirect('/profile/password/edit')
+            elif result == 3:
+                flash("The new password and its repetition must be equal.")
+                return redirect('/profile/password/edit')
+            else: 
+                # proceed to the modification of the password
+                user_logic.modify_password(current_user.id, form['new_password'])
+                        
+                return redirect('/profile')
+                
     else:
         return redirect('/login')

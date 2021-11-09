@@ -13,13 +13,13 @@ def report_user():
         message_id = 0
         try:
             # retrieve message id from the form
-            message_id = request.form.get('message_id', type=int)        
+            message_id = request.form['message_id']      
         except:
             abort(500) # internal server error
 
         # check if that user is a recipient of that message
-        query = db.session.query(Message_Recipient).where(Message_Recipient.recipient_id == current_user.id).where(Message_Recipient.id == message_id).where(Message_Recipient.is_hide == False)
-        if query is None:
+        query = db.session.query(Message_Recipient).where(Message_Recipient.recipient_id == current_user.id).where(Message_Recipient.id == message_id).where(Message_Recipient.is_hide == False).all()
+        if not query:
             abort(403) # that user can't do this action
         
         report_to_add = Report()
@@ -35,7 +35,7 @@ def report_user():
             # this should not happen but we handle it
             abort(409)
 
-        return redirect('/message/received/' + str(message_id))
+        return redirect('/messages/received/' + str(message_id))
 
     else:
         abort(401) # user should login

@@ -3,8 +3,6 @@ from monolith.bottlebox_logic import BottleBoxLogic
 from monolith import app
 import datetime
 
-app.config['WTF_CSRF_ENABLED'] = False
-
 class TestBottlebox(unittest.TestCase):
 
     def test_bottlebox_users(self):
@@ -90,6 +88,11 @@ class TestBottlebox(unittest.TestCase):
             self.assertEqual(result_deliver_time,expected_deliver_time)
             self.assertEqual(result_delivered,expected_delivered)
 
+            # wrong label in retrieving messages
+            result = b.retrieving_messages(2,5)
+            expected_result = False
+            self.assertEqual(result, expected_result)
+    
     def test_rendering(self):
         tested_app = app.test_client()
 
@@ -98,7 +101,7 @@ class TestBottlebox(unittest.TestCase):
         assert b'<label for="email">E-mail</label>' in response.data
 
         # checking that accessing to message details page redirects to the login page if not already logged in
-        response = tested_app.get("/message/received/2", content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/received/2", content_type='html/text', follow_redirects=True)
         assert b'<label for="email">E-mail</label>' in response.data
         """self.assertEqual(404, response.status_code)"""
 
@@ -126,22 +129,22 @@ class TestBottlebox(unittest.TestCase):
         assert b'<h1>Delivered Bottlebox</h1>' in response.data
 
         # checking the rendering of a received message from a blocked user
-        response = tested_app.get("/message/received/3", data = data1 , content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/received/3", data = data1 , content_type='html/text', follow_redirects=True)
         assert b'<h1>Message from</h1>' in response.data
         assert b'<h5>Alessio Bianchi</h5>' in response.data
         assert b'Reply' not in response.data
 
         # checking the rendering of a delivered message to a non blocking/blocked user
-        response = tested_app.get("/message/delivered/2", data = data1 , content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/delivered/2", data = data1 , content_type='html/text', follow_redirects=True)
         assert b'<h1>Message to</h1>' in response.data
         assert b'Carlo Neri' in response.data
 
         # checking that the opening of a message not yet delivered is not possible
-        response = tested_app.get("/message/delivered/1", data = data1 , content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/delivered/1", data = data1 , content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code, 404)
 
         # checking that the opening of a non existing message is not possible
-        response = tested_app.get("/message/received/100000", data = data1 , content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/received/100000", data = data1 , content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code, 404)
 
         # logout
@@ -154,7 +157,7 @@ class TestBottlebox(unittest.TestCase):
         assert b'Hi Carlo' in response.data
 
         # checking that opening a message received from a non blocked/blocking user displays the reply and block user buttons
-        response = tested_app.get("/message/received/2", data = data1 , content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/received/2", data = data1 , content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         assert b'<h1>Message from</h1>' in response.data
         assert b'<h5>Damiano Rossi</h5>' in response.data
@@ -170,13 +173,13 @@ class TestBottlebox(unittest.TestCase):
         assert b'Hi Alessio' in response.data
 
         # checking that opening a message delivered to a blocked/blocking user does not display the reply and block user buttons
-        response = tested_app.get("/message/delivered/3", data = data1 , content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/delivered/3", data = data1 , content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         assert b'<h1>Message to</h1>' in response.data
         assert b'Damiano Rossi' in response.data
         assert b'Reply' not in response.data
 
         # checking that opening a message with wrong URL args redirects to the Home Page
-        response = tested_app.get("/message/received/not_an_int_arg", data = data1 , content_type='html/text', follow_redirects=True)
+        response = tested_app.get("/messages/received/not_an_int_arg", data = data1 , content_type='html/text', follow_redirects=True)
         self.assertEqual(404, response.status_code)
         """assert b'Hi Alessio' in response.data """

@@ -9,7 +9,7 @@ auth = Blueprint('auth', __name__)
 
 
 @auth.route('/login', methods=['GET', 'POST'])
-def login():
+def _login():
     # if the user is already logged in, redirect him to homepage
     if current_user is not None and hasattr(current_user, 'id'):
         return redirect('/')
@@ -51,7 +51,7 @@ def login():
 
 
 @auth.route("/logout")
-def logout():
+def _logout():
     # if the user is not logged in, don't logout and directly redirect him to homepage
     if current_user is not None and hasattr(current_user, 'id'):
         logout_user()

@@ -31,7 +31,7 @@ class BottleBoxLogic:
             msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == False)
             
             #if the content filter is active, all the messages will be displayed censored
-            if user.content_filter_enabled:
+            if filter.filter_enabled(user.id):
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
                    message.content = censored_content
@@ -40,7 +40,7 @@ class BottleBoxLogic:
         elif type == 2: #received
             msg = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message_Recipient.recipient_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today).where(Message_Recipient.is_hide == False)
 
-            if user.content_filter_enabled:
+            if filter.filter_enabled(user.id):
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
                    message.content = censored_content
@@ -48,7 +48,7 @@ class BottleBoxLogic:
         elif type == 3: #delivered
             msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today)
 
-            if user.content_filter_enabled:
+            if filter.filter_enabled(user.id):
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
                    message.content = censored_content
@@ -63,6 +63,8 @@ class BottleBoxLogic:
                    message.content = censored_content
 
             return msg
+        else:
+            return False
 
     def is_recipient(self,id,current_user_id):
         message_recipient = db.session.query(Message_Recipient).where(and_(Message_Recipient.id == id,Message_Recipient.recipient_id == current_user_id))
@@ -72,6 +74,7 @@ class BottleBoxLogic:
     def retrieve_received_message(self, id):
         detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True).where(Message.is_delivered == True)
         detailed_message = [ob for ob in detailed_message]
+
 
         return detailed_message
 
@@ -114,6 +117,7 @@ class BottleBoxLogic:
         try:
             db.session.commit()
         except Exception:
+            db.session.rollback()
             return False
         msg = "Subject: Message notification\n\nThe message you sent to " + current_user.firstname + " has been read."
         message_sender_id = db.session.query(Message).filter(Message.id == id).first().sender_id
@@ -135,7 +139,7 @@ class DraftLogic:
         if detailed_message.image != '':
             
             # directory to the folder in which is stored the image
-            directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attached', str(detailed_message.id))
+            directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attachments', str(detailed_message.id))
             shutil.rmtree(directory, ignore_errors=True)
 
             '''myfile = os.path.join(directory, detailed_message.image)
@@ -232,7 +236,7 @@ class DraftLogic:
 
     def delete_previously_attached_image(self, detailed_message):
         # directory where is stored the attached imaged
-        directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attached', str(detailed_message.id))
+        directory = os.path.join(os.getcwd(), 'monolith', 'static', 'attachments', str(detailed_message.id))
         myfile = os.path.join(directory, detailed_message.image)
         
         # deleting the previously attached image
@@ -250,7 +254,7 @@ class DraftLogic:
         
         id = detailed_message.id
 
-        attached_dir = os.path.join(os.getcwd(),'monolith','static','attached')
+        attached_dir = os.path.join(os.getcwd(),'monolith','static','attachments')
         
         # creating attached folder, if it doesn't already exist
         if not os.path.exists(attached_dir):
@@ -262,13 +266,13 @@ class DraftLogic:
         # creating attached image folder, if it doesn't already exist
         if not os.path.exists(os.path.join(attached_dir, str(id))):
             try:
-                os.mkdir(os.path.join(os.getcwd(),'monolith','static','attached',str(id)))
+                os.mkdir(os.path.join(os.getcwd(),'monolith','static','attachments',str(id)))
             except Exception:
                 return False
 
         # saving the attached image
         try:
-            file.save(os.path.join(os.getcwd(),'monolith','static','attached',str(id),secure_filename(file.filename)))
+            file.save(os.path.join(os.getcwd(),'monolith','static','attachments',str(id),secure_filename(file.filename)))
         except Exception:
                 return False
 

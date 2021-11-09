@@ -5,7 +5,6 @@ from monolith.database import db, User
 
 from monolith import app as tested_app
 
-
 class TestAuthAndReg(unittest.TestCase):
 
     # TODO REMEMBER TO DEFINE SINGLE TESTS METHODS PER EACH FUNCTIONALITY
@@ -63,6 +62,19 @@ class TestAuthAndReg(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         assert b"please register with another email." in response.data
 
+        # login
+        data2 = { 'email' : 'prova3@mail.com' , 'password' : 'prova123' } # correct password
+        response = app.post(
+            "/login", 
+            data = data2 , 
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+            )
+        assert b'Hi Mario' in response.data 
+
+        # trying to access register router redirects to home page
+        response = app.get("/register",content_type='html/text',follow_redirects=True)
+        assert b'Hi Mario' in response.data
 
     def test_unregister(self):
         app = tested_app.test_client()

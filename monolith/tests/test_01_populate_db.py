@@ -1,16 +1,8 @@
-from monolith.database import db, Message_Recipient, Message, User, Blacklist, Report
+from monolith.database import db, Message_Recipient, Message, User, Blacklist
 import random
-
-import re
 import unittest
 import datetime
-from unittest import result
-from warnings import resetwarnings
-
-#from flask import app
-from flask.signals import message_flashed
-from flask_wtf.recaptcha.widgets import RECAPTCHA_SCRIPT
-from monolith import app as tested_app
+from monolith import app
 
 '''
                         README!!!!
@@ -22,7 +14,7 @@ in order to allow the testing process
 class TestPopulateDB(unittest.TestCase):
 
     def test_populate_db(self):
-        with tested_app.app_context():
+        with app.app_context():
             # add 4 users
             example = User()
             example.email = 'prova@mail.com'
@@ -56,7 +48,7 @@ class TestPopulateDB(unittest.TestCase):
             example.email = 'prova5@mail.com'
             example.firstname = 'Carlo'
             example.lastname = 'Neri'
-            example.date_of_birth = datetime.datetime(random.randint(1960, 2000), random.randint(1,12), random.randint(1,29))
+            example.date_of_birth = datetime.datetime(1995,6,12)
             example.is_admin = False
             example.lottery_points = 22
             example.set_password('prova123')

@@ -30,16 +30,16 @@
     <div class="card-body">
       <p class="card-text">{{msg.content}}</p>
       {% if label == 'Pending' %}
-        <a href="/message/pending/{{msg.id}}" class="btn btn-primary">Open</a>
+        <a href="/messages/pending/{{msg.id}}" class="btn btn-primary">Open</a>
       
       {% elif label == 'Received' %}
-        <a href="/message/received/{{msg.id}}" class="btn btn-primary">Open</a>
+        <a href="/messages/received/{{msg.id}}" class="btn btn-primary">Open</a>
       
       {% elif label == 'Delivered' %}
-        <a href="/message/delivered/{{msg.id}}" class="btn btn-primary">Open</a>
+        <a href="/messages/delivered/{{msg.id}}" class="btn btn-primary">Open</a>
       
       {% elif label == 'Drafts' %}
-        <a href="/message/draft/{{msg.id}}" class="btn btn-primary">Open</a>
+        <a href="/messages/draft/{{msg.id}}" class="btn btn-primary">Open</a>
       
       {% endif %}
     </div>

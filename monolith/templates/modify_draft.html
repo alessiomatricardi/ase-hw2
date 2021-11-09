@@ -35,8 +35,8 @@
       <input type="datetime-local" id="deliver_time" name="deliver_time" value = "{{deliver_time}}">
     </p>
     <p>
-        {% if attached != '' %}
-        <p><img src = "{{url_for('messages.send_file', msg_id = message_id, filename = attached)}}" width="480" height="270"></p>
+        {% if attachment != '' %}
+        <p><img src = "{{url_for('messages.send_file', msg_id = message_id, filename = attachment)}}" width="480" height="270"></p>
         <label for="attach_image">Otherwise send another image!</label>
         <input type="file" id="attach_image" name="attach_image">
         {% else %}

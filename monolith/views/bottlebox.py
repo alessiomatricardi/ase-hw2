@@ -7,6 +7,7 @@ from monolith.database import User, db, Blacklist, Message, Message_Recipient
 from monolith.forms import HideForm, ReportForm, MessageForm
 from flask_login import current_user
 from monolith.bottlebox_logic import BottleBoxLogic, DraftLogic
+from monolith.content_filter_logic import ContentFilterLogic
 from sqlalchemy.sql import or_,and_
 from monolith.emails import send_email
 from monolith.message_logic import MessageLogic
@@ -22,7 +23,7 @@ bottlebox = Blueprint('bottlebox', __name__)
 
 
 @bottlebox.route('/bottlebox',methods=['GET'])
-def bottlebox_home():
+def _bottlebox_home():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
         return render_template('bottlebox_home.html')
@@ -31,7 +32,7 @@ def bottlebox_home():
         return redirect('/login')
 
 @bottlebox.route('/bottlebox/pending', methods=['GET'])
-def show_pending():
+def _show_pending():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
 
@@ -47,7 +48,7 @@ def show_pending():
 
 
 @bottlebox.route('/bottlebox/received', methods=['GET'])
-def show_received():
+def _show_received():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
 
@@ -64,7 +65,7 @@ def show_received():
 
 
 @bottlebox.route('/bottlebox/delivered', methods=['GET'])
-def show_delivered():
+def _show_delivered():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
         
@@ -82,7 +83,7 @@ def show_delivered():
 
 
 @bottlebox.route('/bottlebox/drafts', methods=['GET'])
-def show_drafts():
+def _show_drafts():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
 
@@ -98,7 +99,7 @@ def show_drafts():
         return redirect('/login')
 
 
-@bottlebox.route('/message/<label>/<id>', methods=['GET', 'POST'])
+@bottlebox.route('/messages/<label>/<id>', methods=['GET', 'POST'])
 def _message_detail(label, id):
 
     # checks if <id> is not a number, otherwise abort
@@ -146,7 +147,7 @@ def _message_detail(label, id):
             if message_recipient[0].is_read == False:
 
                 if not bottlebox_logic.notify_on_read(id,current_user):
-                    abort(404)
+                    abort(500)
 
             other_id = detailed_message.sender_id
 
@@ -194,7 +195,7 @@ def _message_detail(label, id):
                         # the user is no longer available to receive messages from current_user either being inactive or being blocked/blocking
                         flash("The user " + str(recipient.email) + " is no longer avaiable")
                         if not draft_logic.remove_unavailable_recipient(detailed_message.id,recipient.id):
-                            abort(404)
+                            abort(500)
                     else:
                         # the saved recipient is still available
                         recipients_emails.append(recipient.email)
@@ -203,7 +204,7 @@ def _message_detail(label, id):
                 deliver_time = detailed_message.deliver_time.strftime("%Y-%m-%dT%H:%M")
 
                 # returning the draft html page
-                return render_template("modify_draft.html", form = form, recipients_emails = recipients_emails, content = detailed_message.content, deliver_time = deliver_time, attached = detailed_message.image, message_id = detailed_message.id)
+                return render_template("modify_draft.html", form = form, recipients_emails = recipients_emails, content = detailed_message.content, deliver_time = deliver_time, attachment = detailed_message.image, message_id = detailed_message.id)
 
             # else = Drafts POST method: deleting draft or submitting modification/send request
             else:
@@ -229,7 +230,7 @@ def _message_detail(label, id):
                 if form['submit'] == 'Delete draft':
 
                     if not draft_logic.delete_draft(detailed_message):
-                        abort(404)
+                        abort(500)
 
                     return render_template("index.html")
 
@@ -243,14 +244,14 @@ def _message_detail(label, id):
 
                     # add recipient to draft if not already stored
                     if not draft_logic.update_recipients(detailed_message,recipient_id):
-                        abort(404)
+                        abort(500)
 
                 # update content of message: if the content is not changed, it'll store the same value
                 if not draft_logic.update_content(detailed_message,form):
-                    abort(404)
+                    abort(500)
                 # update the deliver time for the draft
                 if not draft_logic.update_deliver_time(detailed_message,form):
-                    abort(404)
+                    abort(500)
 
                 # checking if there is a new attached image in the form
                 if request.files and request.files['attach_image'].filename != '':
@@ -259,7 +260,7 @@ def _message_detail(label, id):
                     if detailed_message.image != '':
 
                         if not draft_logic.delete_previously_attached_image(detailed_message):
-                            abort(404)
+                            abort(500)
 
                     # retrieving newly attached image
                     file = request.files['attach_image']
@@ -268,18 +269,18 @@ def _message_detail(label, id):
                     if msg_logic.validate_file(file):
 
                         if not draft_logic.update_attached_image(detailed_message,file):
-                            abort(404)
+                            abort(500)
 
                     else:
                         # control on filename fails
                         flash('Insert an image with extention: .png , .jpg, .jpeg, .gif')
-                        return redirect('/message/draft/' + str(detailed_message.id))
+                        return redirect('/messages/draft/' + str(detailed_message.id))
 
                 # the draft is sent and its is_sent attribute is set to 1, from now on it's no longer possible to modify it
                 # in order to stop it, it'll be necessary to spend lottery points
                 if form['submit'] == 'Send bottle':
                     if not draft_logic.send_draft(detailed_message):
-                        abort(404)
+                        abort(500)
 
                 return render_template("index.html")
 
@@ -289,7 +290,7 @@ def _message_detail(label, id):
             # checks that message exists
             if label == 'pending':
                 detailed_message = bottlebox_logic.retrieve_pending_message(id)
-            elif label == 'delivered':
+            else:
                 detailed_message = bottlebox_logic.retrieve_delivered_message(id)
 
             if not detailed_message:
@@ -325,7 +326,13 @@ def _message_detail(label, id):
         reportForm = ReportForm(message_id = id)
         hideForm = HideForm(message_id = id)
 
-        return render_template('/message_detail.html', hideForm = hideForm, reportForm = reportForm, message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, recipients = blocked_info, label = label)
+        filter = ContentFilterLogic()
+
+        if filter.filter_enabled(current_user.id):
+            censored_content = filter.check_message_content(detailed_message.content)
+            detailed_message.content = censored_content
+
+        return render_template('message_detail.html', hideForm = hideForm, reportForm = reportForm, message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, recipients = blocked_info, label = label)
 
     else:
         # there is no logged user, redirect to login
