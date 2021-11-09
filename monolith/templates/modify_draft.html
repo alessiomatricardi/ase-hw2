@@ -53,7 +53,7 @@
     <div class="mb-3">
 
       {% if attachment != '' %}
-        <img src="{{url_for('messages.send_file', msg_id = message_id, filename = attachment)}}" width="480" height="270">
+        <img src="{{url_for('messages._show_attachment', msg_id = message_id, filename = attachment)}}" width="480" height="270">
         <label for="{{form.attach_image.name}}" class="form-label">Send another image</label>
       {% else %}
 

@@ -2,6 +2,9 @@ import unittest
 from monolith.bottlebox_logic import BottleBoxLogic, DraftLogic
 from monolith import app
 import datetime
+import shutil
+import os
+from monolith.database import db, Message
 
 class TestDrafts(unittest.TestCase):
 
@@ -184,7 +187,69 @@ class TestDrafts(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         assert b'Hi Barbara' in response.data 
 
-        # create draft with image
+        # Done on 9/11
+        # create draft without image
+        data_send = { 
+            'content' : 'NEW DRAFT' ,
+            'deliver_time' : "2021-12-18T15:45",
+            'recipients': 'prova@mail.com',
+            'attach_image': '',
+            'submit': 'Save draft'
+        }
+
+        response = tested_app.post("/messages/new", data = data_send, content_type='multipart/form-data', follow_redirects=True)
+        assert b'My message in a bottle' in response.data
+        self.assertEqual(200, response.status_code)
+
+        # reopening draft 
+        response = tested_app.get("/messages/draft/14", content_type='html/text', follow_redirects=True)
+        assert b'value="prova@mail.com"' in response.data
+        assert b'NEW DRAFT' in response.data
+        assert b'value="2021-12-18T15:45"' in response.data
+        assert b'Send bottle' in response.data
+        assert b'Save draft changes' in response.data
+        assert b'Delete draft' in response.data
+        self.assertEqual(response.status_code,200)
+
+        # adding test image to draft
+        source_path = os.path.join(os.getcwd(), 'monolith', 'tests')
+        target_path = os.path.join(os.getcwd(), 'monolith', 'static', 'attachments', '14')
+        if not os.path.exists(target_path):
+            try:
+                os.makedirs(target_path)
+            except Exception:
+                return False
+
+        filename = 'test_image.jpg'
+        shutil.copyfile(os.path.join(source_path, filename), os.path.join(target_path, filename))
+        # setting the image field to the proper file
+        with app.app_context():
+            db.session.query(Message).filter(Message.id == 14).update({'image': filename})
+            db.session.commit()
+
+            message =  db.session.query(Message).filter(Message.id == 14).first()
+            self.assertEqual(message.image, filename)
+            self.assertEqual(message.content, 'NEW DRAFT')
+            
+        
+        # delete draft with image
+        data_send = {
+            'content' : 'NEW MODIFIED TEXT' ,
+            'deliver_time' : new_deliver_time,
+            'recipients': 'prova@mail.com',
+            'submit': 'Delete draft'
+        }
+        response = tested_app.post(
+            "/messages/draft/14",
+            data=data_send,
+            content_type='multipart/form-data',
+            follow_redirects=True
+            )
+        self.assertEqual(response.status_code, 200)
+        #assert b'Hi Barbara' in response.data 
+
+
+
 
     def test_draft_logic(self):
         draft_logic = DraftLogic()
