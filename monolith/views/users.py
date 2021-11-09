@@ -84,13 +84,12 @@ def _unregister():
 
             # if the password is correct, the user won't be active anymore
             # the user is not going to be deleted from db because there may be pending messages to be sent from this user
-            if user is not None:
-                password_is_right = check_password_hash(user.password, password)
-                if password_is_right:
-                    user.is_active = False
-                    db.session.commit()
-                    logout_user()
-                    return redirect('/')
+            password_is_right = check_password_hash(user.password, password)
+            if password_is_right:
+                user.is_active = False
+                db.session.commit()
+                logout_user()
+                return redirect('/')
 
         # html template for unregistration confirmation
         return render_template('unregister.html', form=form, user=current_user)
@@ -164,10 +163,11 @@ def _get_profile_photo(user_id):
 
         list_logic = ListLogic()
 
-        # blocked or blocking users can't see this image
-        all_recipients = [ob.id for ob in list_logic.retrieving_recipients(current_user.id)]
-        if user_id not in all_recipients:
-            abort(404)
+        if user_id != current_user.id:
+            # blocked or blocking users can't see this image
+            all_recipients = [ob.id for ob in list_logic.retrieving_recipients(current_user.id)]
+            if user_id not in all_recipients:
+                abort(403)
 
         user_logic = UserLogic()
 

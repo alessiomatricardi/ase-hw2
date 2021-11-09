@@ -9,6 +9,3 @@ from .report import report
 
 blueprints = [home, auth, users, messages, bottlebox, blacklist, calendar, report]
 
-#
-# TODO remember to add the new blueprint in creating a new view
-#

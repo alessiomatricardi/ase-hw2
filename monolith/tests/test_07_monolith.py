@@ -92,6 +92,12 @@ class TestAuthAndReg(unittest.TestCase):
             )
         self.assertEqual(response.status_code, 200)
 
+        # unregister with wrong format (no password provided)
+        data_unregister = {'password': ''}
+        response = app.post("/unregister", data=data_unregister,
+                            content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        assert b"Mario, are you sure you really want to unregister yourself?" in response.data
+
         # unregister with wrong password
         data_unregister = { 'password' : 'xxx' }
         response = app.post("/unregister", data = data_unregister , content_type='application/x-www-form-urlencoded',follow_redirects=True)
