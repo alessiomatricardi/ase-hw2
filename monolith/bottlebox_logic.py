@@ -38,7 +38,7 @@ class BottleBoxLogic:
             
             return msg
         elif type == 2: #received
-            msg = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message_Recipient.recipient_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today).where(Message_Recipient.is_hide == False)
+            msg = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message_Recipient.recipient_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message_Recipient.is_hide == False)
 
             if filter.filter_enabled(user.id):
                 for message in msg:
@@ -46,7 +46,7 @@ class BottleBoxLogic:
                    message.content = censored_content
             return msg
         elif type == 3: #delivered
-            msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today)
+            msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True)
 
             if filter.filter_enabled(user.id):
                 for message in msg:
