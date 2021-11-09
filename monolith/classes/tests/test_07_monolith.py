@@ -5,7 +5,6 @@ from monolith.database import db, User
 
 from monolith import app as tested_app
 
-
 class TestAuthAndReg(unittest.TestCase):
 
     # TODO REMEMBER TO DEFINE SINGLE TESTS METHODS PER EACH FUNCTIONALITY

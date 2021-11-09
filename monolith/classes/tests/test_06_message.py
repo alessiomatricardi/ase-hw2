@@ -1,15 +1,9 @@
-import re
 import unittest
 import datetime
-from unittest import result
-from warnings import resetwarnings
 import os
+import io
 
-#from flask import app 
-from flask.signals import message_flashed
-from monolith import message_logic
-# from flask_wtf.recaptcha.widgets import RECAPTCHA_SCRIPT
-from monolith.database import Message_Recipient, User, db, Message
+from monolith.database import Message_Recipient, db, Message
 from monolith.message_logic import MessageLogic
 from monolith import app as tested_app
 
@@ -77,6 +71,32 @@ class TestMessage(unittest.TestCase):
             expected_result = db.session.query(Message).filter(Message.id == 8).first().is_sent
             self.assertEqual(expected_result, result)
 
+    def test_is_my_message(self):
+        with tested_app.app_context():
+            # verify that user 4 has rights on message 5 (he should NOT have them)
+            result = m.is_my_message(4,5)
+            expected_result = []
+            self.assertEqual(expected_result, result)
+        
+            #  # verify that user 4 has rights on message 6 (he should have them)
+            result = m.is_my_message(4,6)
+            expected_result = db.session.query(Message).filter(Message.id == 6).all()
+            self.assertEqual(expected_result, result)
+
+    def test_control_rights_on_image(self):
+        with tested_app.app_context():
+            # check that the user 4 has rights to see image (even if not present) of message 1
+            # it shouldn't have the privileges, so the check should fail
+            result = m.control_rights_on_image(1, 4)
+            self.assertEqual(False, result)
+
+            # user 4 has sent message 4, so it should have the privileges to see the image
+            result = m.control_rights_on_image(4, 4)
+            self.assertEqual(True, result)
+
+            # user 4 has received message 6, so it should have the privileges to see the image
+            result = m.control_rights_on_image(6, 4)
+            self.assertEqual(True, result)
 
     def test_delete_message(self):
         with tested_app.app_context():
@@ -254,5 +274,75 @@ class TestMessage(unittest.TestCase):
 
         # test that neither a get or post request are done
         response = app.put("/new_message")
-        assert b'The method is not allowed for the requested URL.' in response.data
         self.assertEqual(response.status_code, 405)
+
+        # test that if the /new_message is called by passing the msg_id argument, the new_message.html is rendered
+        # also with a non-empty form.content field
+        response = app.get('/new_message?msg_id=6', content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        expected_result = b'Sent by Carlo Neri' # not all the string has been inserted
+        assert expected_result in response.data 
+
+        
+        # test that if the /new_message is called by passing a wrong msg_id argument, the new_message.html is rendered
+        # with an empty form.content field
+        response = app.get('/new_message?msg_id=4', content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        # assert b'<textarea id="content" name="content" required=""></textarea>' in response.data
+        
+        # file extension not correct
+        dataForm5 = { 
+            'content' : 'Message with an invalid image' ,
+            'deliver_time' : "2021-12-18T15:45",
+            'recipients': 'prova5@mail.com',
+            'attach_image': (io.BytesIO(b"contenuto del file"), 'test.pdf'),
+            'submit': 'Send bottle'
+        }
+
+        response = app.post("/new_message", data = dataForm5, content_type='multipart/form-data', follow_redirects=True)
+        assert b'Insert an image with extention: .png , .jpg, .jpeg, .gif' in response.data 
+
+
+        # message with a valid image
+        dataForm5 = { 
+            'content' : 'Message with a valid image' ,
+            'deliver_time' : "2021-12-18T15:45",
+            'recipients': 'prova5@mail.com',
+            'attach_image': (io.BytesIO(b"contenuto del file"), 'test.jpg'),
+            'submit': 'Send bottle'
+        }
+
+        response = app.post("/new_message", data = dataForm5, content_type='multipart/form-data', follow_redirects=True)
+        assert b'My message in a bottle' in response.data 
+        
+
+        # no image
+        dataForm6 = { 
+            'content' : 'Message with a non-valid image' ,
+            'deliver_time' : "2021-12-18T15:45",
+            'recipients': 'prova5@mail.com',
+            'attach_image': '',
+            'submit': 'Send bottle'
+        }
+
+        response = app.post("/new_message", data = dataForm6, content_type='multipart/form-data', follow_redirects=True)
+        assert b'My message in a bottle' in response.data
+
+
+        # test that a user cannot see an image
+        response = app.get('/show/1/prova.png', content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 403)
+
+
+        # test that a user can see an image
+        response = app.get('/show/12/test.jpg', content_type='html/text', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+
+
+        # test that neither a get or post request are done
+        try:
+            response = app.put("/new_message")
+        except RuntimeError as e:
+            self.assertEqual('This should not happen!', e)
+        self.assertEqual(response.status_code, 405)
+

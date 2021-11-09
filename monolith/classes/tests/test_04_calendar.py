@@ -1,10 +1,7 @@
 import unittest
 from monolith import app as tested_app
 from monolith.calendar_logic import CalendatLogic
-from monolith.database import db
 import json
-
-from sqlalchemy.sql import and_
 
 class TestCalendar(unittest.TestCase):
 

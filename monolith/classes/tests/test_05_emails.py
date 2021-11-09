@@ -1,10 +1,4 @@
 import unittest
-from unittest import result
-from warnings import resetwarnings
-
-from flask.signals import message_flashed
-from flask_wtf.recaptcha.widgets import RECAPTCHA_SCRIPT
-
 from monolith import app
 from monolith.emails import send_email
 

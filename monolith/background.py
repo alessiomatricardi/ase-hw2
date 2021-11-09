@@ -18,19 +18,28 @@ if os.environ.get('DOCKER_IN_USE') is not None:
 else:
     BACKEND = BROKER = 'redis://localhost:6379'
 
-celery = Celery(__name__, backend=BACKEND, broker=BROKER,
-                include=['monolith.tasks.new_message_tasks', 'monolith.message_logic']) # include these files in the tasks of celery
+celery = Celery(__name__, backend=BACKEND, broker=BROKER) # include these files in the tasks of celery
 
 celery.conf.timezone = 'Europe/Rome' # set timezone to Rome # 'UTC'
 
 
 
-# definition of a periodic task that checks if the lottery needs to be performed.
+# 
+# 1st task: definition of a periodic task that checks if the lottery needs to be performed.
 # for simplicity, the lottery is performed on the 15th of every month for each users, independently from the registration date
+# 
+# 2nd task: definition of a periodic task that checks if there are messages that need to be sent to a recipient.
+# it also manage the sending of a notification in case the messages has been sent
+#
 celery.conf.beat_schedule = {
     'lottery_notification': {
         'task': 'lottery_notification',   
-        'schedule':  crontab(0, 0, day_of_month='15') # frequency of execution
+        'schedule':  crontab() #crontab(0, 0, day_of_month='15') # frequency of execution
+    },
+    'deliver_message_and_send_notification': {
+        'task': 'deliver_message_and_send_notification',    # name of the task to execute
+        'schedule': crontab()                               # frequency of execution (every 1 sec)
+                                                            # crontab(0, 0, day_of_month='15') --> execcute on the 15th day of the month
     },
 }
 
@@ -66,16 +75,6 @@ def lottery_notification():
         db.session.commit()
         print("emails sent")
 
-
-# definition of a periodic task that checks if there are messages that need to be sent to a recipient.
-# it also manage the sending of a notification in case the messages has been sent
-celery.conf.beat_schedule = {
-    'deliver_message_and_send_notification': {
-        'task': 'deliver_message_and_send_notification',    # name of the task to execute
-        'schedule': crontab()                               # frequency of execution (every 1 sec)
-                                                            # crontab(0, 0, day_of_month='15') --> execcute on the 15th day of the month
-    },
-}
 
 @celery.task(name="deliver_message_and_send_notification")
 def deliver_message_and_send_notification():
@@ -118,7 +117,9 @@ def deliver_message_and_send_notification():
             db.session.commit()
             return "Messages and corresponding notification sent!"
 
+
 """
+
 _APP = None
 
 @celery.task(name="deliver_message")

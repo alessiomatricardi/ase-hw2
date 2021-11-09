@@ -1,14 +1,8 @@
 import unittest
-from unittest import result
-
-from werkzeug import test
 from monolith.database import db, User
 from monolith.user_logic import UserLogic
 from monolith import app as tested_app
-from monolith.forms import ModifyPersonalDataForm
-from datetime import date, datetime
-
-tested_app.config['WTF_CSRF_ENABLED'] = False
+from datetime import datetime
 
 ul = UserLogic()
 
