@@ -212,7 +212,7 @@ class TestDrafts(unittest.TestCase):
         self.assertEqual(response.status_code,200)
 
         # adding test image to draft
-        source_path = os.path.join(os.getcwd(), 'monolith', 'tests')
+        source_path = os.path.join(os.getcwd(), 'monolith', 'static', 'tests')
         target_path = os.path.join(os.getcwd(), 'monolith', 'static', 'attachments', '14')
         '''if not os.path.exists(target_path):
             try:'''

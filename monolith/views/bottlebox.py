@@ -71,8 +71,6 @@ def _show_delivered():
         
         bottlebox_logic = BottleBoxLogic()
 
-        bottlebox_logic = BottleBoxLogic()
-
         all_users = bottlebox_logic.retrieving_all_users()
         # retrieving all delivered messages(type:3) sent by current_user
         msg = bottlebox_logic.retrieving_messages(current_user.id,3)
@@ -102,7 +100,7 @@ def _show_drafts():
 @bottlebox.route('/messages/<label>/<id>', methods=['GET', 'POST'])
 def _message_detail(label, id):
 
-    # checks if <id> is not a number, otherwise abort
+    # checks if <id> is a number, otherwise abort
     try:
         int(id)
     except:
@@ -128,7 +126,7 @@ def _message_detail(label, id):
 
         # checking the value of the label
         if label == 'received':
-
+            
             detailed_message = bottlebox_logic.retrieve_received_message(id)
 
             # checking that the <id> message exists

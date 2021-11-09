@@ -15,12 +15,13 @@ class BottleBoxLogic:
     def __init__(self):
         pass
 
+    #utility to retriev all the users except for the admin
     def retrieving_all_users(self):
         return db.session.query(User).where(User.is_admin == False)
 
-    # utility to retrieve messages from db: type 1 for pending, type 2 for received, type 3 for delivered, type 4 for drafts
+    # utility to retrieve messages of the user user_id from db: type 1 for pending, type 2 for received, type 3 for delivered, type 4 for drafts
     def  retrieving_messages(self,user_id,type):
-
+        
         user = db.session.query(User).filter(User.id == user_id).first()
         
         filter = ContentFilterLogic()
@@ -40,6 +41,7 @@ class BottleBoxLogic:
         elif type == 2: #received
             msg = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message_Recipient.recipient_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message_Recipient.is_hide == False)
 
+            #if the content filter is active, all the messages will be displayed censored
             if filter.filter_enabled(user.id):
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
@@ -47,7 +49,8 @@ class BottleBoxLogic:
             return msg
         elif type == 3: #delivered
             msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True)
-
+            
+            #if the content filter is active, all the messages will be displayed censored
             if filter.filter_enabled(user.id):
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
@@ -57,6 +60,7 @@ class BottleBoxLogic:
         elif type == 4: #drafts
             msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == False)
 
+            #if the content filter is active, all the messages will be displayed censored
             if user.content_filter_enabled:
                 for message in msg:
                    censored_content = filter.check_message_content(message.content)
@@ -78,19 +82,22 @@ class BottleBoxLogic:
 
         return detailed_message
 
+    #retrieves a pending message
     def retrieve_pending_message(self, id):
         detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True).where(Message.is_delivered == False)# False : pending
         detailed_message = [ob for ob in detailed_message]
 
         return detailed_message
 
+    #retrieves a delivered message        
     def retrieve_delivered_message(self, id):
-        detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == True).where(Message.is_delivered == True) #  True : delivered
+        detailed_message = Message.query.where(Message.id == id).where(
+            Message.is_sent == True).where(Message.is_delivered == True)  # True : delivered
         detailed_message = [ob for ob in detailed_message]
 
         return detailed_message
 
-    def retrieve_recipients(self,id):
+    def retrieve_recipients(self, id):
         recipients_id = db.session.query(Message_Recipient).where(Message_Recipient.id == id)
         recipients_id = [ob.recipient_id for ob in recipients_id]
         recipients = User.query.filter(User.id.in_(recipients_id))
@@ -98,20 +105,25 @@ class BottleBoxLogic:
 
         return recipients
 
+    #utility to understand if the user current_user_id blocked or is blocked by the user other_id
+
     def user_blacklist_status(self, other_id, current_user_id):
-        blacklist_istance = db.session.query(Blacklist).where(or_(
+        blacklist_instance = db.session.query(Blacklist).where(or_(
                                                             and_(Blacklist.blocked_user_id == current_user_id, Blacklist.blocking_user_id == other_id),
                                                             and_(Blacklist.blocked_user_id == other_id, Blacklist.blocking_user_id == current_user_id)
                                                         ))
-        blacklist_istance = [ob for ob in blacklist_istance]
+        blacklist_instance = [ob for ob in blacklist_instance]
 
-        return blacklist_istance
+        return blacklist_instance
 
+
+    #returns firstname and lastname of the user that sent the message detailed_message
     def retrieve_sender_info(self, detailed_message):
         sender = User.query.where(User.id == detailed_message.sender_id)[0]
         
-        return sender.firstname + ' ' + sender.lastname 
-                
+        return sender.firstname + ' ' + sender.lastname
+
+    #set the is_read flag to true in the Message_Recipient table and send an email to the sender of that message to notify that a recipient read it         
     def notify_on_read(self, id, current_user):
         db.session.query(Message_Recipient).where(and_(Message_Recipient.id == id,Message_Recipient.recipient_id == current_user.id)).update({'is_read': True})
         try:
@@ -148,23 +160,25 @@ class DraftLogic:
             if os.path.isfile(myfile):
                 os.remove(myfile)
                 os.rmdir(directory)'''
-
+        #retrieves a draft from its id
         # deleting the draft from database and committing all changes
         db.session.query(Message).where(Message.id == detailed_message.id).delete()
         try:
             db.session.commit()
         except Exception:
-            db.session.rollback()
+            db.session.rollback()            
             return False
 
         return True
 
+    
     def retrieve_draft(self, id):
         detailed_message = Message.query.where(Message.id == id).where(Message.is_sent == False)
         detailed_message = [ob for ob in detailed_message]
-
+    
         return detailed_message
 
+    #retrieves all the recipients of the message id
     def retrieve_current_draft_recipients(self, id):
         recipients_id = db.session.query(Message_Recipient).where(Message_Recipient.id == id)
         recipients_id = [ob.recipient_id for ob in recipients_id]
@@ -173,6 +187,8 @@ class DraftLogic:
 
         return recipients
 
+
+    #to understand if current_user blocked or is blocked by recipient_id
     def recipient_blacklist_status(self, current_user_id, recipient_id):
         blacklist_istance = db.session.query(Blacklist).where(or_(
                                                         and_(Blacklist.blocked_user_id == current_user_id, Blacklist.blocking_user_id == recipient_id),
@@ -182,6 +198,8 @@ class DraftLogic:
 
         return blacklist_istance
 
+
+    #delete a user from the recipients of the message detailed_message_id
     def remove_unavailable_recipient(self, detailed_message_id, recipient_id):
         db.session.query(Message_Recipient).where(and_(Message_Recipient.id == detailed_message_id,Message_Recipient.recipient_id == recipient_id)).delete()
         try:
@@ -214,6 +232,8 @@ class DraftLogic:
 
         return True
 
+
+    #modify the content of a message
     def update_content(self, detailed_message, form):
         db.session.query(Message).where(Message.id == detailed_message.id).update({"content": form['content']})
         try:
@@ -224,6 +244,7 @@ class DraftLogic:
 
         return True
 
+    #modify the deliver_time of a message
     def update_deliver_time(self, detailed_message, form):
         db.session.query(Message).where(Message.id == detailed_message.id).update({"deliver_time": datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M')})
         try:
@@ -248,7 +269,9 @@ class DraftLogic:
         
         return True
 
+
     def update_attached_image(self, detailed_message, file):
+
         # updating the name of attached image inside db
         db.session.query(Message).where(Message.id == detailed_message.id).update({"image": secure_filename(file.filename)})
         
@@ -284,6 +307,7 @@ class DraftLogic:
         
         return True
 
+    #send a message that was previously saved as draft
     def send_draft(self, detailed_message):
         db.session.query(Message).where(Message.id == detailed_message.id).update({"is_sent": 1})
         try:

@@ -173,7 +173,6 @@ def _show_attachment(msg_id, filename):
     if msg_logic.control_rights_on_image(msg_id, current_user.id): 
         return send_from_directory(os.path.join(os.getcwd(),'monolith', 'static', 'attachments',str(msg_id)), filename)
     else:
-        # TODO handle no suorce requested
         abort(403)
 
 
