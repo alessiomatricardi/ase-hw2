@@ -1,11 +1,9 @@
 import datetime
-import os
-import random
 
 from flask import Flask
 
 from monolith.auth import login_manager
-from monolith.database import Message, User, Message_Recipient, db
+from monolith.database import User, db
 from monolith.views import blueprints
 from monolith import errors
 

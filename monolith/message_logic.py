@@ -70,8 +70,15 @@ class MessageLogic:
         # return a void list if the user has no right on message <msg_id>
         # return a list containg the right message if the user has rights on message <msg_id>
         # you can check if the user has right on <msg_id> if the retrieved list is not empty
+
+        messages = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id)\
+                                .where(Message.is_sent == True)\
+                                .where(Message.is_delivered == True)\
+                                .where(Message.deliver_time <= today)\
+                                .where(Message_Recipient.recipient_id == user_id)\
+                                .where(Message.id == msg_id).all()
         
-        return Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message.deliver_time <= today).where(Message_Recipient.recipient_id == user_id).where(Message.id == msg_id).all()
+        return messages
 
     def validate_file(self, file):
         if file and file.filename != '' and file.filename.split('.')[-1] in ['png', 'jpg', 'jpeg', 'gif', 'PNG', 'JPG', 'JPEG', 'GIF']:

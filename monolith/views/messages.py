@@ -38,14 +38,12 @@ def new_message():
 
                 msg = msg_logic.is_my_message(current_user.id, msg_id)
                 if msg: # the list is not empty
-
                     # text builder
-                    sender = db.session.query(User).where(User.id == msg[0].sender_id)[0]
-                    recipient = db.session.query(User).where(User.id == current_user.id)[0]
-                    "Sent by " + sender.firstname + " " + sender.lastname + "\nto " + recipient.firstname + " " + recipient.lastname + "\non " + str(msg[0].deliver_time) + "\n\n\n\"" + msg[0].content + "\"\n"
+                    sender = db.session.query(User).where(User.id == msg[0].sender_id).first()
+                    recipient = db.session.query(User).where(User.id == current_user.id).first()
                     form.content.data = "Sent by " + sender.firstname + " " + sender.lastname + "\nto " + recipient.firstname + " " + recipient.lastname + "\non " + str(msg[0].deliver_time) + "\n\n\n\"" + msg[0].content + "\"\n" # fill the content with the forward message
-                    #####
-
+                    
+                
             #
             # TODO add multiple_recipients in case a draft with more than 1 recipient has been saved
             #      json_var = request.get_json()
@@ -69,51 +67,40 @@ def new_message():
             id = message.id
 
             # validate message content
-            if msg_logic.validate_message_fields(message):
+            msg_logic.validate_message_fields(message)
                 
-                if len(form.getlist('recipients')) == 0: # if no recipients have been selected
-                    #msg = json.dumps({"msg":"Condition failed on page baz"})
-                    #db.session['msg'] = msg
-                    #return redirect(url_for('.do_foo', messages=messages))
-                    flash("Please select at least 1 recipient")
-                    #return redirect(url_for('.new_message'))
-                    return redirect('/new_message') # TODO VEDIAMO COSA SUCCEDE con questo
+            if len(form.getlist('recipients')) == 0: # if no recipients have been selected
+                flash("Please select at least 1 recipient")
+                return redirect('/new_message')
 
-                
+            
 
-                # add message in the db
-                if request.files and request.files['attach_image'].filename != '': # if the user passes it, save a file in a reposistory and set the field message.image to the filename
-                
-                    file = request.files['attach_image']
+            # add message in the db
+            if request.files and request.files['attach_image'].filename != '': # if the user passes it, save a file in a reposistory and set the field message.image to the filename
+                file = request.files['attach_image']
 
-                    if msg_logic.validate_file(file): # proper controls on the given file
-
-                        message.image = secure_filename(file.filename)
-                        id = msg_logic.create_new_message(message)['id']
-
-                        # TODO trycatch
-                        attachments_dir = os.path.join(os.getcwd(),'monolith','static','attachments')
-                        if not os.path.exists(attachments_dir):
-                            os.makedirs(attachments_dir)
-
-
-                        # TODO try catch
-                        os.mkdir(os.path.join(os.getcwd(),'monolith','static','attachments',str(id)))
-
-                        file.save(os.path.join(os.getcwd(),'monolith','static','attachments',str(id),message.image))
-
-                    else:
-                        flash('Insert an image with extention: .png , .jpg, .jpeg, .gif')
-                        return redirect('/new_message')
-
-                else:
-                
+                if msg_logic.validate_file(file): # proper controls on the given file
+                    message.image = secure_filename(file.filename)
                     id = msg_logic.create_new_message(message)['id']
 
-            else:
-                # TODO handle incorrect message fields
-                return render_template('error.html')
+                    # TODO trycatch
+                    attachments_dir = os.path.join(os.getcwd(),'monolith','static','attachments')
+                    if not os.path.exists(attachments_dir):
+                        os.makedirs(attachments_dir)
+
+
+                    # TODO try catch
+                    os.mkdir(os.path.join(os.getcwd(),'monolith','static','attachments',str(id)))
+
+                    file.save(os.path.join(os.getcwd(),'monolith','static','attachments',str(id),message.image))
+
+                else:
+                    flash('Insert an image with extention: .png , .jpg, .jpeg, .gif')
+                    return redirect('/new_message')
             
+            else:
+                id = msg_logic.create_new_message(message)['id']
+
            
             for recipient_email in form.getlist('recipients'): # list of selected recipients emails
                 message_recipient = Message_Recipient()
@@ -176,7 +163,7 @@ def _hide_message():
     else:
         abort(401) #user should login
 
-# utility to show an image, do not change
+# utility to show an image
 @messages.route('/show/<msg_id>/<filename>')
 def send_file(msg_id, filename):
 

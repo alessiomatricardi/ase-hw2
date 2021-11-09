@@ -1,15 +1,9 @@
 import unittest
-
-from werkzeug import test
-from monolith import bottlebox_logic, content_filter_logic
-from monolith import message_logic
-from monolith.bottlebox_logic import BottleBoxLogic, DraftLogic
 from monolith import app
 from monolith.database import Message_Recipient, db, Message, User
 from monolith.message_logic import MessageLogic 
 import datetime
 
-app.config['WTF_CSRF_ENABLED'] = False
 
 class TestContentFilter(unittest.TestCase):
 

@@ -3,8 +3,6 @@ from monolith.bottlebox_logic import BottleBoxLogic
 from monolith import app
 import datetime
 
-app.config['WTF_CSRF_ENABLED'] = False
-
 class TestBottlebox(unittest.TestCase):
 
     def test_bottlebox_users(self):
