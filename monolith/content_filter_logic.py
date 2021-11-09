@@ -28,6 +28,3 @@ class ContentFilterLogic:
     def check_message_content(self, content):
         pf = ProfanityFilter()
         return pf.censor(content)
-        
-    def check_all_past_messages(): 
-        pass

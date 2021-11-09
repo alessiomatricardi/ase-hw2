@@ -48,19 +48,13 @@ def _register():
         if form.validate_on_submit():
             new_user = User()
             form.populate_obj(new_user)
-            """
-            Password should be hashed with some salt. For example if you choose a hash function x, 
-            where x is in [md5, sha1, bcrypt], the hashed_password should be = x(password + s) where
-            s is a secret key.
-            """
-
+            
             # checking if the given email has already been used and aborting if so
             try:
                 check_existing_user(new_user.email)
             except EmailAlreadyUsedError:
                 # this add an error message that will be printed on screen
-                form.email.errors.append(new_user.email + " is not available, \
-                        please register with another email."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    )
+                form.email.errors.append(new_user.email + " is not available, please register with another email.")
                 return render_template('register.html', form=form)
 
             new_user.set_password(form.password.data)
@@ -69,10 +63,10 @@ def _register():
             return redirect('/')
         # validation failed, when the page reloads it will show the specific error message
         return render_template('register.html', form=form)
-    elif request.method == 'GET':
-        return render_template('register.html', form=form)
     else:
-        raise RuntimeError('This should not happen!')
+        return render_template('register.html', form=form)
+    """else:
+        raise RuntimeError('This should not happen!')"""
 
 
 @users.route('/unregister', methods=['GET', 'POST'])
@@ -90,16 +84,13 @@ def _unregister():
 
             # if the password is correct, the user won't be active anymore
             # the user is not going to be deleted from db because there may be pending messages to be sent from this user
-
             if user is not None:
                 password_is_right = check_password_hash(user.password, password)
                 if password_is_right:
-                    # TODO check if it works
                     user.is_active = False
                     db.session.commit()
                     logout_user()
                     return redirect('/')
-                # TODO else: print error message
 
         # html template for unregistration confirmation
         return render_template('unregister.html', form=form, user=current_user)
@@ -110,7 +101,7 @@ def _unregister():
 # retrieve the list of all users
 @users.route('/users', methods=['GET'])
 def _users():
-    # checking if there is a logged user
+    # checking if there is a logged user, otherwise redirect to login
     if current_user is not None and hasattr(current_user, 'id'):
 
         list_logic = ListLogic()
@@ -122,13 +113,12 @@ def _users():
         return render_template("users.html", users=recipients)
 
     else:
-        # there is no logged user, redirect to login
         return redirect('/login')
 
 
 @users.route('/users/<user_id>', methods=['GET'])
 def _user_details(user_id):
-    # checking if there is a logged user
+    # checking if there is a logged user, otherwise redirect to login
     if current_user is not None and hasattr(current_user, 'id'):
 
         # get the user id
@@ -162,6 +152,7 @@ def _user_details(user_id):
 
 @users.route('/users/<user_id>/picture', methods=['GET'])
 def _get_profile_photo(user_id):
+    # checking if there is a logged user, otherwise redirect to login
     if current_user is not None and hasattr(current_user, 'id'):
 
         # get the user id
@@ -169,6 +160,13 @@ def _get_profile_photo(user_id):
         try:
             user_id = int(user_id)
         except:
+            abort(404)
+
+        list_logic = ListLogic()
+
+        # blocked or blocking users can't see this image
+        all_recipients = [ob.id for ob in list_logic.retrieving_recipients(current_user.id)]
+        if user_id not in all_recipients:
             abort(404)
 
         user_logic = UserLogic()
@@ -199,6 +197,7 @@ def _get_profile_photo(user_id):
 # show the account information
 @users.route('/profile', methods=['GET'])
 def _show_profile():
+    # checking if there is a logged user, otherwise redirect to login
     if current_user is not None and hasattr(current_user, 'id'):
 
         content_filter_form = ContentFilterForm(
@@ -214,6 +213,7 @@ def _show_profile():
 
 @users.route('/profile/content_filter', methods=['POST'])
 def _content_filter():
+    # checking if there is a logged user, otherwise redirect to login
     if current_user is not None and hasattr(current_user, 'id'):
 
         form = ContentFilterForm()
@@ -235,19 +235,17 @@ def _content_filter():
 
             return redirect('/profile')
 
-            '''return render_template('user_details.html',
-                                   user=current_user,
-                                   content_filter_form = form)'''
-
         else:
             return redirect('/profile')
 
     else:
-        abort(403) # no one apart of the logged user can do this action
+        return redirect("/login")
 
 
 @users.route('/profile/picture/edit', methods=['GET', 'POST'])
 def _modify_profile_picture():
+
+    # checking if there is a logged user, otherwise redirect to login
     if current_user is not None and hasattr(current_user, 'id'):
 
         if request.method == 'GET':
@@ -255,7 +253,7 @@ def _modify_profile_picture():
 
             return render_template('modify_picture.html', form = form)
 
-        elif request.method == 'POST':
+        else:
             # retrieve the form
             form = ProfilePictureForm()
 
@@ -294,6 +292,7 @@ def _modify_profile_picture():
 
                 return redirect('/profile')
 
+            # if the form is not valid, the modify_picture.html page is rendered again
             else:
                 return render_template('modify_picture.html', form = form)
 
@@ -303,6 +302,7 @@ def _modify_profile_picture():
 
 @users.route('/profile/data/edit', methods=['GET', 'POST'])
 def _modify_personal_data():
+    # checking if there is a logged user, otherwise redirect to login
     if current_user is not None and hasattr(current_user, 'id'):
 
         if request.method == 'GET':
@@ -315,21 +315,21 @@ def _modify_personal_data():
 
             return render_template('modify_personal_data.html', form=form)
         
-        elif request.method == 'POST':
+        else:
 
             user_logic = UserLogic()
 
+            # retrieve data from the form
             form = request.form
 
+            # if user data are correctly modified
             if user_logic.modify_personal_data(current_user.id, form):
                 return redirect('/profile')
-
-            else: # something went wrong in the modification of the personal data
+            
+            # something went wrong in the modification of the personal data
+            else: 
                 flash('Please insert correct data')
                 return redirect('/profile/data/edit')
-        
-        else:
-            raise RuntimeError('This should not happen!')
 
     else:
         return redirect('/login')
@@ -337,14 +337,14 @@ def _modify_personal_data():
 
 @users.route('/profile/password/edit', methods=['GET', 'POST'])
 def _modify_password():
+    # checking if there is a logged user, otherwise redirect to login
     if current_user is not None and hasattr(current_user, 'id'):
         
         if request.method == 'GET':
             form = ModifyPasswordForm()
             return render_template('modify_password.html', form=form)
-
         
-        elif request.method == 'POST':
+        else:
 
             user_logic = UserLogic()
 

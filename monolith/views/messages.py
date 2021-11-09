@@ -7,16 +7,11 @@ from flask.signals import message_flashed, request_finished
 from sqlalchemy.orm import query
 from sqlalchemy.sql.elements import Null
 from werkzeug.utils import secure_filename
-from monolith.message_logic import MessageLogic
+from monolith.message_logic import MessageLogic # it manages the logic of the messages.
 from monolith.database import Message, Message_Recipient, User, db
 from monolith.forms import MessageForm
 from monolith.auth import current_user
 
-
-
-from monolith.message_logic import MessageLogic # gestisce la logica dei messaggi.
-# Ad esempio, la creazione di un nuovo messaggio +
-# richiesta al db + ritorna oggetto json per fare il test
 
 messages = Blueprint('messages', __name__)
 
@@ -27,78 +22,84 @@ def _new_message():
 
         msg_logic = MessageLogic()
 
-        # the user clicks the "new message" in the homepage
+        # the user clicks the "New message in a bottle" in the homepage
         if request.method == 'GET':
             form = MessageForm()
+
+            # retrieve the list of possible recipients
             form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id)
+
             single_recipient = request.args.get('single_recipient') # used to set a checkbox as checked if the recipient is choosen from the recipient list page
+            
             msg_id = request.args.get('msg_id')
             
-            if msg_id: # if a message id has been given as argument
+            if msg_id: # if a msg_id has been given as argument
 
+                # verify that the message with id == msg_id has been received by the currently logged user
+                # if so, the message will exist                
                 msg = msg_logic.is_my_message(current_user.id, msg_id)
+
                 if msg: # the list is not empty
                     # text builder
                     sender = db.session.query(User).where(User.id == msg[0].sender_id).first()
-                    recipient = db.session.query(User).where(User.id == current_user.id).first()
+                    recipient = db.session.query(User).where(User.id == current_user.id).first() 
                     form.content.data = "Sent by " + sender.firstname + " " + sender.lastname + "\nto " + recipient.firstname + " " + recipient.lastname + "\non " + str(msg[0].deliver_time) + "\n\n\n\"" + msg[0].content + "\"\n" # fill the content with the forward message
                     
-                
-            #
-            # TODO add multiple_recipients in case a draft with more than 1 recipient has been saved
-            #      json_var = request.get_json()
-            #      multiple_recipients = json_var['NOME_DELLA_VARIABILE_JSON']
-            #
-            #      pass multiple recipients into render_template
-            #
 
             return render_template('new_message.html', form=form, single_recipient=single_recipient)
 
-        # the user submits the form to create the new message ("Send bottle" option)
         elif request.method == 'POST':
 
             form = request.form
 
-            # take message content from form
+            # take message content from the form
             message = Message()
             message.sender_id = current_user.id
             message.content = form['content']
-            message.deliver_time = datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M') # !!! DO NOT TOUCH !!!
+            message.deliver_time = datetime.datetime.strptime(form['deliver_time'], '%Y-%m-%dT%H:%M')
             id = message.id
 
             # validate message content
             msg_logic.validate_message_fields(message)
                 
-            if len(form.getlist('recipients')) == 0: # if no recipients have been selected
+            # if no recipients have been selected
+            if len(form.getlist('recipients')) == 0: 
                 flash("Please select at least 1 recipient")
                 return redirect('/messages/new')
 
             
+            # verify that an image has been inserted
+            if request.files and request.files['attach_image'].filename != '': 
 
-            # add message in the db
-            if request.files and request.files['attach_image'].filename != '': # if the user passes it, save a file in a reposistory and set the field message.image to the filename
+                # take the image
                 file = request.files['attach_image']
 
-                if msg_logic.validate_file(file): # proper controls on the given file
+                # checks on the given file
+                if msg_logic.validate_file(file): 
                     message.image = secure_filename(file.filename)
+
+                    # create the message also specifying the the filename of the image
                     id = msg_logic.create_new_message(message)['id']
 
-                    # TODO trycatch
+                    # create the directory 'attachments' if it doesn't exist
                     attachments_dir = os.path.join(os.getcwd(),'monolith','static','attachments')
                     if not os.path.exists(attachments_dir):
                         os.makedirs(attachments_dir)
 
-
-                    # TODO try catch
+                    # create a subdirectory of 'attachments' having as name the id of the message
                     os.mkdir(os.path.join(os.getcwd(),'monolith','static','attachments',str(id)))
 
+                    # save the image in the specified path
                     file.save(os.path.join(os.getcwd(),'monolith','static','attachments',str(id),message.image))
 
+                # incorrect file uploaded
                 else:
                     flash('Insert an image with extention: .png , .jpg, .jpeg, .gif')
                     return redirect('/messages/new')
             
-            else:
+            # if no image has been inserted, the message is created without passing the data
+            # of the image and the id of the message is retrieved
+            else: 
                 id = msg_logic.create_new_message(message)['id']
 
            
@@ -126,7 +127,7 @@ def _new_message():
         else:
             raise RuntimeError('This should not happen!')
 
-    else: # user not logged
+    else: # redirect the user to the login page
         return redirect('/login') 
 
 # this route allow a user to hide a message
@@ -161,7 +162,7 @@ def _hide_message():
 
         return redirect('/bottlebox/received')
     else:
-        abort(401) #user should login
+        return redirect('/login') #user should login
 
 # show an image attached on that message
 @messages.route('/messages/<msg_id>/attachments/<filename>')

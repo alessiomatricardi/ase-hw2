@@ -214,11 +214,11 @@ class TestDrafts(unittest.TestCase):
         # adding test image to draft
         source_path = os.path.join(os.getcwd(), 'monolith', 'tests')
         target_path = os.path.join(os.getcwd(), 'monolith', 'static', 'attachments', '14')
-        if not os.path.exists(target_path):
-            try:
-                os.makedirs(target_path)
-            except Exception:
-                return False
+        '''if not os.path.exists(target_path):
+            try:'''
+        os.makedirs(target_path)
+        '''    except Exception:
+                return False'''
 
         filename = 'test_image.jpg'
         shutil.copyfile(os.path.join(source_path, filename), os.path.join(target_path, filename))

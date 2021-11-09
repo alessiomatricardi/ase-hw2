@@ -44,6 +44,7 @@ class MessageLogic:
         return db.session.query(User).filter(User.email == email).first().id
 
 
+    # add in the database a new message recipient
     def create_new_message_recipient(self, message_recipient):
 
         db.session.add(message_recipient)
@@ -52,17 +53,14 @@ class MessageLogic:
         return message_recipient.get_recipient_obj() # TODO json file with fields to test
 
 
+    # set the message as sent in the database
     def send_bottle(self, message):
         db.session.query(Message).filter(Message.id == message.id).update({'is_sent': True})
         db.session.commit()
 
-        #
-        # TODO implement asynchronous sending of message at a given datetime
-        #
-        
         return True # TODO decide the return value depending on tests 
 
-    # utility to chek if a user has the right to forward a message
+    # chek if a user has the right to forward a message
     def is_my_message(self, user_id, msg_id):
 
         today = datetime.datetime.now()
@@ -80,25 +78,26 @@ class MessageLogic:
         
         return messages
 
+    # verify that the file passed from the html page is a picture (png, jpg, jpeg, gif)
     def validate_file(self, file):
         if file and file.filename != '' and file.filename.split('.')[-1] in ['png', 'jpg', 'jpeg', 'gif', 'PNG', 'JPG', 'JPEG', 'GIF']:
             return True
         else:
             return False
 
+    # verify that the user with id == user_id has either received or sent the message with id == msg_id
     def control_rights_on_image(self, msg_id, user_id):
         
         messages_sent = db.session.query(Message).filter(Message.sender_id == user_id).where(Message.id == msg_id).all()
         messages_received = db.session.query(Message_Recipient).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id==msg_id).all()
-        #Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).filter(Message_Recipient.recipient_id == user_id).where(Message_Recipient.id == msg_id).all()
- 
-        '''print(messages_sent)
-        print(messages_received)'''
         
         if messages_sent or messages_received:
             return True
+
         return False
 
+    # checks that a user has enough points to delete a 'pending' message (= a message sent but not delivered) 
+    # and eventually delete it from the database
     def delete_message(self, message_to_delete):
         # check that the user has enough lottery points
         lottery_points = db.session.query(User).filter(User.id == message_to_delete.sender_id).first().lottery_points
