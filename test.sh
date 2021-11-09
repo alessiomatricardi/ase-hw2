@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo 'Actual db will be renamed to old_mmiab.db'
 echo 'Remember to rename it if you want to use'
 mv -f mmiab.db old_mmiab.db || echo 'mmiab.db not exists... continue with tests'

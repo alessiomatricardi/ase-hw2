@@ -177,8 +177,9 @@ def _content_filter():
     else:
         abort(403) # no one apart of the logged user can do this action
 
+
 @users.route('/profile/picture', methods=['GET', 'POST'])
-def _profile_picture():
+def _modify_profile_picture():
     if current_user is not None and hasattr(current_user, 'id'):
 
         if request.method == 'GET':
@@ -202,17 +203,17 @@ def _profile_picture():
 
                     # save image in 256x256
                     img = Image.open(img_data)
-                    img.resize([256, 256], Image.ANTIALIAS)
-                    img.save(
-                        './monolith/static/pictures/' + str(current_user.id) + 
-                        '.jpg', "JPEG")
+                    img = img.convert('RGB') # in order to support also Alpha transparency images such as PNGs
+                    img = img.resize([256, 256], Image.ANTIALIAS)
+                    img.save('./monolith/static/pictures/' + str(current_user.id) +
+                                '.jpeg', "JPEG", quality=100, subsampling=0)
 
                     # save image in 100x100
                     img = Image.open(img_data)
-                    img.resize([100, 100], Image.ANTIALIAS)
-                    img.save(
-                        './monolith/static/pictures/' + str(current_user.id) +
-                        '_100.jpg', "JPEG")
+                    img = img.convert('RGB')  # in order to support also Alpha transparency images such as PNGs
+                    img = img.resize([100, 100], Image.ANTIALIAS)
+                    img.save('./monolith/static/pictures/' + str(current_user.id) +
+                                '_100.jpeg', "JPEG", quality=100, subsampling=0)
 
                     # now the user has a personal profile picture
                     user = User()
@@ -230,8 +231,10 @@ def _profile_picture():
 
     else:
         return redirect('/login')
+
+
 @users.route('/profile/data', methods=['GET', 'POST'])
-def modify_personal_data():
+def _modify_personal_data():
     if current_user is not None and hasattr(current_user, 'id'):
 
         if request.method == 'GET':
@@ -264,7 +267,7 @@ def modify_personal_data():
 
 
 @users.route('/profile/password', methods=['GET', 'POST'])
-def modify_password():
+def _modify_password():
     if current_user is not None and hasattr(current_user, 'id'):
         
         if request.method == 'GET':

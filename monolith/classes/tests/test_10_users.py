@@ -51,7 +51,7 @@ class TestUsers(unittest.TestCase):
 
             # try to correctly change the password of user 5
             result = ul.check_form_password(5, 'prova123', 'prova456', 'prova456')
-            self.assertEqual(4, result)
+            self.assertEqual(0, result)
 
     def test_modify_password(self):
         with tested_app.app_context():

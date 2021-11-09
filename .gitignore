@@ -12,8 +12,8 @@ attachments/*
 monolith/static/pictures/*
 
 ### Default profile pictures should be saved ###
-!monolith/static/pictures/default.jpg
-!monolith/static/pictures/default_100.jpg
+!monolith/static/pictures/default.jpeg
+!monolith/static/pictures/default_100.jpeg
 
 ### Flask ###
 instance/*
