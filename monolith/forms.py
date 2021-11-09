@@ -36,8 +36,8 @@ class MultiCheckboxField(SelectMultipleField):
 class MessageForm(FlaskForm):
     recipients = MultiCheckboxField('Recipients', choices=[]) # TODO write javascript script that set/remove the required attribute from the checkist
     content = f.TextAreaField('Content', validators=[DataRequired()])
-    deliver_time = f.DateTimeField('Delivery time', validators=[DataRequired()], format="%d-%m-%Y, %H:%M")
-
+    deliver_time = f.DateTimeField('Delivery time', validators=[DataRequired()], format="%d-%m-%Y, %H:%M", render_kw={'type': 'datetime-local'})
+    attach_image = FileField()
 
 class UnregisterForm(FlaskForm):
     password = f.PasswordField('Password', validators=[DataRequired()])
@@ -74,14 +74,7 @@ class ModifyPersonalDataForm(FlaskForm):
     display = ['firstname', 'lastname', 'date_of_birth']
 
 class ModifyPasswordForm(FlaskForm):
-    old_password = f.PasswordField('Old password', validators=[
-        DataRequired(),
-        # this allow us to check the password on server-side
-        Length(min = 8, message = 'Password must be at least %(min)d characters'),
-        ],
-        # this add minlength attribute to the <input> rendered, for client-side check
-        render_kw = {'minlength' : '8'}
-        )
+    old_password = f.PasswordField('Old password', validators=[DataRequired()])
     new_password = f.PasswordField('New password', validators=[
         DataRequired(),
         # this allow us to check the password on server-side

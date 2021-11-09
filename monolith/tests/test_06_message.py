@@ -318,7 +318,7 @@ class TestMessage(unittest.TestCase):
 
         # no image
         dataForm6 = { 
-            'content' : 'Message with a non-valid image' ,
+            'content' : 'Message without image' ,
             'deliver_time' : "2021-12-18T15:45",
             'recipients': 'prova5@mail.com',
             'attach_image': '',

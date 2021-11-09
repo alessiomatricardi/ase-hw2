@@ -5,4 +5,17 @@
     {{ field(**kwargs)|safe }}
     <label for="floatingInput">{{ field.label }}</label>
 </div>
-{% endmacro %}ß
+{% endmacro %}
+
+{% macro render_checkbox_field(field) %}
+<div class="form-check">
+    {{ field(**kwargs)|safe }}
+    <label class="form-check-label" for="{{field.id}}">
+        {{ field.data }}
+    </label>
+</div>
+{% endmacro %}
+
+{% macro render_textarea_field(field) %}
+{{ field(**kwargs)|safe }}
+{% endmacro %}

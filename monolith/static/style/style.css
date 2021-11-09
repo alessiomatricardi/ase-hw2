@@ -92,6 +92,83 @@ body {
   border-top-right-radius: 0;
 }
 
+.form-mod-password {
+  width: 100%;
+  max-width: 550px;
+  padding: 15px;
+  margin: auto;
+}
+
+.form-mod-password .form-floating:focus-within {
+  z-index: 2;
+}
+
+.form-mod-password #old_password {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-mod-password #new_password {
+  margin-bottom: -1px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-mod-password #repeat_new_password {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.form-mod-data {
+  width: 100%;
+  max-width: 550px;
+  padding: 15px;
+  margin: auto;
+}
+
+.form-mod-data .form-floating:focus-within {
+  z-index: 2;
+}
+
+.form-mod-data #firstname {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-mod-data #lastname {
+  margin-bottom: -1px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-mod-data #date_of_birth {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.form-message {
+  width: 100%;
+  max-width: 800px;
+  padding: 15px;
+  margin: auto;
+}
+
+.form-message .form-floating:focus-within {
+  z-index: 2;
+}
+
+.form-message #date_of_birth {
+  margin-bottom: 10px;
+}
+
 .error-page {
   background-color: orange;
   color: cornsilk;
