@@ -17,10 +17,13 @@ def report_user():
         except:
             abort(500) # internal server error
 
-        # check if that user is a recipient of that message
-        query = db.session.query(Message_Recipient).where(Message_Recipient.recipient_id == current_user.id).where(Message_Recipient.id == message_id).where(Message_Recipient.is_hide == False).all()
+        # check if current user is a recipient of the message with id == message_id
+        query = db.session.query(Message_Recipient).where(Message_Recipient.recipient_id == current_user.id)\
+                                                   .where(Message_Recipient.id == message_id)\
+                                                   .where(Message_Recipient.is_hide == False).all()
+        
         if not query:
-            abort(403) # that user can't do this action
+            abort(403) # the user can't do this action
         
         report_to_add = Report()
         report_to_add.message_id = message_id
@@ -32,7 +35,6 @@ def report_user():
             db.session.commit()
         except:
             # this message has been already reported by this user
-            # this should not happen but we handle it
             abort(409)
 
         return redirect('/messages/received/' + str(message_id))

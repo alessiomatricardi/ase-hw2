@@ -201,7 +201,8 @@ class TestUsers(unittest.TestCase):
 
         # trying to activate content_filter redirects to login if not already logged
         response = app.post('/profile/content_filter',content_type='html/text',follow_redirects=True)
-        self.assertEqual(response.status_code,403)
+        self.assertEqual(response.status_code,200)
+        assert b'<label for="email">E-mail</label>' in response.data
 
         # trying to get profile image redirects to login if not already logged
         response = app.get('/profile/picture/edit',content_type='html/text',follow_redirects=True)

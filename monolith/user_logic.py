@@ -9,6 +9,7 @@ class UserLogic:
     def __init__(self):
         pass
 
+
     # get that user
     def get_user(self, user_id):
         
@@ -18,7 +19,8 @@ class UserLogic:
 
         return user
 
-    # create a STRING of recipients' emails to be used when sending a message
+
+    # modify the data personal data of a user and return true or false depending on the fact that the update went well or not
     def modify_personal_data(self, user_id, form):
 
         try:
@@ -31,6 +33,7 @@ class UserLogic:
             db.session.rollback()
             return False
     
+
     def check_form_password(self, user_id, old_password, new_password, repeat_new_password):
         
         # retrieve the user from the database
@@ -50,6 +53,7 @@ class UserLogic:
 
         return 0 # no errors
     
+
     def modify_password(self, user_id, new_password):
 
         # retrieve the user from the database

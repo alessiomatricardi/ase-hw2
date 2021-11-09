@@ -24,7 +24,7 @@ def _login():
         if user is None:
             # this add an error message that will be printed on screen
             form.email.errors.append(
-                "Account " + email + " doesn't exists."
+                "Account " + email + " does not exist."
             )
             return render_template('login.html', form=form)
         
@@ -40,7 +40,7 @@ def _login():
             form.email.errors.append(
                 "This account is no longer active."
             )
-        elif not authenticated:
+        else:
             # wrong password
             # this add an error message that will be printed on screen
             form.password.errors.append(

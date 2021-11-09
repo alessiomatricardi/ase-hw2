@@ -7,8 +7,6 @@ from monolith import app as tested_app
 
 class TestAuthAndReg(unittest.TestCase):
 
-    # TODO REMEMBER TO DEFINE SINGLE TESTS METHODS PER EACH FUNCTIONALITY
-
     def test_homepage(self):  
         app = tested_app.test_client()
         
@@ -24,6 +22,12 @@ class TestAuthAndReg(unittest.TestCase):
         # testing that the login fails
         data1 = { 'email' : 'example@example.com' , 'password' : 'admina' } # wrong password
         response = app.post("/login", data = data1 , content_type='html/text')
+        assert b'<label for="email">E-mail</label>' in response.data # returns to the login page
+
+        # testing that the login fails when the user doesn't exist
+        data_wrong = { 'email' : 'zzzzzzzzzzzzzzzzzzzzzzz@example.com' , 'password' : 'zzzzzzzzz' } # wrong password
+        response = app.post("/login", data = data_wrong , content_type='html/text')
+        assert b'Account zzzzzzzzzzzzzzzzzzzzzzz@example.com does not exist.'
         assert b'<label for="email">E-mail</label>' in response.data # returns to the login page
         
         # checking that the login succeeds
@@ -44,7 +48,6 @@ class TestAuthAndReg(unittest.TestCase):
         # checking that the logout succeeds 
         response = app.get("/logout", content_type='html/text', follow_redirects=True)
         assert b'Hi Anonymous' in response.data
-
 
     def test_register(self):
         app = tested_app.test_client()
@@ -89,6 +92,12 @@ class TestAuthAndReg(unittest.TestCase):
             )
         self.assertEqual(response.status_code, 200)
 
+        # unregister with wrong format (no password provided)
+        data_unregister = {'password': ''}
+        response = app.post("/unregister", data=data_unregister,
+                            content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        assert b"Mario, are you sure you really want to unregister yourself?" in response.data
+
         # unregister with wrong password
         data_unregister = { 'password' : 'xxx' }
         response = app.post("/unregister", data = data_unregister , content_type='application/x-www-form-urlencoded',follow_redirects=True)
@@ -106,7 +115,19 @@ class TestAuthAndReg(unittest.TestCase):
             user = row[0]
             self.assertEqual(user.is_active,False)
 
+            # trying to login with unregistered Mario 
+            data_login = { 'email' : 'prova3@mail.com' , 'password' : 'prova123' } 
+            response = app.post(
+            "/login", 
+            data = data_login , 
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+            )
+            assert b'This account is no longer active.'in response.data
+            assert b'<label for="email">E-mail</label>' in response.data
+
             # deleting the test account
             db.session.query(User).where(User.id==6).delete()
             db.session.commit()
 
+        

@@ -28,7 +28,7 @@
     <p>{{message.content}}</p>
 
     {% if message.image != '' %}
-      <p><img src = "{{url_for('messages.send_file', msg_id = message.id, filename = message.image)}}" width="480" height="270"></p>
+      <p><img src = "{{url_for('messages._show_attachment', msg_id = message.id, filename = message.image)}}" width="480" height="270"></p>
     {% endif %}
   </li>
     
@@ -47,7 +47,7 @@
 
   <form action="/hide" method="POST">
     {{ hideForm.hidden_tag() }}
-    <input type="submit" value="Hide this message">
+    <input type="submit" value="Delete">
   </form>
 
   

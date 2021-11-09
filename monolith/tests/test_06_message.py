@@ -55,7 +55,6 @@ class TestMessage(unittest.TestCase):
         with tested_app.app_context():
             message_recipient = Message_Recipient()
             message_recipient.id = 8 # create recipients for the previously insterted message
-            # message_recipient.read_time = datetime.datetime(2020, 10, 6) # TODO it should be better to set a null vallue, but if done an error occurr
             message_recipient.recipient_id = 2
             result = m.create_new_message_recipient(message_recipient)
             expected_result = db.session.query(Message_Recipient).filter(Message_Recipient.id == 8).first()
@@ -175,15 +174,6 @@ class TestMessage(unittest.TestCase):
             expected_result = False # this time user 5 will not have enough points to delete the message
             self.assertEqual(expected_result, result)
 
-
-
-
-    #
-    # 
-    # TODO test the update of is_delivered attribute
-    # TODO test the sending of emails
-    #
-    #
 
     def test_rendering(self):
         app = tested_app.test_client()
@@ -340,9 +330,6 @@ class TestMessage(unittest.TestCase):
 
 
         # test that neither a get or post request are done
-        try:
-            response = app.put("/messages/new")
-        except RuntimeError as e:
-            self.assertEqual('This should not happen!', e)
+        response = app.put("/messages/new")
         self.assertEqual(response.status_code, 405)
 

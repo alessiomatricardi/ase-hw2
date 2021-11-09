@@ -173,8 +173,3 @@ class TestPopulateDB(unittest.TestCase):
             db.session.add(message_recipient)
        
             db.session.commit()
-
-            # TODO create default reports
-            # TODO create default blacklists
-
-            #assert b'Ciao' in 'Ciao'
