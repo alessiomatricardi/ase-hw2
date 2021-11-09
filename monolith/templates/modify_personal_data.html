@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<main class="form-register text-center">
+<main class="form-mod-data text-center">
   <form action="" method="POST">
 
     {{ form.hidden_tag() }}
@@ -16,7 +16,6 @@
 
     {% endwith %}
 
-    <img class="mb-4" src="TODO LOGO" alt="" width="72" height="57">
     <h1 class="h3 mb-3 fw-normal">Modify your personal data</h1>
 
     {# print errors, if occours #}
@@ -31,21 +30,10 @@
     {% endfor %}
 
     {% for field in form.display %}
-      {% if field != 'date_of_birth' %}
-        {{ render_form_field(form[field], class="form-control", placeholder="nothing") }}
-      {% elif date_of_birth %}
-        <div class="form-floating">
-            <input class="form-control" id="date_of_birth" name="date_of_birth" placeholder="nothing" type="date" value={{date_of_birth}}>
-            <label for="floatingInput"><label for="date_of_birth">Date of birth</label></label>
-        </div>
-      {% else %}
-        {{ render_form_field(form[field], class="form-control", placeholder="nothing") }}
-      {% endif %}
+      {{ render_form_field(form[field], class="form-control", placeholder="nothing") }}
     {% endfor %}
 
     <button class="w-100 btn btn-lg btn-warning" type="submit">Modify data</button>
-
-    <p class="mt-5 mb-3 text-muted">© 2021, ASE - Squad 4</p>
   </form>
 </main>
 

@@ -311,8 +311,9 @@ def _modify_personal_data():
             # populate the form with the existing data of the user
             form.firstname.data = current_user.firstname
             form.lastname.data = current_user.lastname
+            form.date_of_birth.data = current_user.date_of_birth
 
-            return render_template('modify_personal_data.html', form=form, date_of_birth=current_user.date_of_birth)
+            return render_template('modify_personal_data.html', form=form)
         
         elif request.method == 'POST':
 

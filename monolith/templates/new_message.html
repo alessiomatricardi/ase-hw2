@@ -1,50 +1,72 @@
 {% extends "layout.html" %}
+{% from "macros.html" import render_checkbox_field, render_form_field, render_textarea_field %}
 
-{% block title %}New message{% endblock %}
+{% block title %}Write a new message{% endblock %}
 
 {% block content %}
 
-<h1>New message</h1>
-<form method="post" enctype="multipart/form-data">
+<h1>Write a new message</h1>
+
+<main class="form-message">
+  <form method="POST" action="" enctype="multipart/form-data">
+
+    {{ form.hidden_tag() }}
+
     {% with msg = get_flashed_messages() %}
       {% if msg %}
           <p>{{ msg[0] }}</p>
       {% endif %}
 
     {% endwith %}
-    <!-- c'era un hidden tag da qualche parte dove-->
-    <p> Select one or more recipients:</p>
-    <ul>
+
+    <div class="mb-3">
+      <label for="{{form.recipients.name}}" class="form-label">Select one or more recipients</label>
+
       {% for checkbox in form.recipients %}
-      <li>
         {% if checkbox.data == single_recipient %}
-          <input type="checkbox" name="recipients" value={{checkbox.data}} checked>
+          {{ render_checkbox_field(checkbox, class="form-check-input", checked="") }}
         {% else %}
-            {{ checkbox }}
+          {{ render_checkbox_field(checkbox, class="form-check-input") }}
         {% endif %}
-        {{ checkbox.data }}
-      </li>
       {% endfor %}
-    </ul>
-    <p> Insert the text of the message:</p>
-    {{ form.content }}
-    <p>
-      <label for="deliver_time">Deliver time</label>
-      <input type="datetime-local" id="deliver_time" name="deliver_time">
-    </p>
-    <p>
-      <label for="attach_image">Send an image!</label>
-      <input type="file" id="attach_image" name="attach_image">
-    </p>
-    <p>
-      <input type="submit" name="submit" value="Send bottle"></input>
-    </p>
-    <p>
-      <input type="submit" name="submit" value="Save draft"></input>
-    </p>
-</form>
-<form method="get" action="/">
-  <input type="submit" value="Back"></input>
-</form>
+
+    </div>
+    
+    <div class="mb-3">
+      <label for="{{form.content.name}}" class="form-label">Insert the text of the message</label>
+    
+      <div class="input-group">
+        <span class="input-group-text">Message content</span>
+        {{ render_textarea_field(form.content, class="form-control") }}
+      </div>
+    
+    </div>
+
+    <div class="mb-3">
+      <label for="{{form.deliver_time.name}}" class="form-label">Deliver time</label>
+    
+      {{ render_form_field(form.deliver_time, class="form-control") }}
+    
+    </div>
+
+    <div class="mb-3">
+      <label for="{{form.attach_image.name}}" class="form-label">Send an image!</label>
+    
+      {{ render_form_field(form.attach_image, class="form-control") }}
+    
+    </div>
+
+    <div class="mt-3 mb-3">
+      <input class="w-100 btn btn-lg btn-primary" type="submit" name="submit" value="Send bottle"></input>
+    </div>
+
+    <div class="mt-3 mb-3">
+      <input class="w-100 btn btn-lg btn-success" type="submit" name="submit" value="Save draft"></input>
+    </div>
+
+  </form>
+  <a href="/" class="btn btn-warning">Back</a>  
+</main>
+
   
 {% endblock %}

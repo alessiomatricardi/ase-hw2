@@ -19,10 +19,11 @@
       {% endfor %}
     </div>
     <div class="card-header">
+      To:
       {% for recipient in msg.recipients: %}
         {% for user in users: %}
           {% if user.id == recipient.recipient_id %}
-            To: {{user.firstname}} {{user.lastname}} ({{user.email}})
+            {{user.firstname}} {{user.lastname}} ({{user.email}}),
           {% endif %}
         {% endfor %}
       {% endfor %}
