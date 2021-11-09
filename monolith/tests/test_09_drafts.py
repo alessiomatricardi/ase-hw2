@@ -44,8 +44,8 @@ class TestDrafts(unittest.TestCase):
 
         # accessing to a owned draft
         response = tested_app.get("/messages/draft/10", content_type='html/text', follow_redirects=True)
-        assert b'<input type="checkbox" name="recipients" value=prova@mail.com checked>' in response.data
-        assert b'<textarea id="content" name="content"  required = "">ININFLUENT FOR THE TEST</textarea>' in response.data
+        assert b'value="prova@mail.com"' in response.data
+        assert b'ININFLUENT FOR THE TEST' in response.data
         assert b'Send bottle' in response.data
         assert b'Save draft changes' in response.data
         assert b'Delete draft' in response.data
@@ -99,9 +99,9 @@ class TestDrafts(unittest.TestCase):
 
         # reopening draft to check changes
         response = tested_app.get("/messages/draft/10", content_type='html/text', follow_redirects=True)
-        assert b'<input type="checkbox" name="recipients" value=prova2@mail.com checked>' in response.data
-        assert b'<textarea id="content" name="content"  required = "">NEW MODIFIED TEXT</textarea>' in response.data
-        assert b'<input type="datetime-local" id="deliver_time" name="deliver_time" value = "2025-04-24T17:16">' in response.data
+        assert b'value="prova2@mail.com"' in response.data
+        assert b'NEW MODIFIED TEXT' in response.data
+        assert b'value="2025-04-24T17:16"' in response.data
         assert b'Send bottle' in response.data
         assert b'Save draft changes' in response.data
         assert b'Delete draft' in response.data
