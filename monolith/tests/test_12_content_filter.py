@@ -37,7 +37,7 @@ class TestContentFilter(unittest.TestCase):
             message = msg_logic.create_new_message(message)
 
             message_recipient = Message_Recipient()
-            message_recipient.id = 12 # create recipients for the previously insterted message
+            message_recipient.id = 14 # create recipients for the previously insterted message
             message_recipient.recipient_id = 2
 
             # send message_rec in db 
@@ -56,12 +56,14 @@ class TestContentFilter(unittest.TestCase):
             
             response = tested_app.get('/bottlebox/pending', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
+            assert b'I like *****' in response.data
 
-            response = tested_app.get('/messages/pending/12', content_type = 'html/text', follow_redirects = True)
+            response = tested_app.get('/messages/pending/14', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
+            assert b'I like *****' in response.data
 
             # deliver bad message
-            db.session.query(Message).filter(Message.id == 12).update({'is_delivered': True})
+            db.session.query(Message).filter(Message.id == 14).update({'is_delivered': 1})
             db.session.commit()
 
             
@@ -70,9 +72,12 @@ class TestContentFilter(unittest.TestCase):
 
             response = tested_app.get('/bottlebox/delivered', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
+            #print(response.data)
+            assert b'I like *****' in response.data
             
-            response = tested_app.get('/messages/delivered/12', content_type = 'html/text', follow_redirects = True)
+            response = tested_app.get('/messages/delivered/14', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
+            assert b'I like *****' in response.data
 
         
 
@@ -101,6 +106,6 @@ class TestContentFilter(unittest.TestCase):
             response = tested_app.get('/bottlebox/received', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
             
-            response = tested_app.get('/messages/received/12', content_type = 'html/text', follow_redirects = True)
+            response = tested_app.get('/messages/received/14', content_type = 'html/text', follow_redirects = True)
             assert b'I like boobs' not in response.data
         
