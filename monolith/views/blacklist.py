@@ -18,7 +18,7 @@ blacklist_logic = BlacklistLogic()
 @blacklist.route('/blacklist',methods=['GET'])
 def _retrieve_blacklist():
 
-    # checking if there is a logged user
+    # checking if there is a logged user, is so retrieve and render his blacklist
     if current_user is not None and hasattr(current_user, 'id'):
         blacklist = blacklist_logic.retrieving_blacklist(current_user.id)
         users = list_logic.retrieving_users(current_user.id)

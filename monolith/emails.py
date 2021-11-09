@@ -6,10 +6,11 @@ from flask.signals import _FakeSignal
 port = 587  # For starttls
 smtp_server = "smtp.gmail.com"
 
+# email and password of a Gmail account used to send emails
 sender_email = "squad04ase@gmail.com"
 password = "Squad-04-ASE"
 
-
+# function used to send emails
 def send_email(recipient, msg):
     # Try to log in to server and send email
     try:

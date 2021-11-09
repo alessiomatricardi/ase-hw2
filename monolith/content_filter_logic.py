@@ -5,6 +5,7 @@ from monolith.database import db, User
 
 from flask_login import current_user
 
+pf = ProfanityFilter(languages=['en'])
 
 class ContentFilterLogic:
 
@@ -26,5 +27,5 @@ class ContentFilterLogic:
         return
 
     def check_message_content(self, content):
-        pf = ProfanityFilter()
+        
         return pf.censor(content)
