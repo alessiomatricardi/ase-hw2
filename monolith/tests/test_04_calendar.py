@@ -34,10 +34,10 @@ class TestCalendar(unittest.TestCase):
         response = app.get("/calendar", content_type='html/text', follow_redirects=True)
         assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
 
-        response = app.get("/calendar/sent_messages", content_type='html/text', follow_redirects=True)
+        response = app.get("/calendar/sent", content_type='html/text', follow_redirects=True)
         assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
         
-        response = app.get("/calendar/received_messages", content_type='html/text', follow_redirects=True)
+        response = app.get("/calendar/received", content_type='html/text', follow_redirects=True)
         assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
 
         # do the login otherwise the calendar cannot be rendered
@@ -57,8 +57,8 @@ class TestCalendar(unittest.TestCase):
 
         # test that the calendar.html page is correctly rendered when either "Calendar of sent messages"
         # or "Calendar of received messages" button is clicked on the which_calendar.html page
-        response = app.get("/calendar/sent_messages", content_type='html/text', follow_redirects=True)
+        response = app.get("/calendar/sent", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
 
-        response = app.get("/calendar/received_messages", content_type='html/text', follow_redirects=True)
+        response = app.get("/calendar/received", content_type='html/text', follow_redirects=True)
         self.assertEqual(response.status_code, 200)

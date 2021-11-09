@@ -9,6 +9,15 @@ class UserLogic:
     def __init__(self):
         pass
 
+    # get that user
+    def get_user(self, user_id):
+        
+        user = User()
+
+        user = db.session.query(User).filter(User.id == user_id).first()
+
+        return user
+
     # create a STRING of recipients' emails to be used when sending a message
     def modify_personal_data(self, user_id, form):
 

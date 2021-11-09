@@ -67,10 +67,10 @@ class TestUsers(unittest.TestCase):
         response = app.get("/profile", content_type='html/text', follow_redirects=True)
         assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
 
-        response = app.get("/profile/data", content_type='html/text', follow_redirects=True)
+        response = app.get("/profile/data/edit", content_type='html/text', follow_redirects=True)
         assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
         
-        response = app.get("/profile/password", content_type='html/text', follow_redirects=True)
+        response = app.get("/profile/password/edit", content_type='html/text', follow_redirects=True)
         assert b'<h1 class="h3 mb-3 fw-normal">Please sign in</h1>' in response.data
 
         # do the login otherwise the sending of a new message can't take place
@@ -84,7 +84,7 @@ class TestUsers(unittest.TestCase):
         assert b'Hi Francesco' in response.data
         
         # test that the rendered page is a form containing the personal data of the user 5
-        response = app.get("/profile/data", content_type='html/text', follow_redirects=True)
+        response = app.get("/profile/data/edit", content_type='html/text', follow_redirects=True)
         self.assertEqual(200, response.status_code)
         assert b'Francesco' in response.data
         assert b'Viola' in response.data
@@ -96,7 +96,7 @@ class TestUsers(unittest.TestCase):
             'lastname': 'Viola',
             'date_of_birth': '1976-09-20'
         }
-        response = app.post('/profile/data', data=form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = app.post('/profile/data/edit', data=form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
         self.assertEqual(200, response.status_code)
         assert b'Ferdinando' in response.data
         assert b'Viola' in response.data
@@ -108,13 +108,13 @@ class TestUsers(unittest.TestCase):
             'lastname': 'Viola',
             'date_of_birth': 'INVALID_DATE'
         }
-        response = app.post('/profile/data', data=form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = app.post('/profile/data/edit', data=form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
         self.assertEqual(200, response.status_code)
         assert b'Please insert correct data' in response.data
 
 
         # test that the rendered page is the form for the modificaton of the password
-        response = app.get("/profile/data", content_type='html/text', follow_redirects=True)
+        response = app.get("/profile/data/edit", content_type='html/text', follow_redirects=True)
         self.assertEqual(200, response.status_code)
         
         # test that, if the old password is the same of the one stored in the database, an error message is displayed
@@ -124,7 +124,7 @@ class TestUsers(unittest.TestCase):
             'repeat_new_password': 'ININFLUENT FOR TEST'
         }
         # note that the old_password prova123 is not correct because it has been changed in the test_modify_password()
-        response = app.post("/profile/password", data=form,content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = app.post("/profile/password/edit", data=form,content_type='application/x-www-form-urlencoded', follow_redirects=True)
         assert b'<p>The old password you inserted is incorrect. Please insert the correct one.</p>' in response.data
 
         # test that, if the old and new password are the same, an error message is displayed
@@ -134,7 +134,7 @@ class TestUsers(unittest.TestCase):
             'repeat_new_password': 'ININFLUENT FOR TEST'
         }
         # note that the old_password prova123 is not correct because it has been changed in the test_modify_password()
-        response = app.post("/profile/password", data=form,content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = app.post("/profile/password/edit", data=form,content_type='application/x-www-form-urlencoded', follow_redirects=True)
         assert b'Please insert a password different from the old one.' in response.data
 
         # test that, if the new password and the repeated new password are not equal, an error message is displayed
@@ -144,7 +144,7 @@ class TestUsers(unittest.TestCase):
             'repeat_new_password': 'prova789'
         }
         # note that the old_password prova123 is not correct because it has been changed in the test_modify_password()
-        response = app.post("/profile/password", data = form ,content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = app.post("/profile/password/edit", data = form ,content_type='application/x-www-form-urlencoded', follow_redirects=True)
         assert b'The new password and its repetition must be equal.' in response.data
 
         # test that the password is correctly modified, so the rendered page is user_details.html
@@ -154,7 +154,7 @@ class TestUsers(unittest.TestCase):
             'repeat_new_password': 'prova123'
         }
         # note that the old_password prova123 is not correct because it has been changed in the test_modify_password()
-        response = app.post("/profile/password", data = form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = app.post("/profile/password/edit", data = form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
         assert b'Ferdinando' in response.data
         assert b'prova5@mail.com' in response.data
         assert b'Update' in response.data
@@ -204,7 +204,7 @@ class TestUsers(unittest.TestCase):
         self.assertEqual(response.status_code,403)
 
         # trying to get profile image redirects to login if not already logged
-        response = app.get('/profile/picture',content_type='html/text',follow_redirects=True)
+        response = app.get('/profile/picture/edit',content_type='html/text',follow_redirects=True)
         assert b'<label for="email">E-mail</label>' in response.data
 
         #login

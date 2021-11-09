@@ -20,8 +20,8 @@ from monolith.message_logic import MessageLogic # gestisce la logica dei messagg
 
 messages = Blueprint('messages', __name__)
 
-@messages.route('/new_message', methods=['POST', 'GET'])
-def new_message():
+@messages.route('/messages/new', methods=['POST', 'GET'])
+def _new_message():
     # verify that the user is logged in
     if current_user is not None and hasattr(current_user, 'id'):
 
@@ -71,7 +71,7 @@ def new_message():
                 
             if len(form.getlist('recipients')) == 0: # if no recipients have been selected
                 flash("Please select at least 1 recipient")
-                return redirect('/new_message')
+                return redirect('/messages/new')
 
             
 
@@ -96,7 +96,7 @@ def new_message():
 
                 else:
                     flash('Insert an image with extention: .png , .jpg, .jpeg, .gif')
-                    return redirect('/new_message')
+                    return redirect('/messages/new')
             
             else:
                 id = msg_logic.create_new_message(message)['id']
@@ -163,9 +163,9 @@ def _hide_message():
     else:
         abort(401) #user should login
 
-# utility to show an image
-@messages.route('/show/<msg_id>/<filename>')
-def send_file(msg_id, filename):
+# show an image attached on that message
+@messages.route('/messages/<msg_id>/attachments/<filename>')
+def _show_attachment(msg_id, filename):
 
     msg_logic = MessageLogic()
 
@@ -176,8 +176,9 @@ def send_file(msg_id, filename):
         abort(403)
 
 
-@messages.route('/delete_message/<id>', methods=['GET'])
-def delete_message(id):
+# sender who deletes a message not delivered
+@messages.route('/messages/<id>/remove', methods=['GET'])
+def _delete_message(id):
 
     # verify that the user is logged in
     if current_user is not None and hasattr(current_user, 'id'):
@@ -199,7 +200,7 @@ def delete_message(id):
 
         if not msg_logic.delete_message(message_to_delete):
             flash("Not enough points to delete a message")
-            return redirect(f'/message/pending/{id}')
+            return redirect(f'/messages/pending/{id}')
 
         return render_template("index.html")  
     
