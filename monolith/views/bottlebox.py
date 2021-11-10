@@ -3,7 +3,7 @@ from celery.utils.functional import first
 from flask import Blueprint, redirect, render_template, request, abort
 from flask.globals import current_app
 from sqlalchemy.sql.elements import Null
-from monolith.database import User, db, Blacklist, Message, Message_Recipient
+from monolith.database import Report, User, db, Blacklist, Message, Message_Recipient
 from monolith.forms import HideForm, ReportForm, MessageForm
 from flask_login import current_user
 from monolith.bottlebox_logic import BottleBoxLogic, DraftLogic
@@ -102,12 +102,12 @@ def _message_detail(label, id):
 
     # checks if <id> is a number, otherwise abort
     try:
-        int(id)
+        id = int(id)
     except:
         abort(404)
 
     # checks the correctness of label variable
-    if label != 'received' and label != 'delivered' and label != 'pending' and label != 'draft':
+    if label not in ['received', 'delivered', 'pending', 'draft']:
         abort(404)
 
     # POST method is only allowed for drafts, being possible to modify or send them
@@ -167,6 +167,7 @@ def _message_detail(label, id):
             # rendering the draft detail
             if request.method == 'GET':
                 form = MessageForm()
+
                 form.recipients.choices = msg_logic.get_list_of_recipients_email(current_user.id)
 
                 # retrieving the message, if exists
@@ -190,8 +191,10 @@ def _message_detail(label, id):
                 for recipient in recipients:
                     blacklist_istance = draft_logic.recipient_blacklist_status(current_user.id,recipient.id)
                     if len(blacklist_istance) > 0 or not recipient.is_active:
+                        
                         # the user is no longer available to receive messages from current_user either being inactive or being blocked/blocking
                         flash("The user " + str(recipient.email) + " is no longer avaiable")
+                        
                         if not draft_logic.remove_unavailable_recipient(detailed_message.id,recipient.id):
                             abort(500)
                     else:
@@ -201,11 +204,14 @@ def _message_detail(label, id):
                 # defining format of datetime in order to insert it in html form
                 deliver_time = detailed_message.deliver_time.strftime("%Y-%m-%dT%H:%M")
 
+                form.content.data = detailed_message.content
+
                 # returning the draft html page
-                return render_template("modify_draft.html", form = form, recipients_emails = recipients_emails, content = detailed_message.content, deliver_time = deliver_time, attachment = detailed_message.image, message_id = detailed_message.id)
+                return render_template("modify_draft.html", form = form, recipients_emails = recipients_emails, deliver_time = deliver_time, attachment = detailed_message.image, message_id = detailed_message.id)
 
             # else = Drafts POST method: deleting draft or submitting modification/send request
-            else:
+            elif request.method == 'POST':
+
                 form = request.form
 
                 # retrieving the draft to send, modifiy or delete it
@@ -330,7 +336,11 @@ def _message_detail(label, id):
             censored_content = filter.check_message_content(detailed_message.content)
             detailed_message.content = censored_content
 
-        return render_template('message_detail.html', hideForm = hideForm, reportForm = reportForm, message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, recipients = blocked_info, label = label)
+        # has the user already reported this message?
+        query = db.session.query(Report).filter(Report.message_id == detailed_message.id, Report.reporting_user_id == current_user.id).first()
+        reported = query is not None
+
+        return render_template('message_detail.html', hideForm = hideForm, reportForm = reportForm, message = detailed_message, sender_name = sender_name, sender_email = sender.email, blocked = blocked, recipients = blocked_info, label = label, reported = reported)
 
     else:
         # there is no logged user, redirect to login

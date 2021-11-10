@@ -4,60 +4,79 @@
 
 {% block content %}
 
+<h1>Message details</h1>
+
+{# print errors, if occours #}
 {% with msg = get_flashed_messages() %}
   {% if msg %}
-      <p>{{ msg[0] }}</p>
+    <div class="alert alert-danger" role="alert">
+      {{ msg[0] }}
+    </div>
   {% endif %}
 {% endwith %}
 
-{% if label == 'received' %}
-<h1>Message from</h1>
-<h5>{{sender_name}}</h5>
-{% else %}
-<h1>Message to</h1>
-<h5>
-  {% for user in recipients: %}
-    {{user[0].firstname}} {{user[0].lastname}} 
-  {% endfor %}
-</h5>
-
-{% endif %}
-<ul>
-  <li>
-    <p>Deliver time: {{message.deliver_time}}</p>
-    <p>{{message.content}}</p>
-
-    {% if message.image != '' %}
-      <p><img src = "{{url_for('messages._show_attachment', msg_id = message.id, filename = message.image)}}" width="480" height="270"></p>
+<div class="card" style="margin-bottom: 10px;">
+  <div class="card-header">
+    Deliver time: {{message.deliver_time.strftime('%d/%m/%Y at %H:%M')}}
+  </div>
+  <div class="card-header">
+    From: {{sender_name}} ({{sender_email}})
+  </div>
+  <div class="card-header">
+    To:
+    {% if label == 'received' %}
+      {{current_user.firstname}} {{current_user.lastname}} ({{current_user.email}})
+    {% else %}
+      {% for user in recipients: %}
+        {{user[0].firstname}} {{user[0].lastname}} ({{user[0].email}}),
+      {% endfor %}
     {% endif %}
-  </li>
+  </div>
+  <div class="card-body">
+    <p class="card-text">{{message.content}}</p>
+    {% if message.image != '' %}
+      <img src="messages/{{message.id}}/attachments/{{message.image}}" class="img-fluid rounded">
+    {% endif %}
+
+    {% if label == 'received' %}
+
+      <div class="btn-group" role="group" aria-label="commands">
+        <a href='/messages/new?msg_id={{message.id}}' id="forwardButton" class="btn btn-primary">Forward</a>
+        
+        {% if not blocked %}
+          <a href='/messages/new?single_recipient={{sender_email}}' id="replyButton" class="btn btn-primary">Reply</a>
+        {% endif %}
+        
+      </div>
+
+      <div class="mt-3 mb-3">
+        {% if not reported %}
+          <form action="/report" method="POST">
+            {{ reportForm.hidden_tag() }}
+            <button type="submit" class="btn btn-warning">Report this sender</button>
+          </form>
+        {% else %}
+          <button disabled class="btn btn-warning">Reported</button>
+        {% endif %}
+        
+      </div>
+
+      <div class="mt-3 mb-3">
+        <form action="/hide" method="POST">
+          {{ hideForm.hidden_tag() }}
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
     
-</ul>
-{% if label == 'received' %}
+    {% endif %}
 
-  <button onclick="location.href = '/messages/new?msg_id={{message.id}}';" id="forwardButton" class="float-left submit-button" >Forward</button>
-  {% if blocked == False %} <!-- va messo fuori -->
-  <button onclick="location.href = '/messages/new?single_recipient={{sender_email}}';" id="replyButton" class="float-left submit-button">Reply</button>
-  {% endif %}
+    {% if label == 'pending' %}
+      <a href='/messages/{{message.id}}/remove' id="deleteMessage" class="btn btn-danger">Delete message</a>
+    {% endif %}
 
-  <form action="/report" method="POST">
-    {{ reportForm.hidden_tag() }}
-    <input type="submit" value="Report this sender">
-  </form>
+  </div>
+</div>
 
-  <form action="/hide" method="POST">
-    {{ hideForm.hidden_tag() }}
-    <input type="submit" value="Delete">
-  </form>
-
-  
-{% endif %} 
-
-{% if label == 'pending' %}
-  <button onclick="location.href = '/messages/{{message.id}}/remove';" id="deleteMessage" class="float-left submit-button" >Delete message</button>
-{% endif %} 
-
-
-<button onclick="location.href = '/bottlebox?value=Received';" id="backButton" class="float-left submit-button" >Home</button>
+<a href='/bottlebox' id="backButton" class="btn btn-success">Back</a>
  
 {% endblock %}

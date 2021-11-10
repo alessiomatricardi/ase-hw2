@@ -248,22 +248,29 @@ def _modify_profile_picture():
     # checking if there is a logged user, otherwise redirect to login
     if current_user is not None and hasattr(current_user, 'id'):
 
+        form = ProfilePictureForm()
+
         if request.method == 'GET':
-            form = ProfilePictureForm()
+            
 
             return render_template('modify_picture.html', form = form)
 
         else:
-            # retrieve the form
-            form = ProfilePictureForm()
 
             if form.validate_on_submit():
 
+                # be sure that the file is an image
+                user_logic = UserLogic()
+
+                # retrieve image
+                image = request.files['image']
+
+                if not user_logic.validate_picture(image):
+                    form.image.errors.append("This file format is not supported")
+
+                    return render_template('modify_picture.html', form=form)
+
                 try:
-
-                    # be sure that the file is an image
-                    # TODO
-
                     # retrieve the image
                     img_data = form.image.data
 
@@ -305,8 +312,9 @@ def _modify_personal_data():
     # checking if there is a logged user, otherwise redirect to login
     if current_user is not None and hasattr(current_user, 'id'):
 
+        form = ModifyPersonalDataForm()
+
         if request.method == 'GET':
-            form = ModifyPersonalDataForm()
 
             # populate the form with the existing data of the user
             form.firstname.data = current_user.firstname
@@ -315,21 +323,19 @@ def _modify_personal_data():
 
             return render_template('modify_personal_data.html', form=form)
         
-        else:
+        elif request.method == 'POST':
+            
+            if not form.validate_on_submit():
+                return render_template('modify_personal_data.html', form=form)
 
             user_logic = UserLogic()
 
-            # retrieve data from the form
-            form = request.form
-
             # if user data are correctly modified
-            if user_logic.modify_personal_data(current_user.id, form):
+            if user_logic.modify_personal_data(current_user.id, request.form):
                 return redirect('/profile')
             
             # something went wrong in the modification of the personal data
-            else: 
-                flash('Please insert correct data')
-                return redirect('/profile/data/edit')
+            return render_template('modify_personal_data.html', form=form)
 
     else:
         return redirect('/login')
@@ -339,36 +345,45 @@ def _modify_personal_data():
 def _modify_password():
     # checking if there is a logged user, otherwise redirect to login
     if current_user is not None and hasattr(current_user, 'id'):
+
+        form = ModifyPasswordForm()
         
         if request.method == 'GET':
-            form = ModifyPasswordForm()
+
             return render_template('modify_password.html', form=form)
         
-        else:
+        elif request.method == 'POST':
+
+            if not form.validate_on_submit():
+                return render_template('modify_password.html', form=form)
 
             user_logic = UserLogic()
-
-            form = request.form
 
             # check if the old password is the same of the one stored in the database
             # check that the old and new password are not the same
             # check that the new password and the repeated new password are equal
-            result = user_logic.check_form_password(current_user.id, form['old_password'], form['new_password'], form['repeat_new_password'])
+            old_password = form.old_password.data
+            new_password = form.new_password.data
+            repeat_new_password = form.repeat_new_password.data
+            result = user_logic.check_form_password(current_user.id, old_password, new_password, repeat_new_password)
+
+            if result == 0:
+                # proceed to the modification of the password
+                user_logic.modify_password(current_user.id, new_password)
+
+                return redirect('/profile')
 
             if result == 1:
-                flash("The old password you inserted is incorrect. Please insert the correct one.")
-                return redirect('/profile/password/edit')
-            elif result == 2:
-                flash("Please insert a password different from the old one.")
-                return redirect('/profile/password/edit')
-            elif result == 3:
-                flash("The new password and its repetition must be equal.")
-                return redirect('/profile/password/edit')
-            else: 
-                # proceed to the modification of the password
-                user_logic.modify_password(current_user.id, form['new_password'])
-                        
-                return redirect('/profile')
+                form.old_password.errors.append(
+                    "The old password you inserted is incorrect. Please insert the correct one.")
+            if result == 2:
+                form.new_password.errors.append(
+                    "Please insert a password different from the old one.")
+            if result == 3:
+                form.repeat_new_password.errors.append(
+                    "The new password and its repetition must be equal.")
+                
+            return render_template('modify_password.html', form=form)
                 
     else:
         return redirect('/login')

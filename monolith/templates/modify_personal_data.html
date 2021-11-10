@@ -9,12 +9,6 @@
   <form action="" method="POST">
 
     {{ form.hidden_tag() }}
-    {% with msg = get_flashed_messages() %}
-      {% if msg %}
-          <p>{{ msg[0] }}</p>
-      {% endif %}
-
-    {% endwith %}
 
     <h1 class="h3 mb-3 fw-normal">Modify your personal data</h1>
 

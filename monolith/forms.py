@@ -36,7 +36,7 @@ class MultiCheckboxField(SelectMultipleField):
 class MessageForm(FlaskForm):
     recipients = MultiCheckboxField('Recipients', choices=[]) # TODO write javascript script that set/remove the required attribute from the checkist
     content = f.TextAreaField('Content', validators=[DataRequired()])
-    deliver_time = f.DateTimeField('Delivery time', validators=[DataRequired()], format="%d-%m-%Y, %H:%M", render_kw={'type': 'datetime-local'})
+    deliver_time = f.DateTimeField('Delivery time', validators=[DataRequired()], render_kw={'type': 'datetime-local'})
     attach_image = FileField()
 
 class UnregisterForm(FlaskForm):

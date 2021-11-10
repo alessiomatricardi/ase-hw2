@@ -4,7 +4,7 @@ from monolith import blacklist_logic
 from monolith.blacklist_logic import BlacklistLogic
 
 from monolith.database import User, Blacklist, db
-from monolith.forms import UnblockForm
+from monolith.forms import BlockForm, UnblockForm
 from monolith.list_logic import ListLogic
 from monolith.blacklist_logic import BlacklistLogic
 
@@ -35,12 +35,17 @@ def _block_user():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
 
+        form = BlockForm()
+
+        if not form.validate_on_submit():
+            abort(400)
+
         target = 0
         try:
             # retrieve the user id from the form
-            target = request.form.get('user_id', type=int)
+            target = int(form.user_id.data)
         except:
-            abort(500)  # internal server error
+            abort(400)
 
         # checking that we are not trying to block ourselves
         if current_user.id == target:
@@ -63,12 +68,17 @@ def _unblock_user():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
 
+        form = UnblockForm()
+
+        if not form.validate_on_submit():
+            abort(400)
+
         target = 0
         try:
             # retrieve the user id from the form
-            target = request.form.get('user_id', type=int)
+            target = int(form.user_id.data)
         except:
-            abort(500)  # internal server error
+            abort(400)
 
         # checking that we are not trying to unblock ourselves
         if current_user.id == target:

@@ -55,11 +55,11 @@ class TestProfile(unittest.TestCase):
         response = app.post("/profile/picture/edit", data=pictureData, content_type='multipart/form-data', follow_redirects=True)
         assert b'Select a new profile image' in response.data
 
-        # TODO upload new profile image with wrong format
+        # upload new profile image with wrong format
         pictureData = {
             'image': (io.BytesIO(b"contenuto del file"), 'test.pdf'),
         }
 
         response = app.post("/profile/picture/edit", data=pictureData,
                             content_type='multipart/form-data', follow_redirects=True)
-        #assert b'Barbara Verdi' in response.data
+        assert b'This file format is not supported' in response.data
