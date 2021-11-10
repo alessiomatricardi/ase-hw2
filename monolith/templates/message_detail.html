@@ -20,7 +20,7 @@
     Deliver time: {{message.deliver_time.strftime('%d/%m/%Y at %H:%M')}}
   </div>
   <div class="card-header">
-    From: {{sender_name}} ({{sender_email}}) <a href="/users/{{message.sender_id}}" class="btn btn-success btn-sm">See profile</a>
+    From: {{sender_name}} ({{sender_email}}) {% if not blocked %} <a href="/users/{{message.sender_id}}" class="btn btn-success btn-sm">See profile</a> {% endif %}
   </div>
   <div class="card-header">
     To:
