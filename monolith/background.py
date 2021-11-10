@@ -20,8 +20,7 @@ else:
 
 celery = Celery(__name__, backend=BACKEND, broker=BROKER) # include these files in the tasks of celery
 
-celery.conf.timezone = 'Europe/Rome' # set timezone to Rome # 'UTC'
-
+celery.conf.timezone = 'Europe/Rome' # set timezone to Rome
 
 
 # 
