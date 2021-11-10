@@ -28,7 +28,11 @@
       {{current_user.firstname}} {{current_user.lastname}} ({{current_user.email}})
     {% else %}
       {% for user in recipients: %}
-        {{user[0].firstname}} {{user[0].lastname}} ({{user[0].email}}),
+        <br>
+        {{user[0].firstname}} {{user[0].lastname}} ({{user[0].email}}) 
+        {% if not user[1] %} <!-- non-blocked user -->
+          <a href="/users/{{user[0].id}}" class="btn btn-success mt-1">See profile</a>
+        {% endif %}
       {% endfor %}
     {% endif %}
   </div>
@@ -45,6 +49,7 @@
         
         {% if not blocked %}
           <a href='/messages/new?single_recipient={{sender_email}}' id="replyButton" class="btn btn-primary">Reply</a>
+          <a href="/users/{{message.sender_id}}" class="btn btn-success">See profile</a>
         {% endif %}
         
       </div>
