@@ -21,7 +21,7 @@ def report_user():
             # retrieve the message id from the form
             message_id = int(form.message_id.data)
         except:
-            abort(400)  # internal server error
+            abort(400)
 
         # check if current user is a recipient of the message with id == message_id
         query = db.session.query(Message_Recipient).where(Message_Recipient.recipient_id == current_user.id)\

@@ -336,7 +336,7 @@ def _message_detail(label, id):
             censored_content = filter.check_message_content(detailed_message.content)
             detailed_message.content = censored_content
 
-        # the user has already reported this message?
+        # has the user already reported this message?
         query = db.session.query(Report).filter(Report.message_id == detailed_message.id, Report.reporting_user_id == current_user.id).first()
         reported = query is not None
 

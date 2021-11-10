@@ -146,7 +146,7 @@ def _hide_message():
             # retrieve the message id from the form
             message_id = int(form.message_id.data)
         except:
-            abort(400)  # internal server error
+            abort(400)
 
         try:
             # check if that user is a recipient of that message

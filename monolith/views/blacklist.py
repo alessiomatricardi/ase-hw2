@@ -45,7 +45,7 @@ def _block_user():
             # retrieve the user id from the form
             target = int(form.user_id.data)
         except:
-            abort(400)  # internal server error
+            abort(400)
 
         # checking that we are not trying to block ourselves
         if current_user.id == target:
@@ -78,7 +78,7 @@ def _unblock_user():
             # retrieve the user id from the form
             target = int(form.user_id.data)
         except:
-            abort(400)  # internal server error
+            abort(400)
 
         # checking that we are not trying to unblock ourselves
         if current_user.id == target:
