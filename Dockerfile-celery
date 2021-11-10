@@ -2,6 +2,8 @@ FROM python:3.9-alpine
 WORKDIR /code
 ADD . /code
 ENV DOCKER_IN_USE=yes
-RUN apk add build-base
-RUN pip install -r requirements.txt
+RUN apk add build-base py-pip jpeg-dev zlib-dev
+ENV LIBRARY_PATH=/lib:/usr/lib
+RUN pip3 install -r requirements.txt
+RUN python3 -m spacy download en
 CMD ["celery", "-A", "monolith.background", "worker", "-l", "INFO", "-B"]
