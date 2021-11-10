@@ -50,7 +50,7 @@ def _login():
     return render_template('login.html', form=form)
 
 
-@auth.route("/logout")
+@auth.route("/logout", methods=['GET'])
 def _logout():
     # if the user is not logged in, don't logout and directly redirect him to homepage
     if current_user is not None and hasattr(current_user, 'id'):

@@ -247,14 +247,3 @@ class TestDrafts(unittest.TestCase):
             )
         self.assertEqual(response.status_code, 200)
         #assert b'Hi Barbara' in response.data 
-
-
-
-
-    def test_draft_logic(self):
-        draft_logic = DraftLogic()
-        bottlebox_logic = BottleBoxLogic()
-
-        with app.app_context():
-
-            pass

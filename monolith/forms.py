@@ -66,6 +66,12 @@ class ContentFilterForm(FlaskForm):
 
 class ProfilePictureForm(FlaskForm):
     image = FileField(validators=[FileRequired('File was empty!')])
+
+class SearchUserForm(FlaskForm):
+    firstname = f.StringField('First name')
+    lastname = f.StringField('Last name')
+    email = f.StringField('E-mail')
+    display = ['firstname', 'lastname', 'email']
     
 class ModifyPersonalDataForm(FlaskForm):
     firstname = f.StringField('First name', validators=[DataRequired()])

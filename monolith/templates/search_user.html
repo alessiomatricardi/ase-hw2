@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% from "macros.html" import render_form_field %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
+<main class="form-register text-center">
+  <form action="" method="POST">
+
+    {{ form.hidden_tag() }}
+
+    <img class="mb-4 img-fluid" src="{{url_for('static', filename='logo/logo.png')}}" style="max-width: 300px;">
+    <h1 class="h3 mb-3 fw-normal">
+      Search a user
+    </h1>
+
+    {% with msg = get_flashed_messages() %}
+      {% if msg %}
+        <div class="alert alert-danger" role="alert">
+          {{ msg[0] }}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {# print errors, if occours #}
+    {% for field in form.display %}
+      {% if form[field].errors %}
+        {% for error in form[field].errors %}
+          <div class="alert alert-danger" role="alert">
+            {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+
+    {% for field in form.display %}
+      {{ render_form_field(form[field], class="form-control", placeholder="nothing") }}
+    {% endfor %}
+
+    <button class="w-100 btn btn-lg btn-warning" type="submit">Search</button>
+    <p class="mt-5 mb-3 text-muted">© 2021, ASE - Squad 4</p>
+  </form>
+</main>
+
+{% endblock %}

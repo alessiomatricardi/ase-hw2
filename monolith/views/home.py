@@ -6,7 +6,7 @@ from monolith.database import db, User
 home = Blueprint('home', __name__)
 
 
-@home.route('/')
+@home.route('/', methods=['GET'])
 def _index():
     # render the homepage
     return render_template("index.html")
