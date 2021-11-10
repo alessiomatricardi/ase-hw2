@@ -33,3 +33,23 @@ class TestReport(unittest.TestCase):
         data_report1 = { 'message_id': '6'}
         response = tested_app.post('/report', data=data_report1, follow_redirects = True) 
         self.assertEqual(response.status_code,409)
+
+        # report request with a missing value for message_id
+        data_report = {'message_id': ''}
+        response = tested_app.post(
+            "/report",
+            data=data_report,
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 400)
+
+        # hide request with a wrong format for message_id
+        data_report = {'message_id': 'not_an_integer'}
+        response = tested_app.post(
+            "/report",
+            data=data_report,
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 400)

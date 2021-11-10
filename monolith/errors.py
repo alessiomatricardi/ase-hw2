@@ -4,6 +4,9 @@ class ErrorDetail:
     def __init__(self, errorCode, error_obj):
         self.code = errorCode
         self.customDescription = error_obj.description
+        if errorCode == 400:
+            self.name = 'Bad request'
+            self.description = 'Apparentely you done something wrong... we keep an eye on you'
         if errorCode == 401:
             self.name = 'Unauthorized'
             self.description = 'You must login to see this content'
@@ -23,9 +26,14 @@ class ErrorDetail:
             self.name = 'Internal Server Error'
             self.description = 'Awesome! You broke something... go back and forget this mess'
         else:
-            self.name = 'Error ' + errorCode
+            self.name = 'Error ' + str(errorCode)
             self.description = 'Something went wrong'
 
+
+# User must login to see the content of the page
+def bad_request(e):
+    error = ErrorDetail(400, e)
+    return render_template('error.html', error=error), 400
 
 # User must login to see the content of the page
 def unauthorized(e):

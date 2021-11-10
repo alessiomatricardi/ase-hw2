@@ -5,18 +5,31 @@
 
 {% block content %}
 
-<h1>Write a new message</h1>
-
 <main class="form-message">
   <form method="POST" action="" enctype="multipart/form-data">
 
     {{ form.hidden_tag() }}
 
+    <h1 class="h1 mb-3 fw-normal">Write a new message</h1>
+
+    {# print errors, if occours #}
+    {% for field in form.display %}
+      {% if form[field].errors %}
+        {% for error in form[field].errors %}
+          <div class="alert alert-danger" role="alert">
+            {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+
+    {# print errors, if occours #}
     {% with msg = get_flashed_messages() %}
       {% if msg %}
-          <p>{{ msg[0] }}</p>
+        <div class="alert alert-danger" role="alert">
+          {{ msg[0] }}
+        </div>
       {% endif %}
-
     {% endwith %}
 
     <div class="mb-3">

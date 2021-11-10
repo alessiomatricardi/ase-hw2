@@ -9,7 +9,7 @@ from sqlalchemy.sql.elements import Null
 from werkzeug.utils import secure_filename
 from monolith.message_logic import MessageLogic # it manages the logic of the messages.
 from monolith.database import Message, Message_Recipient, User, db
-from monolith.forms import MessageForm
+from monolith.forms import HideForm, MessageForm
 from monolith.auth import current_user
 
 
@@ -136,12 +136,17 @@ def _hide_message():
     # verify that the user is logged in
     if current_user is not None and hasattr(current_user, 'id'):
 
+        form = HideForm()
+
+        if not form.validate_on_submit():
+            abort(400)
+
         message_id = 0
         try:
-            # retrieve message id from the form
-            message_id = request.form.get('message_id', type=int)
+            # retrieve the message id from the form
+            message_id = int(form.message_id.data)
         except:
-            abort(500) # internal server error
+            abort(400)  # internal server error
 
         try:
             # check if that user is a recipient of that message

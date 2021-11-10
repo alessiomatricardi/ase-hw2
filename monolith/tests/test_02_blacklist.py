@@ -53,6 +53,46 @@ class TestBlacklist(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         assert b'Carlo Neri' in response.data
 
+        # block request with a missing value for user_id
+        data_block = {'user_id': ''}
+        response = app.post(
+            "/block",
+            data=data_block,
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 400)
+
+        # block request with a wrong format for user_id
+        data_block = {'user_id': 'not_an_integer'}
+        response = app.post(
+            "/block",
+            data=data_block,
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 400)
+
+        # unblock request with a missing value for user_id
+        data_unblock = {'user_id': ''}
+        response = app.post(
+            "/unblock",
+            data=data_unblock,
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 400)
+
+        # unblock request with a wrong format for user_id
+        data_unblock = {'user_id': 'not_an_integer'}
+        response = app.post(
+            "/unblock",
+            data=data_unblock,
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 400)
+
         # check rendering
 
         # check that the recipients list is now empty (user 3 has blocked everyone)

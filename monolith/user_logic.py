@@ -62,3 +62,9 @@ class UserLogic:
         # set the new password
         user.set_password(new_password)
         db.session.commit()
+
+    # verify that the file passed from the html page is a picture (png, jpg, jpeg, gif)
+    def validate_picture(self, file):
+        return file\
+            and file.filename != ''\
+            and file.filename.split('.')[-1] in ['png', 'jpg', 'jpeg', 'gif', 'PNG', 'JPG', 'JPEG', 'GIF']

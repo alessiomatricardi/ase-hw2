@@ -110,7 +110,7 @@ class TestUsers(unittest.TestCase):
         }
         response = app.post('/profile/data/edit', data=form, content_type='application/x-www-form-urlencoded', follow_redirects=True)
         self.assertEqual(200, response.status_code)
-        assert b'Please insert correct data' in response.data
+        assert b'alert alert-danger' in response.data
 
 
         # test that the rendered page is the form for the modificaton of the password
@@ -125,7 +125,7 @@ class TestUsers(unittest.TestCase):
         }
         # note that the old_password prova123 is not correct because it has been changed in the test_modify_password()
         response = app.post("/profile/password/edit", data=form,content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        assert b'<p>The old password you inserted is incorrect. Please insert the correct one.</p>' in response.data
+        assert b'The old password you inserted is incorrect. Please insert the correct one.' in response.data
 
         # test that, if the old and new password are the same, an error message is displayed
         form = {
