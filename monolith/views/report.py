@@ -3,6 +3,7 @@ import datetime
 from flask.globals import request
 from flask_login import current_user
 from monolith.database import Message, Message_Recipient, db, Report
+from monolith.forms import ReportForm
 report = Blueprint('report', __name__)
 
 @report.route('/report',methods=['POST'])
@@ -10,12 +11,17 @@ def report_user():
     # checking if there is a logged user
     if current_user is not None and hasattr(current_user, 'id'):
 
+        form = ReportForm()
+
+        if not form.validate_on_submit():
+            abort(400)
+
         message_id = 0
         try:
-            # retrieve message id from the form
-            message_id = request.form['message_id']      
+            # retrieve the message id from the form
+            message_id = int(form.message_id.data)
         except:
-            abort(500) # internal server error
+            abort(400)
 
         # check if current user is a recipient of the message with id == message_id
         query = db.session.query(Message_Recipient).where(Message_Recipient.recipient_id == current_user.id)\

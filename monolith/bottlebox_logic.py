@@ -29,7 +29,7 @@ class BottleBoxLogic:
         today = datetime.datetime.now()
 
         if type == 1: #pending
-            msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == False)
+            msg = db.session.query(Message).where(Message.sender_id == user.id).where(Message.is_sent == True).where(Message.is_delivered == False)
             
             #if the content filter is active, all the messages will be displayed censored
             if filter.filter_enabled(user.id):
@@ -39,16 +39,33 @@ class BottleBoxLogic:
             
             return msg
         elif type == 2: #received
-            msg = Message.query.join(Message_Recipient, Message.id == Message_Recipient.id).where(Message_Recipient.recipient_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True).where(Message_Recipient.is_hide == False)
+            msg = db.session.query(Message).join(Message_Recipient, Message.id == Message_Recipient.id).\
+                add_columns(Message_Recipient.is_read).\
+                filter(Message_Recipient.recipient_id == user.id,
+                Message.is_sent == True,
+                Message.is_delivered == True,
+                Message_Recipient.is_hide == False).all()
+
+            '''
+            for message in msg
+                message[0] -> Message object
+                message[1] -> is_read boolean
+            '''
+
+            # we need to adjust this situation
+            to_return = []
+            for message in msg:
+                message[0].is_read = message[1]
+                to_return.append(message[0])
 
             #if the content filter is active, all the messages will be displayed censored
             if filter.filter_enabled(user.id):
-                for message in msg:
-                   censored_content = filter.check_message_content(message.content)
-                   message.content = censored_content
-            return msg
+                for message in to_return:
+                    censored_content = filter.check_message_content(message.content)
+                    message.content = censored_content
+            return to_return
         elif type == 3: #delivered
-            msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == True).where(Message.is_delivered == True)
+            msg = db.session.query(Message).where(Message.sender_id == user.id).where(Message.is_sent == True).where(Message.is_delivered == True)
             
             #if the content filter is active, all the messages will be displayed censored
             if filter.filter_enabled(user.id):
@@ -58,7 +75,7 @@ class BottleBoxLogic:
 
             return msg
         elif type == 4: #drafts
-            msg = db.session.query(Message).where(Message.sender_id == user_id).where(Message.is_sent == False)
+            msg = db.session.query(Message).where(Message.sender_id == user.id).where(Message.is_sent == False)
 
             #if the content filter is active, all the messages will be displayed censored
             if user.content_filter_enabled:

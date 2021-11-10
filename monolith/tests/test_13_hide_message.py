@@ -53,3 +53,23 @@ class TestHide(unittest.TestCase):
         assert b'Received Bottlebox' in response.data
         assert b'Messaggio per Barbara da utente 5' not in response.data
         assert b'Messaggio per Barbara da utente 3' in response.data
+
+        # hide request with a missing value for message_id
+        data_hide = {'message_id': ''}
+        response = app.post(
+            "/hide",
+            data=data_hide,
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 400)
+
+        # hide request with a wrong format for message_id
+        data_hide = {'message_id': 'not_an_integer'}
+        response = app.post(
+            "/hide",
+            data=data_hide,
+            content_type='application/x-www-form-urlencoded',
+            follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 400)

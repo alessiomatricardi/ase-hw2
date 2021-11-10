@@ -8,6 +8,11 @@
 
 {% for msg in messages: %}
   <div class="card" style="margin-bottom: 10px;">
+    {% if not msg.is_read %}
+      <div class="card-header bg-primary text-white h5">
+        New
+      </div>
+    {% endif %}
     <div class="card-header">
       Deliver time: {{msg.deliver_time.strftime('%d/%m/%Y at %H:%M')}}
     </div>
@@ -40,7 +45,7 @@
         <a href="/messages/delivered/{{msg.id}}" class="btn btn-primary">Open</a>
       
       {% elif label == 'Drafts' %}
-        <a href="/messages/draft/{{msg.id}}" class="btn btn-primary">Open</a>
+        <a href="/messages/draft/{{msg.id}}" class="btn btn-primary">Modify message</a>
       
       {% endif %}
     </div>

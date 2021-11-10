@@ -162,7 +162,7 @@ class TestPopulateDB(unittest.TestCase):
             message = Message()
             message.content = 'Messaggio per Barbara da utente 3'
             message_recipient = Message_Recipient()
-            message.sender_id = 1
+            message.sender_id = 5
             message_recipient.id = 7
             message_recipient.recipient_id = 4
             message.is_sent = True

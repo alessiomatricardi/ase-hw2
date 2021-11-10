@@ -213,7 +213,7 @@ class TestMessage(unittest.TestCase):
         }
         response = app.post("/messages/new", data = dataForm1, content_type='application/x-www-form-urlencoded', follow_redirects=True)
         #self.assertEqual(400, response.status_code)
-        assert b'<p>Please select at least 1 recipient</p>' in response.data
+        assert b'Please select at least 1 recipient' in response.data
 
         # test that the message is saved as a draft, so the rendered page is the index.html
         dataForm2 = { 

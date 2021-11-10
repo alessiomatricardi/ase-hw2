@@ -19,6 +19,7 @@ def create_app():
     app.config['WTF_CSRF_ENABLED'] = False
 
     # Errors handling
+    app.register_error_handler(400, errors.bad_request)
     app.register_error_handler(401, errors.unauthorized)
     app.register_error_handler(403, errors.forbidden)
     app.register_error_handler(404, errors.page_not_found)
