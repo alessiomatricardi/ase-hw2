@@ -6,7 +6,7 @@ from flask.helpers import send_from_directory
 import os
 
 from monolith.database import User, db
-from monolith.forms import ContentFilterForm, ProfilePictureForm, UserForm, BlockForm, ModifyPersonalDataForm, ModifyPasswordForm, UnregisterForm
+from monolith.forms import ContentFilterForm, ProfilePictureForm, UserForm, BlockForm, ModifyPersonalDataForm, ModifyPasswordForm, UnregisterForm, SearchUserForm
 from monolith.content_filter_logic import ContentFilterLogic
 from monolith.list_logic import ListLogic
 from monolith.user_logic import UserLogic
@@ -385,5 +385,42 @@ def _modify_password():
                 
             return render_template('modify_password.html', form=form)
                 
+    else:
+        return redirect('/login')
+
+
+@users.route('/users/search', methods=['GET', 'POST'])
+def _search_user():
+    # checking if there is a logged user, otherwise redirect to login
+    if current_user is not None and hasattr(current_user, 'id'):
+        
+        form = SearchUserForm()
+        
+        if request.method == 'GET':
+            return render_template('search_user.html', form=form)
+
+        else:
+
+            form = request.form
+            firstname, lastname, email = form['firstname'], form['lastname'], form['email']
+
+            list_logic = ListLogic()
+
+            # if none of the fileds have been compiled
+            if not firstname and not lastname and not email:
+                flash("Insert at least one field")
+                return redirect('/users/search')
+
+            else:
+                # retrieving the list of users that match with the content of the form
+                users = list_logic.search_user_form(list_logic.retrieving_recipients(current_user.id), firstname, lastname, email)
+
+                if not users:
+                    flash("No user found")
+                    return redirect('/users/search')
+                
+                else:
+                    return render_template("users.html", users=users)
+
     else:
         return redirect('/login')

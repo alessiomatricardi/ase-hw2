@@ -90,7 +90,7 @@ def _new_message():
                     os.mkdir(os.path.join(os.getcwd(),'monolith','static','attachments',str(id)))
 
                     # save the image in the specified path
-                    file.save(os.path.join(os.getcwd(),'monolith','static','attachments',str(id),message.image))
+                    file.save(os.path.join(os.getcwd(),'monolith','static','attachments',str(id), message.image))
 
                 # incorrect file uploaded
                 else:
@@ -170,7 +170,7 @@ def _hide_message():
         return redirect('/login') #user should login
 
 # show an image attached on that message
-@messages.route('/messages/<msg_id>/attachments/<filename>')
+@messages.route('/messages/<msg_id>/attachments/<filename>', methods=['GET'])
 def _show_attachment(msg_id, filename):
 
     msg_logic = MessageLogic()

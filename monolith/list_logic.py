@@ -39,3 +39,18 @@ class ListLogic:
                         break
         
         return all_users
+
+    # search a user given an initial list of possible recipients and a firstname, lastaname and/or email
+    def search_user_form(self, all_users, firstname, lastname, email):
+
+        users_to_show = []
+
+        for u in all_users:
+            
+            # find all the users that satisfy the following checks
+            if (firstname != '' and firstname in u.firstname) or\
+                    (lastname != '' and lastname in u.lastname) or\
+                    (email != '' and email in u.email):
+                users_to_show.append(u)
+    
+        return users_to_show
