@@ -154,6 +154,37 @@ body {
   border-top-right-radius: 0;
 }
 
+.form-search {
+  width: 100%;
+  max-width: 550px;
+  padding: 15px;
+  margin: auto;
+}
+
+.form-search .form-floating:focus-within {
+  z-index: 2;
+}
+
+.form-search #firstname {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-search #lastname {
+  margin-bottom: -1px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-search #email {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 .form-message {
   width: 100%;
   max-width: 800px;

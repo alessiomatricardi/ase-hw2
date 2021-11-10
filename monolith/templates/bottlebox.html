@@ -8,7 +8,7 @@
 
 {% for msg in messages: %}
   <div class="card" style="margin-bottom: 10px;">
-    {% if not msg.is_read %}
+    {% if label == 'Received' and not msg.is_read %}
       <div class="card-header bg-primary text-white h5">
         New
       </div>

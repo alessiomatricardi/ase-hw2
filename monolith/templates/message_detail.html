@@ -20,7 +20,7 @@
     Deliver time: {{message.deliver_time.strftime('%d/%m/%Y at %H:%M')}}
   </div>
   <div class="card-header">
-    From: {{sender_name}} ({{sender_email}})
+    From: {{sender_name}} ({{sender_email}}) <a href="/users/{{message.sender_id}}" class="btn btn-success btn-sm">See profile</a>
   </div>
   <div class="card-header">
     To:
@@ -31,7 +31,7 @@
         <br>
         {{user[0].firstname}} {{user[0].lastname}} ({{user[0].email}}) 
         {% if not user[1] %} <!-- non-blocked user -->
-          <a href="/users/{{user[0].id}}" class="btn btn-success mt-1">See profile</a>
+          <a href="/users/{{user[0].id}}" class="btn btn-success mt-1 btn-sm">See profile</a>
         {% endif %}
       {% endfor %}
     {% endif %}
@@ -49,7 +49,6 @@
         
         {% if not blocked %}
           <a href='/messages/new?single_recipient={{sender_email}}' id="replyButton" class="btn btn-primary">Reply</a>
-          <a href="/users/{{message.sender_id}}" class="btn btn-success">See profile</a>
         {% endif %}
         
       </div>
