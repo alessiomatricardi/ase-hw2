@@ -7,8 +7,6 @@ echo 'monolith/static/attachments folder has been moved into root directory'
 mkdir attachments
 mv monolith/static/attachments/* attachments || ( echo 'monolith/static/attachments folder not exists... continue with tests' && mkdir monolith/static/attachments )
 
-python3 -m spacy download en
-
 pytest -s
 
 mv -f mmiab.db mmiab_test.db
