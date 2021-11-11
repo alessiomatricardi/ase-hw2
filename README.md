@@ -41,7 +41,16 @@ Or
 pip3 install -r requirements.txt && python3 -m spacy download en
 ```
 
-### 3. Run
+### 3. Start Redis & Celery
+In order to get mail notification and asynchronous database update you have to start Redis server and Celery workers.
+You can do it by execute these following commands:
+
+```
+Terminal 1: systemctl start redis
+Terminal 2: celery -A monolith.background worker -l INFO -B
+```
+
+### 4. Run
 Run the application by typing
 
 ```
