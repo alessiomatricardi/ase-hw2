@@ -42,12 +42,12 @@ pip3 install -r requirements.txt && python3 -m spacy download en
 ```
 
 ### 3. Start Redis & Celery
-In order to get mail notification and asynchronous database update you have to start Redis server and Celery workers.
-You can do it by execute these following commands:
+In order to get mail notification and asynchronous database update you have to start Redis server [See documentation](https://tableplus.com/blog/2018/10/how-to-start-stop-restart-redis.html).
+
+After that, start Celery workers by execute this following command:
 
 ```
-Terminal 1: systemctl start redis
-Terminal 2: celery -A monolith.background worker -l INFO -B
+celery -A monolith.background worker -l INFO -B
 ```
 
 ### 4. Run
