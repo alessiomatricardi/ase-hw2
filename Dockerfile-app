@@ -1,8 +1,8 @@
-FROM python:3.9-alpine
+FROM python:3.9
 ADD . /code
 WORKDIR /code
-RUN apk add build-base py-pip jpeg-dev zlib-dev
+ENV TZ=Europe/Rome
 ENV LIBRARY_PATH=/lib:/usr/lib
 RUN pip3 install -r requirements.txt
 RUN python3 -m spacy download en
-CMD ["sh", "start.sh"]
+CMD ["sh", "run.sh"]
